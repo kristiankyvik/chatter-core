@@ -4,17 +4,19 @@ Meteor.publish("chatterMessages", function (opts) {
         messageLimit: Number
     });
     
+    /*
     let room = ChatterRoom.findOne({ name: opts.roomName });
-    
     if (_.isUndefined(room)) return [];
     // TODO Check for room restrictions here
-    
+    */
+   
     return ChatterMessage.find({
-        name: opts.roomName,
+        roomName: opts.roomName,
     }, {
         limit: opts.limit,
         fields: {
             message: 1,
+            roomName: 1,
             userNick: 1,
         }
     });

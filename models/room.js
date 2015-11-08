@@ -1,4 +1,4 @@
-ChatterRoom = Astro.Class({
+Chatter.Room = ChatterRoom = Astro.Class({
     name: "ChatterRoom",
     collection: new Mongo.Collection("chatterroom"),
     

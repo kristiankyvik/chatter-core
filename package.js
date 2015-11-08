@@ -15,14 +15,18 @@ Package.onUse(function(api) {
   api.use('check');
   api.use('accounts-base');
   
-  api.use('jagi:astronomy');
+  api.use('momentjs:moment');
+  api.use('jagi:astronomy@1.2.1');
   api.use('jagi:astronomy-timestamp-behavior');
   
-  api.addFiles('chattercore.js');
+  api.addFiles('chatter.js');
   api.addFiles('models/message.js');
   api.addFiles('models/room.js');
   
-  api.addFiles('server/publish.js', 'server');
+  api.addFiles([
+    'server/publish.js',
+    'server/access.js',
+  ], 'server');
   
   api.export([
     'Chatter',
@@ -32,7 +36,7 @@ Package.onUse(function(api) {
 Package.onTest(function(api) {
   api.use('ecmascript');
   api.use('tinytest');
-  api.use('chattercore');
+  api.use('chatter:core');
   api.addFiles('chattercore-tests.js');
   
 });

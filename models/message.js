@@ -1,4 +1,4 @@
-ChatterMessage = Astro.Class({
+Chatter.Message = ChatterMessage = Astro.Class({
     name: "ChatterMessage",
     collection: new Mongo.Collection("chattermessage"),
     
@@ -7,7 +7,7 @@ ChatterMessage = Astro.Class({
             type: "string"
         },
         
-        roomId: {
+        roomName: {
             type: "string"
         },
         
@@ -19,7 +19,6 @@ ChatterMessage = Astro.Class({
             type: "string"
         },
         
-        
     },
     
     events: {
@@ -27,7 +26,9 @@ ChatterMessage = Astro.Class({
     },
     
     methods: {
-        
+        timeAgo: function () {
+            return moment(this.get("createdAt")).fromNow();
+        }
     },
     
     behaviors: ["timestamp"]
