@@ -1,1 +1,3 @@
-Chatter = {};
+Chatter = {
+    options: {}
+};

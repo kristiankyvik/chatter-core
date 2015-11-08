@@ -7,6 +7,18 @@ ChatterMessage = Astro.Class({
             type: "string"
         },
         
+        roomId: {
+            type: "string"
+        },
+        
+        userNick: {
+            type: "string"
+        },
+        
+        message: {
+            type: "string"
+        },
+        
         
     },
     
