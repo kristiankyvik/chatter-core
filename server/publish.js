@@ -25,7 +25,7 @@ Meteor.publish("chatterMessages", function (opts) {
 Meteor.publish("chatterRooms", function () {
     let user = Meteor.users.findOne(this.userId);
     
-    // TODO do some clver things here to determine
+    // TODO do some clever things here to determine
     // which rooms are accessible
     
     return ChatterRoom.find({
@@ -36,5 +36,20 @@ Meteor.publish("chatterRooms", function () {
             roomType: 1,
             userNicks: 1
         }
+    });
+});
+
+
+Meteor.publish("chatterUsers", function (roomName) {
+    check(roomName, String)
+    
+    
+    // TODO do some clever things here to determine
+    // which users are visible
+    
+    return Meteor.users.find({
+        "status.online": true
+    }, {
+        // TODO Get the nickname field from configuration
     });
 });

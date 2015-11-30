@@ -1,6 +1,6 @@
 Package.describe({
-  name: 'chatter:core',
-  version: '0.0.1',
+  name: 'jorgeer:chatter-core',
+  version: '0.1.0',
   summary: 'Models and chat functionality for chatter',
   git: 'https://github.com/jorgeer/chatter-core',
   documentation: 'README.md'
@@ -15,9 +15,9 @@ Package.onUse(function(api) {
   api.use('check');
   api.use('accounts-base');
   
-  api.use('momentjs:moment');
+  api.use('momentjs:moment@2.8.4');
   api.use('jagi:astronomy@1.2.1');
-  api.use('jagi:astronomy-timestamp-behavior');
+  api.use('jagi:astronomy-timestamp-behavior@1.0.0');
   
   api.addFiles('chatter.js');
   api.addFiles('models/message.js');
@@ -36,7 +36,7 @@ Package.onUse(function(api) {
 Package.onTest(function(api) {
   api.use('ecmascript');
   api.use('tinytest');
-  api.use('chatter:core');
+  api.use('jorgeer:chatter-core');
   api.addFiles('chattercore-tests.js');
   
 });
