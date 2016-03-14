@@ -1,15 +1,18 @@
+
+
+
 Meteor.publish("chatterMessages", function (opts) {
     check(opts, {
         roomName: String,
         messageLimit: Number
     });
-    
+
     /*
     let room = ChatterRoom.findOne({ name: opts.roomName });
     if (_.isUndefined(room)) return [];
     // TODO Check for room restrictions here
     */
-   
+
     return ChatterMessage.find({
         roomName: opts.roomName,
     }, {
@@ -24,10 +27,10 @@ Meteor.publish("chatterMessages", function (opts) {
 
 Meteor.publish("chatterRooms", function () {
     let user = Meteor.users.findOne(this.userId);
-    
+
     // TODO do some clever things here to determine
     // which rooms are accessible
-    
+
     return ChatterRoom.find({
         roomType: "public"
     }, {
@@ -39,14 +42,25 @@ Meteor.publish("chatterRooms", function () {
     });
 });
 
+Meteor.publish("chatterUserRooms", function () {
+    let user = Meteor.users.findOne(this.userId);
+
+    // TODO do some clever things here to determine
+    // which rooms are accessible
+
+    return ChatterUserRoom.find({
+    }, {
+
+    });
+});
+
 
 Meteor.publish("chatterUsers", function (roomName) {
     check(roomName, String)
-    
-    
+
+
     // TODO do some clever things here to determine
     // which users are visible
-    
     return Meteor.users.find({
         "status.online": true
     }, {
