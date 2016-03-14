@@ -1,6 +1,3 @@
-
-
-
 Meteor.publish("chatterMessages", function (opts) {
     check(opts, {
         roomName: String,
@@ -64,6 +61,7 @@ Meteor.publish("chatterUsers", function (roomName) {
     return Meteor.users.find({
         "status.online": true
     }, {
+        // fields: {}
         // TODO Get the nickname field from configuration
     });
 });
