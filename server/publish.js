@@ -61,7 +61,6 @@ Meteor.publish("chatterUsers", function (roomName) {
     return Meteor.users.find({
         "status.online": true
     }, {
-        // fields: {}
         // TODO Get the nickname field from configuration
     });
 });

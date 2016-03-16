@@ -7,11 +7,7 @@ Chatter.UserRoom = ChatterUserRoom = Astro.Class({
             type: "string"
         },
 
-        roomName: {
-            type: "string"
-        },
-
-        nickname: {
+        roomId: {
             type: "string"
         }
 

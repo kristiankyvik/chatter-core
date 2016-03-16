@@ -26,6 +26,7 @@ Chatter.Room = ChatterRoom = Astro.Class({
     },
 
     methods: {
+
     },
 
     behaviors: ["timestamp"]
