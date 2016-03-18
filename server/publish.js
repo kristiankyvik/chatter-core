@@ -1,6 +1,6 @@
 Meteor.publish("chatterMessages", function (opts) {
     check(opts, {
-        roomName: String,
+        roomId: String,
         messageLimit: Number
     });
 
@@ -11,12 +11,12 @@ Meteor.publish("chatterMessages", function (opts) {
     */
 
     return ChatterMessage.find({
-        roomName: opts.roomName,
+        roomId: opts.roomId,
     }, {
         limit: opts.limit,
         fields: {
             message: 1,
-            roomName: 1,
+            roomId: 1,
             userNick: 1,
         }
     });
@@ -29,7 +29,6 @@ Meteor.publish("chatterRooms", function () {
     // which rooms are accessible
 
     return ChatterRoom.find({
-        roomType: "public"
     }, {
         fields: {
             name: 1,
@@ -52,12 +51,10 @@ Meteor.publish("chatterUserRooms", function () {
 });
 
 
-Meteor.publish("chatterUsers", function (roomName) {
-    check(roomName, String)
-
-
+Meteor.publish("chatterUsers", function (roomId) {
     // TODO do some clever things here to determine
     // which users are visible
+    check(roomId, String);
     return Meteor.users.find({
         "status.online": true
     }, {

@@ -1,4 +1,14 @@
 Meteor.methods({
+    "message.build" (params) {
+        console.log(params);
+        return  new Chatter.Message({
+            message: params.message,
+            roomId: params.roomId,
+            userId: params.userId,
+            userNick: params.userNick
+        }).save();
+    },
+
     "userroom.build" (roomName) {
         var userId = Meteor.userId();
         var roomId = Chatter.Room.findOne({"name": roomName})._id;
