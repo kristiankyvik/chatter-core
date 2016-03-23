@@ -18,6 +18,8 @@ Meteor.publish("chatterMessages", function (opts) {
             message: 1,
             roomId: 1,
             userNick: 1,
+            userId: 1,
+            createdAt: 1
         }
     });
 });
@@ -54,7 +56,6 @@ Meteor.publish("chatterUserRooms", function () {
 Meteor.publish("chatterUsers", function (roomId) {
     // TODO do some clever things here to determine
     // which users are visible
-    check(roomId, String);
     return Meteor.users.find({
         "status.online": true
     }, {

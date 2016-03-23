@@ -1,7 +1,6 @@
 Meteor.methods({
     "message.build" (params) {
-        console.log(params);
-        return  new Chatter.Message({
+        return new Chatter.Message({
             message: params.message,
             roomId: params.roomId,
             userId: params.userId,
