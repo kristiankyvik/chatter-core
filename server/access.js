@@ -14,9 +14,6 @@ ChatterMessage.getCollection().allow({
             throw new Meteor.Error("cant_find_user", "Can't find specified user");
         }
 
-
-
-
         return true;
     }
 })

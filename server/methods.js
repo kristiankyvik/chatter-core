@@ -9,12 +9,12 @@ Meteor.methods({
     },
 
     "userroom.build" (roomName) {
-        var userId = Meteor.userId();
-        var roomId = Chatter.Room.findOne({"name": roomName})._id;
+        const userId = Meteor.userId();
+        const roomId = Chatter.Room.findOne({"name": roomName})._id;
 
-        var records = Chatter.UserRoom.find({"userId": userId, "roomId" : roomId}).fetch();
+        const records = Chatter.UserRoom.find({"userId": userId, "roomId" : roomId}).fetch();
 
-        if (records === undefined || records.length == 0) {
+        if (records === undefined || records.length === 0) {
             return new Chatter.UserRoom({
                 roomId: roomId,
                 userId: userId
@@ -23,9 +23,9 @@ Meteor.methods({
     },
 
     "room.build" (form) {
-        var user = Meteor.user();
-        var user_email = user.emails[0].address;
-        var nickname = user_email.slice(0, user_email.indexOf("@"));
+        const user = Meteor.user();
+        const user_email = user.emails[0].address;
+        const nickname = user_email.slice(0, user_email.indexOf("@"));
         return new Chatter.Room({
             name: form.name,
             _userIds: [user._id],
