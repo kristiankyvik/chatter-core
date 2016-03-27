@@ -24,8 +24,6 @@ Meteor.methods({
 
     "room.build" (form) {
         const user = Meteor.user();
-        const user_email = user.emails[0].address;
-        const nickname = user_email.slice(0, user_email.indexOf("@"));
         return new Chatter.Room({
             name: form.name,
             _userIds: [user._id],
