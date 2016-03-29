@@ -4,14 +4,13 @@ Meteor.methods({
             message: params.message,
             roomId: params.roomId,
             userId: params.userId,
-            userNick: params.userNick
+            userNick: getNickname(Meteor.user())
         }).save();
     },
 
     "userroom.build" (roomName) {
         const userId = Meteor.userId();
         const roomId = Chatter.Room.findOne({"name": roomName})._id;
-
         const records = Chatter.UserRoom.find({"userId": userId, "roomId" : roomId}).fetch();
 
         if (records === undefined || records.length === 0) {
@@ -26,7 +25,6 @@ Meteor.methods({
         const user = Meteor.user();
         return new Chatter.Room({
             name: form.name,
-            _userIds: [user._id],
             roomType: form.roomType
         }).save();
     },
@@ -35,13 +33,18 @@ Meteor.methods({
         const userRooms = Chatter.UserRoom.find({"roomId": roomId}).fetch();
         const users = userRooms.map(function(userRoom) {
             const user = Meteor.users.findOne({_id: userRoom.userId });
-            console.log(user);
             const userInfo = {
                 _id: user._id,
-                nick: user.emails[0].address
+                userNick: getNickname(user)
             };
             return userInfo;
         });
         return users;
     }
 });
+
+function getNickname(user) {
+    const nickPath = Chatter.options.nickProperty;
+    const nick = nickPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
+    return nick;
+}

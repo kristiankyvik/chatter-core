@@ -34,8 +34,7 @@ Meteor.publish("chatterRooms", function () {
     }, {
         fields: {
             name: 1,
-            roomType: 1,
-            userNicks: 1
+            roomType: 1
         }
     });
 });
@@ -59,6 +58,8 @@ Meteor.publish("chatterUsers", function (roomId) {
     return Meteor.users.find({
         "status.online": true
     }, {
-        // TODO Get the nickname field from configuration
+        userNick: 1
     });
 });
+
+
