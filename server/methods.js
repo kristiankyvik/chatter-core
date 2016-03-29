@@ -29,5 +29,19 @@ Meteor.methods({
             _userIds: [user._id],
             roomType: form.roomType
         }).save();
+    },
+
+    "room.users" (roomId) {
+        const userRooms = Chatter.UserRoom.find({"roomId": roomId}).fetch();
+        const users = userRooms.map(function(userRoom) {
+            const user = Meteor.users.findOne({_id: userRoom.userId });
+            console.log(user);
+            const userInfo = {
+                _id: user._id,
+                nick: user.emails[0].address
+            };
+            return userInfo;
+        });
+        return users;
     }
 });
