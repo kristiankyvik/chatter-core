@@ -59,7 +59,8 @@ Meteor.publish("chatterUsers", function (roomId) {
     return Meteor.users.find({
         "status.online": true
     }, {
-        userNick: 1
+        userNick: 1,
+        avatar: 1
     });
 });
 
