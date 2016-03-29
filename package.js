@@ -27,7 +27,7 @@ Package.onUse(function(api) {
   api.addFiles([
     'server/publish.js',
     'server/access.js',
-    'server/methods.js',
+    'server/methods.js'
   ], 'server');
 
   api.export([

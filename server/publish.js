@@ -18,6 +18,7 @@ Meteor.publish("chatterMessages", function (opts) {
             message: 1,
             roomId: 1,
             userNick: 1,
+            userAvatar: 1,
             userId: 1,
             createdAt: 1
         }
@@ -61,5 +62,4 @@ Meteor.publish("chatterUsers", function (roomId) {
         userNick: 1
     });
 });
-
 

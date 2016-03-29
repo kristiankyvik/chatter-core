@@ -4,7 +4,8 @@ Meteor.methods({
             message: params.message,
             roomId: params.roomId,
             userId: params.userId,
-            userNick: getNickname(Meteor.user())
+            userNick: getNickname(Meteor.user()),
+            userAvatar: getAvatar(Meteor.user())
         }).save();
     },
 
@@ -48,3 +49,11 @@ function getNickname(user) {
     const nick = nickPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
     return nick;
 }
+
+
+function getAvatar(user) {
+    const avatarPath = Chatter.options.avatarProperty;
+    const avatar = avatarPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
+    return avatar;
+}
+
