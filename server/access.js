@@ -24,3 +24,4 @@ ChatterUserRoom.getCollection().allow({
         return true;
     }
 })
+

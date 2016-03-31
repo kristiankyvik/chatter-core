@@ -7,6 +7,13 @@ Chatter.Room = ChatterRoom = Astro.Class({
 
         roomType: {
             type: "string"
+        },
+
+        lastActive: {
+            type: "date",
+            default: function() {
+              return (new Date());
+            }
         }
     },
 

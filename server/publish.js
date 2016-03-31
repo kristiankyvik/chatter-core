@@ -35,7 +35,8 @@ Meteor.publish("chatterRooms", function () {
     }, {
         fields: {
             name: 1,
-            roomType: 1
+            roomType: 1,
+            lastActive: 1
         }
     });
 });
@@ -52,6 +53,17 @@ Meteor.publish("chatterUserRooms", function () {
     });
 });
 
+Meteor.publish("chatterUserRoomCounts", function () {
+
+    return ChatterUserRoomCount.find({
+    }, {
+        fields: {
+            count: 1,
+            userId: 1,
+            roomId: 1
+        }
+    });
+});
 
 Meteor.publish("chatterUsers", function (roomId) {
     // TODO do some clever things here to determine
