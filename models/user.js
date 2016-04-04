@@ -8,6 +8,9 @@ Chatter.User = ChatterUser = Astro.Class({
         },
         userId: {
             type: "string"
+        },
+        nickname: {
+            type: "string"
         }
     },
 

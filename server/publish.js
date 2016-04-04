@@ -75,7 +75,8 @@ Meteor.publish("chatterUsers", function () {
     }, {
         _id: 1,
         userId: 1,
-        userType: 1
+        userType: 1,
+        nickname: 1
     });
 });
 
