@@ -52,8 +52,8 @@ Meteor.methods({
         return users;
     },
 
-    "userroomcount.reset" (userId, roomId) {
-        return Chatter.UserRoomCount.update({
+    "userroom.count.reset" (userId, roomId) {
+        return Chatter.UserRoom.update({
             roomId : roomId,
             userId: userId
         },
@@ -62,10 +62,10 @@ Meteor.methods({
         });
     },
 
-    "userroomcount.increase" (userId, roomId) {
+    "userroom.count.increase" (userId, roomId) {
         const userRooms = Chatter.UserRoom.find({"roomId": roomId, "userId": {$nin:[userId]}}).fetch();
         const users = userRooms.map(function(userRoom) {
-            Chatter.UserRoomCount.update({
+            Chatter.UserRoom.update({
                 roomId : userRoom.roomId,
                 userId: userRoom.userId
             },
@@ -73,16 +73,6 @@ Meteor.methods({
                 $inc: { count: 1}
             });
         });
-    },
-
-    "userroomcount.build" (userId, roomId ) {
-        const records = Chatter.UserRoomCount.find({"userId": userId, "roomId" : roomId}).fetch();
-        if (records === undefined || records.length === 0) {
-            return new  Chatter.UserRoomCount({
-                roomId: roomId,
-                userId: userId
-            }).save();
-        }
     }
 });
 

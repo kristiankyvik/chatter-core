@@ -49,14 +49,6 @@ Meteor.publish("chatterUserRooms", function () {
 
     return ChatterUserRoom.find({
     }, {
-
-    });
-});
-
-Meteor.publish("chatterUserRoomCounts", function () {
-
-    return ChatterUserRoomCount.find({
-    }, {
         fields: {
             count: 1,
             userId: 1,
