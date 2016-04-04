@@ -25,3 +25,8 @@ ChatterUserRoom.getCollection().allow({
     }
 })
 
+ChatterUser.getCollection().allow({
+    insert: function (userId) {
+        return true;
+    }
+})
