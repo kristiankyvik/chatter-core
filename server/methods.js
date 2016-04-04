@@ -1,4 +1,9 @@
 Meteor.methods({
+    "user.check" (userId) {
+        const chatterUsers = Chatter.User.find({userId: userId}).fetch();
+        return chatterUsers.length > 0;
+    },
+
     "message.build" (params) {
         return new Chatter.Message({
             message: params.message,

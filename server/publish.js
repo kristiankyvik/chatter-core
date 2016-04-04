@@ -57,7 +57,7 @@ Meteor.publish("chatterUserRooms", function () {
     });
 });
 
-Meteor.publish("chatterUsers", function (roomId) {
+Meteor.publish("users", function (roomId) {
     // TODO do some clever things here to determine
     // which users are visible
     return Meteor.users.find({
@@ -65,6 +65,17 @@ Meteor.publish("chatterUsers", function (roomId) {
     }, {
         userNick: 1,
         avatar: 1
+    });
+});
+
+Meteor.publish("chatterUsers", function () {
+    // TODO do some clever things here to determine
+    // which users are visible
+    return Chatter.User.find({
+    }, {
+        _id: 1,
+        userId: 1,
+        userType: 1
     });
 });
 
