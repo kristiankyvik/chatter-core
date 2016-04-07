@@ -17,16 +17,3 @@ ChatterMessage.getCollection().allow({
         return true;
     }
 })
-
-
-ChatterUserRoom.getCollection().allow({
-    insert: function (userId) {
-        return true;
-    }
-})
-
-ChatterUser.getCollection().allow({
-    insert: function (userId) {
-        return true;
-    }
-})
