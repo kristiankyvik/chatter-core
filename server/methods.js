@@ -1,3 +1,16 @@
+function getNickname(user) {
+    const nickPath = Chatter.options.nickProperty;
+    const nick = nickPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
+    return nick;
+}
+
+
+function getAvatar(user) {
+    const avatarPath = Chatter.options.avatarProperty;
+    const avatar = avatarPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
+    return avatar;
+}
+
 Meteor.methods({
     "user.check" (userId) {
         const chatterUsers = Chatter.User.find({userId: userId}).fetch();
@@ -80,17 +93,3 @@ Meteor.methods({
         });
     }
 });
-
-function getNickname(user) {
-    const nickPath = Chatter.options.nickProperty;
-    const nick = nickPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
-    return nick;
-}
-
-
-function getAvatar(user) {
-    const avatarPath = Chatter.options.avatarProperty;
-    const avatar = avatarPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
-    return avatar;
-}
-

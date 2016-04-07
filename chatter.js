@@ -5,11 +5,16 @@ Chatter = {
     }
 };
 
-
 Chatter.configure = function (opts) {
     _.extend(this.options, opts);
 };
 
+/**
+ * @summary Adds user to Chatter and defines its privileges
+ * @locus Server
+ * @param {string} userId Unique string identifying the users of your application.
+ * @param {string} userType Defines the restricitons on the new user. Can either be set to "admin" or "standard".
+ */
 Chatter.addUser = function(userId, userType) {
     const user = Meteor.users.findOne({_id: userId});
     return Chatter.User.upsert({
@@ -22,6 +27,11 @@ Chatter.addUser = function(userId, userType) {
     });
 };
 
+/**
+ * @summary Adds empty room to Chatter.
+ * @locus Server
+ * @param {string} rommName Unique string identifying the room.
+ */
 Chatter.addRoom = function(roomName) {
     return Chatter.Room.upsert({
         name: roomName
@@ -32,6 +42,12 @@ Chatter.addRoom = function(roomName) {
     });
 };
 
+/**
+ * @summary Adds user to room.
+ * @locus Server
+ * @param {string} userId Unique string identifying user.
+ * @param {string} roomName Unique string identifying the room.
+ */
 Chatter.addUserToRoom = function(userId, roomName) {
     const chatterUserId = Chatter.User.findOne({userId: userId})._id;
     const room = Chatter.Room.findOne({name: roomName});
@@ -50,7 +66,6 @@ Chatter.addUserToRoom = function(userId, roomName) {
         }
     });
 };
-
 
 function getNickname(user) {
     const nickPath = Chatter.options.nickProperty;

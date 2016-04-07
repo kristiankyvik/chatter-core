@@ -14,7 +14,7 @@ Chatter.UserRoom = ChatterUserRoom = Astro.Class({
         count: {
             type: "number",
             default: function() {
-              return 0;
+                return 0;
             }
         }
     },
