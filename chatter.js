@@ -17,7 +17,10 @@ Chatter.configure = function (opts) {
  * @returns {string} userId
  */
 Chatter.addUser = function(userId, userType) {
+  check(userId, String);
+  check(userType, Match.Maybe(String));
     const user = Meteor.users.findOne({_id: userId});
+    const userType =  userType? userType : "standard";
     return Chatter.User.upsert({
         userId: userId
     }, {
@@ -35,6 +38,7 @@ Chatter.addUser = function(userId, userType) {
  * @returns {string} roomId
  */
 Chatter.addRoom = function(roomName) {
+    check(roomName, String);
     return Chatter.Room.upsert({
         name: roomName
     }, {
@@ -52,6 +56,8 @@ Chatter.addRoom = function(roomName) {
  * @returns {string} userRoomId
  */
 Chatter.addUserToRoom = function(userId, roomName) {
+    check(userId, String);
+    check(roomName, String);
     const chatterUserId = Chatter.User.findOne({userId: userId})._id;
     const room = Chatter.Room.findOne({name: roomName});
 
