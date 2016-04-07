@@ -14,6 +14,7 @@ Chatter.configure = function (opts) {
  * @locus Server
  * @param {string} userId Unique string identifying the users of your application.
  * @param {string} userType Defines the restricitons on the new user. Can either be set to "admin" or "standard".
+ * @returns {string} userId
  */
 Chatter.addUser = function(userId, userType) {
     const user = Meteor.users.findOne({_id: userId});
@@ -31,6 +32,7 @@ Chatter.addUser = function(userId, userType) {
  * @summary Adds empty room to Chatter.
  * @locus Server
  * @param {string} rommName Unique string identifying the room.
+ * @returns {string} roomId
  */
 Chatter.addRoom = function(roomName) {
     return Chatter.Room.upsert({
@@ -47,6 +49,7 @@ Chatter.addRoom = function(roomName) {
  * @locus Server
  * @param {string} userId Unique string identifying user.
  * @param {string} roomName Unique string identifying the room.
+ * @returns {string} userRoomId
  */
 Chatter.addUserToRoom = function(userId, roomName) {
     const chatterUserId = Chatter.User.findOne({userId: userId})._id;
