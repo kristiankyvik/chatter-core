@@ -14,6 +14,13 @@ Chatter.Room = ChatterRoom = Astro.Class({
             default: function() {
               return (new Date());
             }
+        },
+
+        archived: {
+            type: "boolean",
+            default: function() {
+              return false;
+            }
         }
     },
 

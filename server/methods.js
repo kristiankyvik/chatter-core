@@ -69,16 +69,23 @@ Meteor.methods({
         });
     },
 
+    "room.archive" (id, archived) {
+        check(id, String);
+        check(archived, Boolean);
+        return Chatter.Room.update({
+            _id : id
+        },
+        {
+            $set:{archived: archived}
+        });
+    },
+
     "room.users" (roomId) {
         check(roomId, String);
         const userRooms = Chatter.UserRoom.find({"roomId": roomId}).fetch();
         const users = userRooms.map(function(userRoom) {
-            const user = Meteor.users.findOne({_id: userRoom.userId });
-            const userInfo = {
-                _id: user._id,
-                userNick: getNickname(user)
-            };
-            return userInfo;
+            const user = Chatter.User.findOne({_id: userRoom.userId });
+            return user;
         });
         return users;
     },
