@@ -33,18 +33,12 @@ Chatter.addUser = function(userId, userType) {
 /**
  * @summary Adds empty room to Chatter.
  * @locus Server
- * @param {string} rommName Unique string identifying the room.
+ * @param {string} rommName
  * @returns {string} roomId
  */
 Chatter.addRoom = function(roomName) {
     check(roomName, String);
-    return Chatter.Room.upsert({
-        name: roomName
-    }, {
-        $set: {
-            name: roomName
-        }
-    });
+    return Chatter.Room.insert({name: roomName});
 };
 
 /**
@@ -54,11 +48,11 @@ Chatter.addRoom = function(roomName) {
  * @param {string} roomName Unique string identifying the room.
  * @returns {string} userRoomId
  */
-Chatter.addUserToRoom = function(userId, roomName) {
+Chatter.addUserToRoom = function(userId, roomId) {
     check(userId, String);
-    check(roomName, String);
+    check(roomId, String);
     const chatterUserId = Chatter.User.findOne({userId: userId})._id;
-    const room = Chatter.Room.findOne({name: roomName});
+    const room = Chatter.Room.findOne({_id: roomId});
 
     if (room === undefined) {
         return "room does not exist";

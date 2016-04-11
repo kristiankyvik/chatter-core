@@ -33,29 +33,29 @@ Meteor.methods({
         }).save();
     },
 
-    "userroom.build" (roomName) {
-        check(roomName, String);
-        const userId = Meteor.userId();
-        const roomId = Chatter.Room.findOne({"name": roomName})._id;
-        const records = Chatter.UserRoom.find({"userId": userId, "roomId" : roomId}).fetch();
+    "userroom.build" (form) {
+        check(form, {
+            name: String,
+            invitees: [String]
+        });
 
-        if (records === undefined || records.length === 0) {
-            return new Chatter.UserRoom({
-                roomId: roomId,
-                userId: userId
-            }).save();
-        }
+        const roomId = Chatter.Room.findOne({"name": form.name})._id;
+
+        _.each(form.invitees, function(chatterUserId) {
+          new Chatter.UserRoom({
+              roomId: roomId,
+              userId: chatterUserId
+          }).save();
+        })
     },
 
     "room.build" (form) {
         check(form, {
             name: String,
-            roomType: String
+            invitees: [String]
         });
-        const user = Meteor.user();
         return new Chatter.Room({
-            name: form.name,
-            roomType: form.roomType
+            name: form.name
         }).save();
     },
 
