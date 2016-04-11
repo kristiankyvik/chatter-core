@@ -11,6 +11,12 @@ Chatter.User = ChatterUser = Astro.Class({
         },
         nickname: {
             type: "string"
+        },
+        avatar: {
+            type: "string",
+            default: function() {
+              return "http://localhost:3000/packages/jorgeer_chatter-semantic/public/images/avatar.jpg";
+            }
         }
     },
 

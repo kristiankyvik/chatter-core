@@ -34,7 +34,6 @@ Meteor.publish("chatterRooms", function () {
     return ChatterRoom.find({
     }, {
         fields: {
-            _id: 1,
             name: 1,
             roomType: 1,
             lastActive: 1,

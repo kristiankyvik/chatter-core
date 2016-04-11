@@ -11,14 +11,6 @@ Chatter.Message = ChatterMessage = Astro.Class({
             type: "string"
         },
 
-        userNick: {
-            type: "string"
-        },
-
-        userAvatar: {
-            type: "string"
-        },
-
         message: {
             type: "string"
         }
