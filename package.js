@@ -8,26 +8,29 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.versionsFrom('1.2.0.2');
-  
+
   api.use('ecmascript');
   api.use('underscore');
   api.use('mongo');
   api.use('check');
   api.use('accounts-base');
-  
+
   api.use('momentjs:moment@2.8.4');
   api.use('jagi:astronomy@1.2.1');
   api.use('jagi:astronomy-timestamp-behavior@1.0.0');
-  
+
   api.addFiles('chatter.js');
   api.addFiles('models/message.js');
   api.addFiles('models/room.js');
-  
+  api.addFiles('models/userroom.js');
+  api.addFiles('models/userroomcount.js');
+
   api.addFiles([
     'server/publish.js',
     'server/access.js',
+    'server/methods.js'
   ], 'server');
-  
+
   api.export([
     'Chatter',
   ], ['client', 'server']);
@@ -38,5 +41,5 @@ Package.onTest(function(api) {
   api.use('tinytest');
   api.use('jorgeer:chatter-core');
   api.addFiles('chattercore-tests.js');
-  
+
 });

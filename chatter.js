@@ -9,3 +9,4 @@ Chatter = {
 Chatter.configure = function (opts) {
     _.extend(this.options, opts);
 };
+
