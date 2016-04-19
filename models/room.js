@@ -5,6 +5,8 @@ Chatter.Room = ChatterRoom = Astro.Class({
     fields: {
         name: "string",
 
+        description: "string",
+
         roomType: {
             type: "string"
         },

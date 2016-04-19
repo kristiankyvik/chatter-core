@@ -63,10 +63,12 @@ Meteor.methods({
 
     "room.build" (form) {
         check(form, {
-            name: String
+            name: String,
+            description: String
         });
         return new Chatter.Room({
-            name: form.name
+            name: form.name,
+            description: form.description
         }).save();
     },
 
@@ -77,6 +79,13 @@ Meteor.methods({
         },
         {
             $set:{lastActive : new Date()}
+        });
+    },
+
+    "room.get" (id) {
+        check(id, String);
+        return Chatter.Room.findOne({
+            _id : id
         });
     },
 

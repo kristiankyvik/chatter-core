@@ -35,9 +35,11 @@ Meteor.publish("chatterRooms", function () {
     }, {
         fields: {
             name: 1,
+            description: 1,
             roomType: 1,
             lastActive: 1,
-            archived: 1
+            archived: 1,
+            createdAt: 1
         }
     });
 });
