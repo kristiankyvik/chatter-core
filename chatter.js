@@ -54,8 +54,8 @@ Chatter.addUserToRoom = function(userId, roomId) {
     const chatterUserId = Chatter.User.findOne({userId: userId})._id;
     const room = Chatter.Room.findOne({_id: roomId});
 
-    if (room === undefined) {
-        return "room does not exist";
+    if (room === undefined || chatterUserId === undefined) {
+        return "room or user does not exist";
     }
 
     return Chatter.UserRoom.upsert({

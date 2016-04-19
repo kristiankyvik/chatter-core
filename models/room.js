@@ -21,7 +21,9 @@ Chatter.Room = ChatterRoom = Astro.Class({
             default: function() {
               return false;
             }
-        }
+        },
+
+        createdBy: "string"
     },
 
     events: {

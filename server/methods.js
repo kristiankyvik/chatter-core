@@ -21,23 +21,49 @@ Meteor.methods({
     "userroom.build" (form) {
         check(form, {
             name: String,
+            roomId: String,
             invitees: [String]
         });
 
-        const roomId = Chatter.Room.findOne({"name": form.name})._id;
+        const room = Chatter.Room.findOne({_id: form.roomId});
+
+        if (room === undefined) {
+            return "room does not exist";
+        }
 
         _.each(form.invitees, function(chatterUserId) {
-          new Chatter.UserRoom({
-              roomId: roomId,
-              userId: chatterUserId
-          }).save();
+            let user = Chatter.User.find({_id: chatterUserId}).fetch();
+            if (user.length === 0) {
+                return "user does not exist";
+            }
+
+            Chatter.UserRoom.upsert({
+                userId: chatterUserId,
+                roomId: room._id
+            }, {
+                $set: {
+                    userId: chatterUserId,
+                    roomId: room._id
+                }
+            });
         })
+    },
+
+    "userroom.remove" (params) {
+        check(params, {
+            userId: String,
+            roomId: String
+        });
+
+        Chatter.UserRoom.remove({
+            userId: params.userId,
+            roomId: params.roomId
+        });
     },
 
     "room.build" (form) {
         check(form, {
-            name: String,
-            invitees: [String]
+            name: String
         });
         return new Chatter.Room({
             name: form.name
