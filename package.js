@@ -41,5 +41,7 @@ Package.onTest(function(api) {
   api.use('ecmascript');
   api.use('practicalmeteor:chai');
   api.use('jorgeer:chatter-core');
-  api.mainModule('chattercore.test.js');
+  api.use('xolvio:cleaner');
+  api.mainModule('chattercore.server.tests.js', 'server');
+  api.mainModule('chattercore.client.tests.js', 'client');
 });
