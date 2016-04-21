@@ -37,9 +37,9 @@ Package.onUse(function(api) {
 });
 
 Package.onTest(function(api) {
+  api.use('accounts-base');
   api.use('ecmascript');
-  api.use('tinytest');
+  api.use('practicalmeteor:chai');
   api.use('jorgeer:chatter-core');
-  api.addFiles('chattercore-tests.js');
-
+  api.mainModule('chattercore.test.js');
 });
