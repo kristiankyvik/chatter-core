@@ -17,9 +17,10 @@ Chatter.configure = function (opts) {
  * @returns {string} userId
  */
 Chatter.addUser = function(userId, userType) {
-  check(userId, String);
-  check(userType, Match.Maybe(String));
+  // check(userId, String);
+  // check(userType, Match.Maybe(String));
     const user = Meteor.users.findOne({_id: userId});
+
     return Chatter.User.upsert({
         userId: userId
     }, {

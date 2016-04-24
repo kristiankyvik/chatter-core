@@ -28,8 +28,6 @@ describe('chatter message model', function () {
     chai.assert.equal(message.timeAgo(), "a few seconds ago");
   });
 
-  Chatter.Message.remove({_id: messageId});
-
 });
 
 describe('chatter room model', function () {
@@ -56,8 +54,6 @@ describe('chatter room model', function () {
     const now = new Date();
     chai.assert.equal(now.getTime() - room.lastActive.getTime() < 20000, true);
   });
-
-  Chatter.Room.remove({_id: roomId});
 
 });
 
@@ -93,10 +89,6 @@ describe('chatter user model', function () {
   it('User is inserted when overwritting defaults', function () {
     chai.assert.equal(customUser.avatar, "test avatar");
   });
-
-  Chatter.User.remove({_id: defaultUserId});
-  Chatter.User.remove({_id: customUserId});
-
 });
 
 describe('chatter userroom model', function () {
@@ -121,3 +113,25 @@ describe('chatter userroom model', function () {
 
   Chatter.UserRoom.remove({_id: userRoomId});
 });
+
+//Chatter API tests
+describe('chatte api methods', function () {
+  //create stubs
+  stubs.create('findOne', Meteor.users, 'findOne');
+  stubs.findOne.returns({
+    _id: '43hk2j4h324k3j2',
+    username: "test nickname"
+  });
+
+
+  it("chatter user is created", function() {
+    const meteorUser = Meteor.users.findOne();
+    const userId = Chatter.addUser(meteorUser._id, "admin");
+    const user = Chatter.User.findOne({userId:'43hk2j4h324k3j2'});
+    chai.assert.equal(user.userId, '43hk2j4h324k3j2');
+  });
+
+
+});
+
+
