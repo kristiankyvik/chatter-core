@@ -1,7 +1,8 @@
 import { chai } from 'meteor/practicalmeteor:chai';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 
-after(function () {
+after(function() {
+  console.log(resetDatabase);
   resetDatabase();
 });
 
@@ -14,8 +15,13 @@ describe('chatter message model', function () {
     roomId: "testRoomId"
   };
 
-  const messageId = Chatter.Message.insert(attributes);
-  const message = Chatter.Message.findOne({_id: messageId});
+  let messageId;
+  let message;
+
+  before(function() {
+    messageId = Chatter.Message.insert(attributes);
+    message = Chatter.Message.findOne({_id: messageId});
+  });
 
   it('message is inserted with correct attributes', function () {
     chai.assert.equal(message.userId, attributes.userId);
@@ -39,9 +45,15 @@ describe('chatter room model', function () {
     createdBy: "test creator"
   };
 
-  const then = new Date();
-  const roomId = Chatter.Room.insert(attributes);
-  const room = Chatter.Room.findOne({_id: roomId});
+  let then;
+  let roomId;
+  let room;
+
+  before(function() {
+    then = new Date();
+    roomId = Chatter.Room.insert(attributes);
+    room = Chatter.Room.findOne({_id: roomId});
+  });
 
   it('room is inserted with correct attributes', function () {
     chai.assert.equal(room.name, attributes.name);
@@ -56,7 +68,6 @@ describe('chatter room model', function () {
   });
 
 });
-
 
 describe('chatter user model', function () {
 
@@ -99,8 +110,13 @@ describe('chatter userroom model', function () {
     roomId: "testRoomId"
   };
 
-  const userRoomId = Chatter.UserRoom.insert(attributes);
-  const userRoom = Chatter.UserRoom.findOne({_id: userRoomId});
+  let userRoomId;
+  let userRoom;
+
+  before(function() {
+    userRoomId = Chatter.UserRoom.insert(attributes);
+    userRoom = Chatter.UserRoom.findOne({_id: userRoomId});
+  });
 
   it('User Room is inserted with correct attributes', function () {
     chai.assert.equal(userRoom.userId, attributes.userId);
@@ -115,23 +131,40 @@ describe('chatter userroom model', function () {
 });
 
 //Chatter API tests
-describe('chatte api methods', function () {
-  //create stubs
-  stubs.create('findOne', Meteor.users, 'findOne');
-  stubs.findOne.returns({
-    _id: '43hk2j4h324k3j2',
-    username: "test nickname"
-  });
+describe('chatter api methods', function () {
+  let user;
+  let room;
 
+  before(function() {
+    // create stubs
+    stubs.create('findOne', Meteor.users, 'findOne');
+    stubs.findOne.returns({
+      _id: '43hk2j4h324k3j2',
+      username: "test nickname stub"
+    });
 
-  it("chatter user is created", function() {
+    //add chatter user
     const meteorUser = Meteor.users.findOne();
     const userId = Chatter.addUser(meteorUser._id, "admin");
-    const user = Chatter.User.findOne({userId:'43hk2j4h324k3j2'});
+    user = Chatter.User.findOne({_id: userId});
+
+    //add chatter room
+    const roomId = Chatter.addRoom("test room");
+    room = Chatter.Room.findOne({_id: roomId});
+  });
+
+  it("chatter user is added", function() {
     chai.assert.equal(user.userId, '43hk2j4h324k3j2');
   });
 
+  it("chatter room is added", function() {
+    chai.assert.equal(room.name, "test room");
+  });
+
+  it("chatter user is added to chatter room", function() {
+    Chatter.addUserToRoom(user.userId, room._id);
+    const roomUsers = Chatter.UserRoom.find({userId: user._id, roomId: room._id}).fetch();
+    chai.assert.lengthOf(roomUsers, 1);
+  });
 
 });
-
-
