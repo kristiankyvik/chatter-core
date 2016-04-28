@@ -30,23 +30,25 @@ Meteor.methods({
         if (room === undefined) {
             return "room does not exist";
         }
-
+        let userNotexists = false;
         _.each(form.invitees, function(chatterUserId) {
             let user = Chatter.User.find({_id: chatterUserId}).fetch();
-            if (user.length === 0) {
-                return "user does not exist";
-            }
-
-            Chatter.UserRoom.upsert({
+            if (user.length > 0) {
+              Chatter.UserRoom.upsert({
                 userId: chatterUserId,
                 roomId: room._id
-            }, {
+              }, {
                 $set: {
-                    userId: chatterUserId,
-                    roomId: room._id
+                  userId: chatterUserId,
+                  roomId: room._id
                 }
-            });
+             });
+            } else {
+              userNotexists = true;
+              return false;
+            }
         })
+        return userNotexists ? "user does not exist" : Chatter.UserRoom.findOne()._id;;
     },
 
     "userroom.remove" (params) {
