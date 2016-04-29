@@ -8,13 +8,12 @@ Meteor.methods({
     "message.build" (params) {
         check(params, {
               message: String,
-              roomId: String,
-              userId: String
+              roomId: String
         });
         return new Chatter.Message({
             message: params.message,
             roomId: params.roomId,
-            userId: params.userId
+            userId: Chatter.User.findOne({userId: this.userId})._id
         }).save();
     },
 
@@ -74,16 +73,6 @@ Meteor.methods({
         }).save();
     },
 
-    "room.update" (id) {
-        check(id, String);
-        Chatter.Room.update({
-            _id : id
-        },
-        {
-            $set:{lastActive : new Date()}
-        });
-    },
-
     "room.get" (id) {
         check(id, String);
         return Chatter.Room.findOne({
@@ -91,11 +80,11 @@ Meteor.methods({
         });
     },
 
-    "room.archive" (id, archived) {
-        check(id, String);
+    "room.archive" (roomId, archived) {
+        check(roomId, String);
         check(archived, Boolean);
         return Chatter.Room.update({
-            _id : id
+            _id : roomId
         },
         {
             $set:{archived: archived}
@@ -112,30 +101,20 @@ Meteor.methods({
         return users;
     },
 
-    "userroom.count.reset" (userId, roomId) {
-        check(userId, String);
+    "userroom.count.reset" (roomId) {
         check(roomId, String);
+        console.log("reset is called");
+        const userId = Chatter.User.findOne({userId: this.userId})._id;
+        console.log(userId);
+        console.log(roomId);
+        console.log(Chatter.UserRoom.findOne({ roomId : roomId, userId:userId }));
+
         return Chatter.UserRoom.update({
             roomId : roomId,
-            userId: userId
+            userId: Chatter.User.findOne({userId: this.userId})._id
         },
         {
             $set:{count: 0}
-        });
-    },
-
-    "userroom.count.increase" (userId, roomId) {
-        check(userId, String);
-        check(roomId, String);
-        const userRooms = Chatter.UserRoom.find({"roomId": roomId, "userId": {$nin:[userId]}}).fetch();
-        const users = userRooms.map(function(userRoom) {
-            Chatter.UserRoom.update({
-                roomId : userRoom.roomId,
-                userId: userRoom.userId
-            },
-            {
-                $inc: { count: 1}
-            });
         });
     }
 });

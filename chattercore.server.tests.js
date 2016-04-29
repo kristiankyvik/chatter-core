@@ -206,6 +206,7 @@ describe("chatter meteor methods", function() {
 
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
+          chai.assert.isUndefined(response);
           chai.assert.equal(error.errorType, "Match.Error");
           done();
         });
@@ -231,6 +232,7 @@ describe("chatter meteor methods", function() {
 
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
+          chai.assert.isUndefined(response);
           chai.assert.equal(error.errorType, "Match.Error");
           done();
         })
@@ -267,6 +269,7 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
+              chai.assert.isUndefined(response);
               chai.assert.equal(error.errorType, "Match.Error");
             });
           });
@@ -275,6 +278,7 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
+              chai.assert.isUndefined(response);
               chai.assert.equal(error.errorType, "Match.Error");
             });
           });
@@ -283,6 +287,7 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
+              chai.assert.isUndefined(response);
               chai.assert.equal(error.errorType, "Match.Error");
               done();
             });
@@ -315,12 +320,14 @@ describe("chatter meteor methods", function() {
       });
 
       describe("when no parameters are missing or wrong", function (done) {
+
         it("creates a userRoom instance", function (done) {
           params.invitees = [user._id];
           params.roomId = room._id;
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
+              chai.assert.isUndefined(error);
               chai.assert.isString(response);
               done();
             });
@@ -328,6 +335,26 @@ describe("chatter meteor methods", function() {
         });
       });
     });
-  });
 
+    describe("userroom.remove method", function (done) {
+
+      it("throw an error if missing parameters", function (done) {
+        params = {};
+        Meteor.call("userroom.remove", params, function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(response);
+            chai.assert.equal(error.errorType, "Match.Error");
+            done();
+          });
+        });
+      });
+
+      it("remove userroom if no missing parameters missing or incorrect", function () {
+        Meteor.call("userroom.remove", {userId: user._id, roomId: room._id});
+        const results = Chatter.UserRoom.find({userId: user._id, roomId: room._id}).fetch();
+        chai.assert.equal(results.length, 0);
+      });
+    });
+
+  });
 });
