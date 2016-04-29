@@ -1,12 +1,12 @@
 Chatter = {
-    options: {
-        messageLimit: 30,
-        nickProperty: "username",
-    }
+  options: {
+    messageLimit: 30,
+    nickProperty: "username",
+  }
 };
 
 Chatter.configure = function (opts) {
-    _.extend(this.options, opts);
+  _.extend(this.options, opts);
 };
 
 /**
@@ -19,17 +19,17 @@ Chatter.configure = function (opts) {
 Chatter.addUser = function(userId, userType) {
    check(userId, String);
    check(userType, Match.Maybe(String));
-    const user = Meteor.users.findOne({_id: userId});
+  const user = Meteor.users.findOne({_id: userId});
 
-    Chatter.User.upsert({
-        userId: userId
-    }, {
-        $set: {
-          userType: userType,
-          nickname: getNickname(user)
-        }
-    });
-    return Chatter.User.findOne({userId: userId})._id;
+  Chatter.User.upsert({
+    userId: userId
+  }, {
+    $set: {
+      userType: userType,
+      nickname: getNickname(user)
+    }
+  });
+  return Chatter.User.findOne({userId: userId})._id;
 };
 
 /**
@@ -39,9 +39,9 @@ Chatter.addUser = function(userId, userType) {
  * @returns {string} roomId
  */
 Chatter.addRoom = function(roomName) {
-    check(roomName, String);
+  check(roomName, String);
 
-    return Chatter.Room.insert({name: roomName});
+  return Chatter.Room.insert({name: roomName});
 };
 
 /**
@@ -52,29 +52,29 @@ Chatter.addRoom = function(roomName) {
  * @returns {string} userRoomId
  */
 Chatter.addUserToRoom = function(userId, roomId) {
-    check(userId, String);
-    check(roomId, String);
-    const chatterUserId = Chatter.User.findOne({userId: userId})._id;
-    const room = Chatter.Room.findOne({_id: roomId});
+  check(userId, String);
+  check(roomId, String);
+  const chatterUserId = Chatter.User.findOne({userId: userId})._id;
+  const room = Chatter.Room.findOne({_id: roomId});
 
-    if (room === undefined || chatterUserId === undefined) {
-        return "room or user does not exist";
+  if (room === undefined || chatterUserId === undefined) {
+    return "room or user does not exist";
+  }
+
+  return Chatter.UserRoom.upsert({
+    userId: chatterUserId,
+    roomId: room._id
+  }, {
+    $set: {
+      userId: chatterUserId,
+      roomId: room._id
     }
-
-    return Chatter.UserRoom.upsert({
-        userId: chatterUserId,
-        roomId: room._id
-    }, {
-        $set: {
-            userId: chatterUserId,
-            roomId: room._id
-        }
-    });
+  });
 };
 
 function getNickname(user) {
-    const nickPath = Chatter.options.nickProperty;
-    const nick = nickPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
+  const nickPath = Chatter.options.nickProperty;
+  const nick = nickPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
 
-    return nick;
+  return nick;
 }
