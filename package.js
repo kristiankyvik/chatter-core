@@ -18,6 +18,7 @@ Package.onUse(function(api) {
   api.use('momentjs:moment@2.8.4');
   api.use('jagi:astronomy@1.2.1');
   api.use('jagi:astronomy-timestamp-behavior@1.0.0');
+  api.use('jagi:astronomy-validators');
 
   api.addFiles('chatter.js');
   api.addFiles('models/message.js');
