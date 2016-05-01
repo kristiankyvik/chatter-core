@@ -4,22 +4,40 @@ describe("chatter meteor methods", function() {
   let user;
 
   before(function() {
-    //add chatter user
     const meteorUser = Meteor.users.findOne();
     const userId = Chatter.addUser(meteorUser._id, "admin");
     user = Chatter.User.findOne({_id: userId});
   });
 
   describe("user.check method", function () {
-    it("user.check return false when user does not exist", function() {
-      const nonUserCheck = Meteor.call("user.check");
-      chai.assert.equal(nonUserCheck, false);
+    before(function() {
+      stubs.create("userId", Meteor, "userId");
+    });
+
+    it("user.check return false when user does not exist", function(done) {
+      // Creating stub for Meteor.userId() that return id from non-chatter user
+      stubs.userId.returns("meteor_unknown_id");
+
+      Meteor.call("user.check", function (error, response){
+        setTimeout(function() {
+          chai.assert.isUndefined(error);
+          chai.assert.equal(response, false);
+          done();
+        });
+      });
     });
 
     it("user.check returns true when user exists", function() {
-      this.userId ="themuser id";
-      const userCheck = Meteor.call("user.check").apply(this);;
-      chai.assert.equal(userCheck, true);
+      // Creating stub for Meteor.userId() that return id from chatter user
+      stubs.userId.returns("meteor_user_one_id");
+
+      Meteor.call("user.check", function (error, response){
+        setTimeout(function() {
+          chai.assert.isUndefined(error);
+          chai.assert.equal(response, true);
+          done();
+        });
+      });
     });
   });
 
@@ -28,10 +46,11 @@ describe("chatter meteor methods", function() {
 
     before(function() {
       params = {};
+      const roomId = params.roomId = Chatter.Room.insert({name: "test_room" });
+      Chatter.UserRoom.insert({userId: user._id, roomId: roomId });
     });
 
     it("message.build throws exception when parameters are missing", function (done) {
-
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
           chai.assert.isUndefined(response);
@@ -42,9 +61,7 @@ describe("chatter meteor methods", function() {
     });
 
     it("message.build succeeds when no parameters are missing", function (done) {
-      params.userId = "test userId";
       params.message = "test message";
-      params.roomId = "test roomId";
 
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
@@ -66,11 +83,35 @@ describe("chatter meteor methods", function() {
         })
       });
     });
+
+    it("message.build throws exception when message text is empty", function (done) {
+      params.message = "";
+
+      Meteor.call("message.build", params, function(error, response) {
+        setTimeout(function() {
+          chai.assert.equal(error.error, "validation-error");
+          done();
+        })
+      });
+    });
+
+    it("message.build throws error when user is not part of room ", function (done) {
+      Chatter.UserRoom.remove({userId: user._id, roomId: params.roomId });
+      params.message = "test message";
+
+      Meteor.call("message.build", params, function(error, response) {
+        setTimeout(function() {
+          chai.assert.isUndefined(response);
+          chai.assert.equal(error.error, "user-not-in-room");
+          done();
+        })
+      });
+    });
   });
 
   describe("userRoom methods", function (done) {
 
-    const attributes = {
+    const roomAttributes = {
       name: "test room",
       description: "test description",
       createdBy: "test creator"
@@ -83,11 +124,11 @@ describe("chatter meteor methods", function() {
 
     before(function() {
       params = {};
-      roomId = Chatter.Room.insert(attributes);
-      room = Chatter.Room.findOne({_id: roomId});
-
       const meteorUser = Meteor.users.findOne();
       const userId = Chatter.addUser(meteorUser._id, "admin");
+
+      roomId = Chatter.Room.insert(roomAttributes);
+      room = Chatter.Room.findOne({_id: roomId});
       user = Chatter.User.findOne({_id: userId});
     });
 
@@ -128,7 +169,8 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
-              chai.assert.equal(response, "room does not exist");
+              chai.assert.isUndefined(response);
+              chai.assert.equal(error.error, "non-existing-room");
               done();
             });
           });
@@ -140,7 +182,8 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
-              chai.assert.equal(response, "user does not exist");
+              chai.assert.isUndefined(response);
+              chai.assert.equal(error.error, "non-existing-users");
               done();
             });
           });

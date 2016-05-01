@@ -1,3 +1,9 @@
+const reqStrNotNull = Validators.and([
+  Validators.required(),
+  Validators.string(),
+  Validators.notNull()
+]);
+
 Chatter.Message = ChatterMessage = Astro.Class({
   name: "ChatterMessage",
   collection: new Mongo.Collection("chattermessage"),
@@ -17,7 +23,18 @@ Chatter.Message = ChatterMessage = Astro.Class({
   },
 
   validators: {
+    userId: [
+      reqStrNotNull
+    ],
 
+    roomId: [
+      reqStrNotNull
+    ],
+
+    message: [
+      Validators.minLength(1, 'The message must not be empty!'),
+      reqStrNotNull
+    ]
   },
 
   events: {
