@@ -122,6 +122,155 @@ describe("chatter meteor methods", function() {
     });
   });
 
+  describe("room methods", function (done) {
+    const roomAttributes = {
+      name: "test room",
+      description: "test description"
+    };
+
+    let params;
+    let room;
+    let user;
+
+
+    before(function() {
+      params = {};
+      const meteorUser = Meteor.users.findOne();
+      const userId = Chatter.addUser(meteorUser._id, "admin");
+
+      roomId = Chatter.Room.insert(roomAttributes);
+      room = Chatter.Room.findOne({_id: roomId});
+      user = Chatter.User.findOne({_id: userId});
+    });
+
+    describe("room.build", function (done) {
+      it("throws an error when required parameters are missing", function (done) {
+        const params = {};
+
+        Meteor.call("room.build", params, function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(response);
+            chai.assert.equal(error.errorType, "Match.Error");
+            done();
+          });
+        });
+      });
+
+      it("return roomId when parameters are correct", function (done) {
+        const params = roomAttributes;
+        Meteor.call("room.build", params, function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(error);
+            chai.assert.isString(response);
+            done();
+          });
+        });
+      });
+
+      it("throws a validation error when name is empty string", function (done) {
+        const params = {
+          name: "",
+          description: "test description"
+        };
+
+        Meteor.call("room.build", params, function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(response);
+            chai.assert.equal(error.error, "validation-error");
+            done();
+          });
+        });
+      });
+    });
+
+    describe("room.archive", function (done) {
+
+      it("throws an error when params are not right type", function (done) {
+        const params = {
+          roomId: 124324324,
+          archived: false
+        };
+
+        Meteor.call("room.archive", roomId, function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(response);
+            chai.assert.equal(error.errorType, "Match.Error");
+            done();
+          });
+        });
+      });
+
+      it("throws an error when params are missing", function (done) {
+        const params = {
+          roomId: "124324324"
+        };
+
+        Meteor.call("room.archive", roomId, function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(response);
+            chai.assert.equal(error.errorType, "Match.Error");
+            done();
+          });
+        });
+      });
+
+      it("throws an error when roomId does not exist", function (done) {
+        const params = {
+          roomId: "non-existing-room",
+          archived: true
+        };
+
+        Meteor.call("room.archive", params, function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(response);
+            chai.assert.equal(error.error, "non-existing-room");
+            done();
+          });
+        });
+      });
+
+      it("room is built with archived set to default", function () {
+        chai.assert.equal(room.archived, false);
+      });
+
+      it("returns true after succesfully calling method with true parameter", function (done) {
+        const params = {
+          archived: true,
+          roomId: room._id
+        };
+        Meteor.call("room.archive", params, function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(error);
+            chai.assert.equal(response, true);
+            done();
+          });
+        });
+      });
+
+      it("actually changed archived status to true", function () {
+        chai.assert.equal(Chatter.Room.findOne({_id: room._id}).archived, true);
+      });
+
+      it("returns false after succesfully calling method with false parameter", function (done) {
+        const params = {
+          archived: false,
+          roomId: room._id
+        };
+        Meteor.call("room.archive", params, function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(error);
+            chai.assert.equal(response, false);
+            done();
+          });
+        });
+      });
+
+      it("actually changed archived status to true", function () {
+        chai.assert.equal(Chatter.Room.findOne({_id: room._id}).archived, false);
+      });
+    });
+  });
+
   describe("userRoom methods", function (done) {
 
     const roomAttributes = {
@@ -133,7 +282,6 @@ describe("chatter meteor methods", function() {
     let params;
     let room;
     let user;
-
 
     before(function() {
       params = {};

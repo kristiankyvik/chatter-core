@@ -90,15 +90,25 @@ Meteor.methods({
     });
   },
 
-  "room.build" (form) {
-  check(form, {
-      name: String,
-      description: String
+  "room.build" (params) {
+    check(params, {
+        name: String,
+        description: String
     });
-    return new Chatter.Room({
-      name: form.name,
-      description: form.description
-    }).save();
+
+    const chatterId = getChatterId(Meteor.userId());
+
+    const room = new Chatter.Room({
+      name: params.name,
+      description: params.description,
+      createdBy: chatterId
+    })
+
+    if (room.validate()) {
+      return room.save();
+    }
+
+    room.throwValidationException();
   },
 
   "room.get" (id) {
@@ -108,15 +118,24 @@ Meteor.methods({
     });
   },
 
-  "room.archive" (roomId, archived) {
-    check(roomId, String);
-    check(archived, Boolean);
-    return Chatter.Room.update({
-      _id : roomId
+  "room.archive" (params) {
+    check(params, {
+        roomId: String,
+        archived: Boolean
+    });
+
+    const rooms = Chatter.Room.find({_id: params.roomId}).fetch();
+    if (rooms.length === 0) {
+      throw new Meteor.Error("non-existing-room", "room does not exist");
+    }
+
+    Chatter.Room.update({
+      _id : params.roomId
     },
     {
-      $set:{archived: archived}
+      $set:{archived: params.archived}
     });
+    return params.archived;
   },
 
   "room.users" (roomId) {

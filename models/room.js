@@ -29,7 +29,17 @@ Chatter.Room = ChatterRoom = Astro.Class({
   },
 
   validators: {
+    name: [
+      Validators.required(),
+      Validators.minLength(1),
+      Validators.maxLength(30)
+    ],
 
+    description: [
+      Validators.required(),
+      Validators.minLength(1),
+      Validators.maxLength(150)
+    ]
   },
 
   events: {
