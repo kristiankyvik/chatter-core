@@ -33,6 +33,7 @@ Chatter.Message = ChatterMessage = Astro.Class({
 
     message: [
       Validators.minLength(1, 'The message must not be empty!'),
+      Validators.maxLength(1000),
       reqStrNotNull
     ]
   },

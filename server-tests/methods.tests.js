@@ -62,13 +62,26 @@ describe("chatter meteor methods", function() {
 
     it("message.build succeeds when no parameters are missing", function (done) {
       params.message = "test message";
-
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
           chai.assert.isUndefined(error);
           chai.assert.isString(response);
           done();
         });
+      });
+    });
+
+
+    it("message.build throws an error when he message text is too long", function (done) {
+      const longMessage = "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?";
+      params.message = longMessage;
+
+      Meteor.call("message.build", params, function(error, response) {
+        setTimeout(function() {
+          chai.assert.isUndefined(response);
+          chai.assert.equal(error.error, "validation-error");
+          done();
+        })
       });
     });
 
@@ -143,15 +156,6 @@ describe("chatter meteor methods", function() {
             });
           });
 
-          params.name = room.name;
-
-          Meteor.call("userroom.build", params, function(error, response) {
-            setTimeout(function() {
-              chai.assert.isUndefined(response);
-              chai.assert.equal(error.errorType, "Match.Error");
-            });
-          });
-
           params.roomId = room._id;
 
           Meteor.call("userroom.build", params, function(error, response) {
@@ -163,7 +167,7 @@ describe("chatter meteor methods", function() {
           });
         });
 
-        it("returns 'room does not exist' when roomId does not exist", function (done) {
+        it("returns 'room does not exist' error when roomId does not exist", function (done) {
           params.roomId = "non existent roomId";
           params.invitees = [user._id];
 
@@ -176,7 +180,7 @@ describe("chatter meteor methods", function() {
           });
         });
 
-        it("returns 'user does not exist' when userId does not exist", function (done) {
+        it("returns 'user does not exist' error when userId does not exist", function (done) {
           params.invitees = ["non existent userId"];
           params.roomId = room._id;
 
@@ -211,6 +215,7 @@ describe("chatter meteor methods", function() {
 
       it("throw an error if missing parameters", function (done) {
         params = {};
+
         Meteor.call("userroom.remove", params, function(error, response) {
           setTimeout(function() {
             chai.assert.isUndefined(response);
@@ -221,11 +226,56 @@ describe("chatter meteor methods", function() {
       });
 
       it("remove userroom if no missing parameters missing or incorrect", function () {
+
         Meteor.call("userroom.remove", {userId: user._id, roomId: room._id});
         const results = Chatter.UserRoom.find({userId: user._id, roomId: room._id}).fetch();
         chai.assert.equal(results.length, 0);
       });
     });
 
+    describe("userroom.count methods", function (done) {
+
+      before(function() {
+        params.invitees = [user._id];
+        params.roomId = room._id;
+        Meteor.call("userroom.build", params);
+      });
+
+      it("useroom count is set to zero when reset method is called", function (done) {
+
+        Meteor.call("userroom.count.reset", roomId , function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(error);
+            chai.assert.equal(response, true);
+          });
+          chai.assert.equal(Chatter.UserRoom.findOne({roomId, userId: user._id}).count, 0);
+          done();
+        });
+      });
+
+      it("useroom count return error when wrong roomId is passed in", function (done) {
+        const roomId = "non-existing-room";
+
+        Meteor.call("userroom.count.reset", roomId , function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(response);
+            chai.assert.equal(error.error, "non-existing-room");
+            done();
+          });
+        });
+      });
+
+      it("useroom count return error when user is not in room", function (done) {
+        Chatter.UserRoom.remove({userId: user._id, roomId});
+
+        Meteor.call("userroom.count.reset", roomId , function(error, response) {
+          setTimeout(function() {
+            chai.assert.isUndefined(response);
+            chai.assert.equal(error.error, "user-not-in-room");
+            done();
+          });
+        });
+      });
+    });
   });
 });
