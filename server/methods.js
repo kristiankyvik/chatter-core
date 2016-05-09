@@ -13,9 +13,10 @@ const userInRoom = function(chatterId, roomId) {
 
 
 Meteor.methods({
+
   "user.check" () {
     const chatterUsers = Chatter.User.find({userId: Meteor.userId()}).fetch();
-    return chatterUsers.length > 0 ;
+    return chatterUsers.length > 0;
   },
 
   "message.build" (params) {

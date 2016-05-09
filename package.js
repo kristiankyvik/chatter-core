@@ -19,6 +19,8 @@ Package.onUse(function(api) {
   api.use('jagi:astronomy@1.2.1');
   api.use('jagi:astronomy-timestamp-behavior@1.0.0');
   api.use('jagi:astronomy-validators');
+  api.use('xolvio:cleaner');
+
 
   api.addFiles('chatter.js');
   api.addFiles('models/message.js');
@@ -29,7 +31,9 @@ Package.onUse(function(api) {
   api.addFiles([
     'server/publish.js',
     'server/access.js',
-    'server/methods.js'
+    'server/methods.js',
+    'imports/api/setup.app-tests.js'
+
   ], 'server');
 
   api.export([
