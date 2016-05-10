@@ -45,7 +45,7 @@ Meteor.methods({
     newMessage.throwValidationException();
   },
 
-  "userroom.build" (params) {
+  "room.join" (params) {
     check(params, {
       roomId: String,
       invitees: [String]
@@ -80,7 +80,7 @@ Meteor.methods({
     return Chatter.UserRoom.findOne()._id;
   },
 
-  "userroom.remove" (params) {
+  "room.leave" (params) {
     check(params, {
       userId: String,
       roomId: String
@@ -154,7 +154,7 @@ Meteor.methods({
     return users;
   },
 
-  "userroom.count.reset" (roomId) {
+  "room.counter.reset" (roomId) {
     check(roomId, String);
 
     const chatterUserId = getChatterUserId(Meteor.userId());

@@ -1,19 +1,18 @@
-Meteor.publish("chatterMessages", function (opts) {
-  check(opts, {
-    roomId: String,
-    messageLimit: Number
+Meteor.publish("chatterMessages", function (params) {
+  check(params, {
+    roomId: String
   });
 
   /*
-  let room = ChatterRoom.findOne({ name: opts.roomName });
+  let room = ChatterRoom.findOne({ name: params.roomName });
   if (_.isUndefined(room)) return [];
   // TODO Check for room restrictions here
   */
 
   return ChatterMessage.find({
-    roomId: opts.roomId,
+    roomId: params.roomId,
   }, {
-    limit: opts.limit,
+    limit: Chatter.options.messageLimit,
     fields: {
       message: 1,
       roomId: 1,
@@ -33,6 +32,7 @@ Meteor.publish("chatterRooms", function () {
 
   return ChatterRoom.find({
   }, {
+    limit: Chatter.options.roomLimit,
     fields: {
       name: 1,
       description: 1,
