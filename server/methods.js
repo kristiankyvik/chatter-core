@@ -1,7 +1,7 @@
 const getChatterId = function(userId) {
   const results = Chatter.User.find({userId: userId}).fetch();
   if (results.length === 0) {
-    throw new Error("unknown-user", "user has not been added to chatter")
+    throw new Meteor.Error("unknown-user", "user has not been added to chatter");
   }
   return results[0]._id;
 };

@@ -38,9 +38,9 @@ Chatter.addUser = function(params) {
 
   const {userId, userType} = params;
 
-  const checkChatterUser = Chatter.User.find({userId}).fetch();
+  const chatterUser = Chatter.User.findOne({userId});
 
-  if (checkChatterUser > 0) {
+  if (!chatterUser) {
     throw new Meteor.Error("user-already-exists", "user has already been added to chatter");
   }
 
@@ -106,8 +106,10 @@ Chatter.addUserToRoom = function(params) {
   const chatterUser = Chatter.User.findOne({userId});
   const room = Chatter.Room.findOne({_id: roomId});
 
-  if (room === undefined || chatterUser === undefined) {
-    throw new Meteor.Error("room-or-user-does-not-exist", "the values provided for userId or roomId are incorrect");
+  if (!room) {
+    throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
+  } else if (!chatterUser) {
+    throw new  Meteor.Error("unknown-user", "user has not been added to chatter");
   }
 
   const userRoom = new Chatter.UserRoom({
