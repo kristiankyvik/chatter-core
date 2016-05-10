@@ -19,7 +19,7 @@ Meteor.methods({
     return chatterUsers.length > 0;
   },
 
-  "message.build" (params) {
+  "message.send" (params) {
     check(params, {
       message: String,
       roomId: String
@@ -33,29 +33,31 @@ Meteor.methods({
     }
 
     const newMessage = new Chatter.Message({
-      userId: chatterUserId
+      userId: chatterUserId,
+      message,
+      roomId
     });
 
     if (newMessage.validate()) {
-      return message.save();
+      return newMessage.save();
     }
 
     newMessage.throwValidationException();
   },
 
-  "userroom.build" (form) {
-    check(form, {
+  "userroom.build" (params) {
+    check(params, {
       roomId: String,
       invitees: [String]
     });
 
-    const room = Chatter.Room.findOne({_id: form.roomId});
+    const room = Chatter.Room.findOne({_id: params.roomId});
 
     if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
     let userNotexists = false;
-    _.each(form.invitees, function(chatterUserId) {
+    _.each(params.invitees, function(chatterUserId) {
       let chatterUser = Chatter.User.findOne({_id: chatterUserId});
       if (chatterUser) {
         Chatter.UserRoom.upsert({
@@ -90,7 +92,7 @@ Meteor.methods({
     });
   },
 
-  "room.build" (params) {
+  "room.create" (params) {
     check(params, {
         name: String,
         description: String
