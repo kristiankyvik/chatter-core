@@ -7,13 +7,13 @@ describe("chatter api methods", function () {
   const assert = chai.assert;
 
   before(function() {
-    meteorUser = Meteor.users.findOne({_id: "id_of_user_one"});
+    meteorUser = Meteor.users.findOne("id_of_user_one");
 
     const userId = Chatter.addUser(meteorUser._id, "admin");
-    user = Chatter.User.findOne({_id: userId});
+    user = Chatter.User.findOne(userId);
 
     const roomId = Chatter.addRoom("test room");
-    room = Chatter.Room.findOne({_id: roomId});
+    room = Chatter.Room.findOne(roomId);
   });
 
   it("chatter user is added", function() {

@@ -7,7 +7,7 @@ describe("chatter meteor methods", function() {
   before(function() {
     const meteorUser = Meteor.users.findOne();
     const userId = Chatter.addUser(meteorUser._id, "admin");
-    user = Chatter.User.findOne({_id: userId});
+    user = Chatter.User.findOne(userId);
   });
 
   describe("user.check method", function() {
@@ -140,8 +140,8 @@ describe("chatter meteor methods", function() {
       const userId = Chatter.addUser(meteorUser._id, "admin");
 
       roomId = Chatter.Room.insert(roomAttributes);
-      room = Chatter.Room.findOne({_id: roomId});
-      user = Chatter.User.findOne({_id: userId});
+      room = Chatter.Room.findOne(roomId);
+      user = Chatter.User.findOne(userId);
     });
 
     describe("room.build", function() {
@@ -249,7 +249,7 @@ describe("chatter meteor methods", function() {
       });
 
       it("actually changed archived status to true", function() {
-        assert.equal(Chatter.Room.findOne({_id: room._id}).archived, true);
+        assert.equal(Chatter.Room.findOne(room._id).archived, true);
       });
 
       it("returns false after succesfully calling method with false parameter", function(done) {
@@ -267,7 +267,7 @@ describe("chatter meteor methods", function() {
       });
 
       it("actually changed archived status to true", function() {
-        assert.equal(Chatter.Room.findOne({_id: room._id}).archived, false);
+        assert.equal(Chatter.Room.findOne(room._id).archived, false);
       });
     });
   });
@@ -290,8 +290,8 @@ describe("chatter meteor methods", function() {
       const userId = Chatter.addUser(meteorUser._id, "admin");
 
       roomId = Chatter.Room.insert(roomAttributes);
-      room = Chatter.Room.findOne({_id: roomId});
-      user = Chatter.User.findOne({_id: userId});
+      room = Chatter.Room.findOne(roomId);
+      user = Chatter.User.findOne(userId);
     });
 
     describe("userroom.build method", function() {

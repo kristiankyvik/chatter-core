@@ -17,7 +17,7 @@ describe("chatter models", function() {
 
     before(function() {
       messageId = Chatter.Message.insert(attributes);
-      message = Chatter.Message.findOne({_id: messageId});
+      message = Chatter.Message.findOne(messageId);
     });
 
     it("message is inserted with correct attributes", function() {
@@ -49,7 +49,7 @@ describe("chatter models", function() {
     before(function() {
       then = new Date();
       roomId = Chatter.Room.insert(attributes);
-      room = Chatter.Room.findOne({_id: roomId});
+      room = Chatter.Room.findOne(roomId);
     });
 
     it("room is inserted with correct attributes", function() {
@@ -76,12 +76,12 @@ describe("chatter models", function() {
     };
 
     const defaultUserId = Chatter.User.insert(attributes);
-    const defaultUser = Chatter.User.findOne({_id: defaultUserId});
+    const defaultUser = Chatter.User.findOne(defaultUserId);
 
     attributes.avatar = "test avatar";
 
     const customUserId = Chatter.User.insert(attributes);
-    const customUser = Chatter.User.findOne({_id: customUserId});
+    const customUser = Chatter.User.findOne(customUserId);
 
 
     it("User is inserted with correct attributes", function() {
@@ -112,7 +112,7 @@ describe("chatter models", function() {
 
     before(function() {
       userRoomId = Chatter.UserRoom.insert(attributes);
-      userRoom = Chatter.UserRoom.findOne({_id: userRoomId});
+      userRoom = Chatter.UserRoom.findOne(userRoomId);
     });
 
     it("User Room is inserted with correct attributes", function() {

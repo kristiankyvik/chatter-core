@@ -51,14 +51,14 @@ Meteor.methods({
       invitees: [String]
     });
 
-    const room = Chatter.Room.findOne({_id: params.roomId});
+    const room = Chatter.Room.findOne(params.roomId);
 
     if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
     let userNotexists = false;
     _.each(params.invitees, function(chatterUserId) {
-      let chatterUser = Chatter.User.findOne({_id: chatterUserId});
+      let chatterUser = Chatter.User.findOne(chatterUserId);
       if (chatterUser) {
         Chatter.UserRoom.upsert({
           userId: chatterUserId,
@@ -128,7 +128,7 @@ Meteor.methods({
     });
 
     const {roomId, archived} = params;
-    const room = Chatter.Room.findOne({_id: roomId});
+    const room = Chatter.Room.findOne(roomId);
 
     if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
@@ -148,7 +148,7 @@ Meteor.methods({
 
     const userRooms = Chatter.UserRoom.find({"roomId": roomId}).fetch();
     const users = userRooms.map(function(userRoom) {
-      return Chatter.User.findOne({_id: userRoom.userId });
+      return Chatter.User.findOne(userRoom.userId);
     });
 
     return users;
@@ -158,7 +158,7 @@ Meteor.methods({
     check(roomId, String);
 
     const chatterUserId = getChatterUserId(Meteor.userId());
-    const room = Chatter.Room.findOne({_id: roomId});
+    const room = Chatter.Room.findOne(roomId);
 
     if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
