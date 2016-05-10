@@ -12,36 +12,55 @@ Chatter.configure = function (opts) {
 /**
  * @summary Adds user to Chatter and defines its privileges
  * @locus Server
- * @param {string} userId Unique string identifying the users of your application.
- * @param {string} userType Defines the restricitons on the new user. Can either be set to "admin" or "standard".
- * @returns {string} userId
+ *
+ * @param params Information about the new user.
+ * @param {string} params.userId Meteor user id.
+ * @param {string} params.userType Defines the restricitons on the new user. Can either be set to "admin" or "standard".
+ * @returns {string} chatterId
  */
-Chatter.addUser = function(userId, userType) {
-   check(userId, String);
-   check(userType, Match.Maybe(String));
-  const user = Meteor.users.findOne({_id: userId});
-
-  Chatter.User.upsert({
-    userId: userId
-  }, {
-    $set: {
-      userType: userType,
-      nickname: getNickname(user)
-    }
+Chatter.addUser = function(params) {
+  check(params, {
+    userId: String,
+    userType: Match.Maybe(String)
   });
-  return Chatter.User.findOne({userId: userId})._id;
+
+  const users = Meteor.users.find({_id: params.userId}).fetch();
+
+  if (users > 0) {
+    throw new Meteor.Error("user-already-exists", "user has already been added to chatter");
+  }
+
+  const chatterUser = new Chatter.User({
+    userId: params.userId,
+    userType: userType,
+    nickname: getNickname(user)
+  })
+
+  if (chatterUser.validate()) {
+    return chatterUser.save();
+  }
+
+  chatterUser.throwValidationException();
 };
 
 /**
  * @summary Adds empty room to Chatter.
  * @locus Server
- * @param {string} rommName
+ * @param {string} params Information about the new room.
+ * @param {string} params.name The name of the room.
+ * @param {string} params.description The description of the room.
  * @returns {string} roomId
  */
-Chatter.addRoom = function(roomName) {
-  check(roomName, String);
+Chatter.addRoom = function(params) {
+  check(params, {
+    name: String,
+    description: String
+  });
 
-  return Chatter.Room.insert({name: roomName});
+  return new Chatter.Room({
+    name: params.name,
+    description: params.description,
+  }).save();
 };
 
 /**
