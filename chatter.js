@@ -10,9 +10,21 @@ Chatter.configure = function (opts) {
 };
 
 /**
+ * @summary Retrieves nickname of user.
+ * @locus Server
+ * @param {object} meteor user.
+ * @returns {string} the nickname of the user.
+ */
+function getNickname(user) {
+  const nickPath = Chatter.options.nickProperty;
+  const nick = nickPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
+
+  return nick;
+}
+
+/**
  * @summary Adds user to Chatter and defines its privileges
  * @locus Server
- *
  * @param params Information about the new user.
  * @param {string} params.userId Meteor user id.
  * @param {string} params.userType Defines the restricitons on the new user. Can either be set to "admin" or "standard".
@@ -24,15 +36,19 @@ Chatter.addUser = function(params) {
     userType: Match.Maybe(String)
   });
 
-  const users = Meteor.users.find({_id: params.userId}).fetch();
+  const {userId, userType} = params;
 
-  if (users > 0) {
+  const checkChatterUser = Chatter.User.find({userId}).fetch();
+
+  if (checkChatterUser > 0) {
     throw new Meteor.Error("user-already-exists", "user has already been added to chatter");
   }
 
+  const user = Meteor.users.findOne({_id: userId});
+
   const chatterUser = new Chatter.User({
-    userId: params.userId,
-    userType: userType,
+    userId,
+    userType,
     nickname: getNickname(user)
   })
 
@@ -57,43 +73,51 @@ Chatter.addRoom = function(params) {
     description: String
   });
 
-  return new Chatter.Room({
-    name: params.name,
-    description: params.description,
-  }).save();
+  const {name, description} = params;
+
+  const room = new Chatter.Room({
+    name,
+    description
+  })
+
+  if (room.validate()) {
+    return room.save();
+  }
+
+  room.throwValidationException();
 };
 
 /**
  * @summary Adds user to room.
  * @locus Server
- * @param {string} userId Unique string identifying user.
- * @param {string} roomName Unique string identifying the room.
- * @returns {string} userRoomId
+ * @param params Information about the new room.
+ * @param {string} params.userId Unique string identifying user.
+ * @param {string} params.roomId Unique string identifying the room.
+ * @returns {string} the string of the userRoom
  */
-Chatter.addUserToRoom = function(userId, roomId) {
-  check(userId, String);
-  check(roomId, String);
-  const chatterUserId = Chatter.User.findOne({userId: userId})._id;
+Chatter.addUserToRoom = function(params) {
+  check(params, {
+    userId: String,
+    roomId: String
+  });
+
+  const {userId, roomId} = params;
+
+  const chatterUser = Chatter.User.findOne({userId});
   const room = Chatter.Room.findOne({_id: roomId});
 
-  if (room === undefined || chatterUserId === undefined) {
-    return "room or user does not exist";
+  if (room === undefined || chatterUser === undefined) {
+    throw new Meteor.Error("room-or-user-does-not-exist", "the values provided for userId or roomId are incorrect");
   }
 
-  return Chatter.UserRoom.upsert({
-    userId: chatterUserId,
-    roomId: room._id
-  }, {
-    $set: {
-      userId: chatterUserId,
-      roomId: room._id
-    }
-  });
+  const userRoom = new Chatter.UserRoom({
+    userId: chatterUser._id,
+    roomId
+  })
+
+  if (userRoom.validate()) {
+    return userRoom.save();
+  }
+
+  userRoom.throwValidationException();
 };
-
-function getNickname(user) {
-  const nickPath = Chatter.options.nickProperty;
-  const nick = nickPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
-
-  return nick;
-}
