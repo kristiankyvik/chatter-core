@@ -1,4 +1,4 @@
-const getChatterId = function(userId) {
+const getChatterUserId = function(userId) {
   const chatterUser = Chatter.User.findOne({userId: userId});
   if (!chatterUser) {
     throw new Meteor.Error("unknown-user", "user has not been added to chatter");
@@ -26,15 +26,14 @@ Meteor.methods({
     });
 
     const {message, roomId} = params;
+    const chatterUserId = getChatterUserId(Meteor.userId());
 
-    const chatterId = getChatterId(Meteor.userId());
-
-    if (!userInRoom(chatterId, roomId)) {
+    if (!userInRoom(chatterUserId, roomId)) {
       throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");
     }
 
     const newMessage = new Chatter.Message({
-      userId: chatterId
+      userId: chatterUserId
     });
 
     if (newMessage.validate()) {
@@ -98,13 +97,12 @@ Meteor.methods({
     });
 
     const {name, description} = params;
-
-    const chatterId = getChatterId(Meteor.userId());
+    const chatterUserId = getChatterUserId(Meteor.userId());
 
     const room = new Chatter.Room({
       name,
       description,
-      createdBy: chatterId
+      createdBy: chatterUserId
     })
 
     if (room.validate()) {
@@ -128,8 +126,8 @@ Meteor.methods({
     });
 
     const {roomId, archived} = params;
-
     const room = Chatter.Room.findOne({_id: roomId});
+
     if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
@@ -145,31 +143,32 @@ Meteor.methods({
 
   "room.users" (roomId) {
     check(roomId, String);
+
     const userRooms = Chatter.UserRoom.find({"roomId": roomId}).fetch();
     const users = userRooms.map(function(userRoom) {
-      const user = Chatter.User.findOne({_id: userRoom.userId });
-      return user;
+      return Chatter.User.findOne({_id: userRoom.userId });
     });
+
     return users;
   },
 
   "userroom.count.reset" (roomId) {
     check(roomId, String);
-    const chatterId = getChatterId(Meteor.userId());
 
+    const chatterUserId = getChatterUserId(Meteor.userId());
     const room = Chatter.Room.findOne({_id: roomId});
 
     if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
-    if (!userInRoom(chatterId, roomId)) {
+    if (!userInRoom(chatterUserId, roomId)) {
       throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");
     }
 
     Chatter.UserRoom.update({
       roomId: roomId,
-      userId: chatterId
+      userId: chatterUserId
     },
     {
       $set:{count: 0}

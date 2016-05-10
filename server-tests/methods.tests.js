@@ -2,6 +2,7 @@ import { resetDatabase } from "meteor/xolvio:cleaner";
 
 describe("chatter meteor methods", function() {
   let user;
+  const assert = chai.assert;
 
   before(function() {
     const meteorUser = Meteor.users.findOne();
@@ -20,8 +21,8 @@ describe("chatter meteor methods", function() {
 
       Meteor.call("user.check", function (error, response){
         setTimeout(function() {
-          chai.assert.isUndefined(error);
-          chai.assert.equal(response, false);
+          assert.isUndefined(error);
+          assert.equal(response, false);
           done();
         });
       });
@@ -33,8 +34,8 @@ describe("chatter meteor methods", function() {
 
       Meteor.call("user.check", function (error, response){
         setTimeout(function() {
-          chai.assert.isUndefined(error);
-          chai.assert.equal(response, true);
+          assert.isUndefined(error);
+          assert.equal(response, true);
           done();
         });
       });
@@ -53,8 +54,8 @@ describe("chatter meteor methods", function() {
     it("message.build throws exception when parameters are missing", function (done) {
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
-          chai.assert.isUndefined(response);
-          chai.assert.equal(error.errorType, "Match.Error");
+          assert.isUndefined(response);
+          assert.equal(error.errorType, "Match.Error");
           done();
         });
       });
@@ -64,8 +65,8 @@ describe("chatter meteor methods", function() {
       params.message = "test message";
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
-          chai.assert.isUndefined(error);
-          chai.assert.isString(response);
+          assert.isUndefined(error);
+          assert.isString(response);
           done();
         });
       });
@@ -78,8 +79,8 @@ describe("chatter meteor methods", function() {
 
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
-          chai.assert.isUndefined(response);
-          chai.assert.equal(error.error, "validation-error");
+          assert.isUndefined(response);
+          assert.equal(error.error, "validation-error");
           done();
         })
       });
@@ -90,8 +91,8 @@ describe("chatter meteor methods", function() {
 
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
-          chai.assert.isUndefined(response);
-          chai.assert.equal(error.errorType, "Match.Error");
+          assert.isUndefined(response);
+          assert.equal(error.errorType, "Match.Error");
           done();
         })
       });
@@ -102,7 +103,7 @@ describe("chatter meteor methods", function() {
 
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
-          chai.assert.equal(error.error, "validation-error");
+          assert.equal(error.error, "validation-error");
           done();
         })
       });
@@ -114,8 +115,8 @@ describe("chatter meteor methods", function() {
 
       Meteor.call("message.build", params, function(error, response) {
         setTimeout(function() {
-          chai.assert.isUndefined(response);
-          chai.assert.equal(error.error, "user-not-in-room");
+          assert.isUndefined(response);
+          assert.equal(error.error, "user-not-in-room");
           done();
         })
       });
@@ -149,8 +150,8 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("room.build", params, function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(response);
-            chai.assert.equal(error.errorType, "Match.Error");
+            assert.isUndefined(response);
+            assert.equal(error.errorType, "Match.Error");
             done();
           });
         });
@@ -160,8 +161,8 @@ describe("chatter meteor methods", function() {
         const params = roomAttributes;
         Meteor.call("room.build", params, function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(error);
-            chai.assert.isString(response);
+            assert.isUndefined(error);
+            assert.isString(response);
             done();
           });
         });
@@ -175,8 +176,8 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("room.build", params, function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(response);
-            chai.assert.equal(error.error, "validation-error");
+            assert.isUndefined(response);
+            assert.equal(error.error, "validation-error");
             done();
           });
         });
@@ -193,8 +194,8 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("room.archive", roomId, function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(response);
-            chai.assert.equal(error.errorType, "Match.Error");
+            assert.isUndefined(response);
+            assert.equal(error.errorType, "Match.Error");
             done();
           });
         });
@@ -207,8 +208,8 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("room.archive", roomId, function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(response);
-            chai.assert.equal(error.errorType, "Match.Error");
+            assert.isUndefined(response);
+            assert.equal(error.errorType, "Match.Error");
             done();
           });
         });
@@ -222,15 +223,15 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("room.archive", params, function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(response);
-            chai.assert.equal(error.error, "non-existing-room");
+            assert.isUndefined(response);
+            assert.equal(error.error, "non-existing-room");
             done();
           });
         });
       });
 
       it("room is built with archived set to default", function () {
-        chai.assert.equal(room.archived, false);
+        assert.equal(room.archived, false);
       });
 
       it("returns true after succesfully calling method with true parameter", function (done) {
@@ -240,15 +241,15 @@ describe("chatter meteor methods", function() {
         };
         Meteor.call("room.archive", params, function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(error);
-            chai.assert.equal(response, true);
+            assert.isUndefined(error);
+            assert.equal(response, true);
             done();
           });
         });
       });
 
       it("actually changed archived status to true", function () {
-        chai.assert.equal(Chatter.Room.findOne({_id: room._id}).archived, true);
+        assert.equal(Chatter.Room.findOne({_id: room._id}).archived, true);
       });
 
       it("returns false after succesfully calling method with false parameter", function (done) {
@@ -258,15 +259,15 @@ describe("chatter meteor methods", function() {
         };
         Meteor.call("room.archive", params, function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(error);
-            chai.assert.equal(response, false);
+            assert.isUndefined(error);
+            assert.equal(response, false);
             done();
           });
         });
       });
 
       it("actually changed archived status to true", function () {
-        chai.assert.equal(Chatter.Room.findOne({_id: room._id}).archived, false);
+        assert.equal(Chatter.Room.findOne({_id: room._id}).archived, false);
       });
     });
   });
@@ -299,8 +300,8 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
-              chai.assert.isUndefined(response);
-              chai.assert.equal(error.errorType, "Match.Error");
+              assert.isUndefined(response);
+              assert.equal(error.errorType, "Match.Error");
             });
           });
 
@@ -308,8 +309,8 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
-              chai.assert.isUndefined(response);
-              chai.assert.equal(error.errorType, "Match.Error");
+              assert.isUndefined(response);
+              assert.equal(error.errorType, "Match.Error");
               done();
             });
           });
@@ -321,8 +322,8 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
-              chai.assert.isUndefined(response);
-              chai.assert.equal(error.error, "non-existing-room");
+              assert.isUndefined(response);
+              assert.equal(error.error, "non-existing-room");
               done();
             });
           });
@@ -334,8 +335,8 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
-              chai.assert.isUndefined(response);
-              chai.assert.equal(error.error, "non-existing-users");
+              assert.isUndefined(response);
+              assert.equal(error.error, "non-existing-users");
               done();
             });
           });
@@ -350,8 +351,8 @@ describe("chatter meteor methods", function() {
 
           Meteor.call("userroom.build", params, function(error, response) {
             setTimeout(function() {
-              chai.assert.isUndefined(error);
-              chai.assert.isString(response);
+              assert.isUndefined(error);
+              assert.isString(response);
               done();
             });
           });
@@ -366,8 +367,8 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("userroom.remove", params, function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(response);
-            chai.assert.equal(error.errorType, "Match.Error");
+            assert.isUndefined(response);
+            assert.equal(error.errorType, "Match.Error");
             done();
           });
         });
@@ -377,7 +378,7 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("userroom.remove", {userId: user._id, roomId: room._id});
         const results = Chatter.UserRoom.find({userId: user._id, roomId: room._id}).fetch();
-        chai.assert.equal(results.length, 0);
+        assert.equal(results.length, 0);
       });
     });
 
@@ -393,10 +394,10 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("userroom.count.reset", roomId , function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(error);
-            chai.assert.equal(response, true);
+            assert.isUndefined(error);
+            assert.equal(response, true);
           });
-          chai.assert.equal(Chatter.UserRoom.findOne({roomId, userId: user._id}).count, 0);
+          assert.equal(Chatter.UserRoom.findOne({roomId, userId: user._id}).count, 0);
           done();
         });
       });
@@ -406,8 +407,8 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("userroom.count.reset", roomId , function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(response);
-            chai.assert.equal(error.error, "non-existing-room");
+            assert.isUndefined(response);
+            assert.equal(error.error, "non-existing-room");
             done();
           });
         });
@@ -418,8 +419,8 @@ describe("chatter meteor methods", function() {
 
         Meteor.call("userroom.count.reset", roomId , function(error, response) {
           setTimeout(function() {
-            chai.assert.isUndefined(response);
-            chai.assert.equal(error.error, "user-not-in-room");
+            assert.isUndefined(response);
+            assert.equal(error.error, "user-not-in-room");
             done();
           });
         });

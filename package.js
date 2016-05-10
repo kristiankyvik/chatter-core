@@ -31,8 +31,7 @@ Package.onUse(function(api) {
   api.addFiles([
     'server/publish.js',
     'server/access.js',
-    'server/methods.js',
-    'imports/api/setup.app-tests.js'
+    'server/methods.js'
 
   ], 'server');
 
@@ -48,6 +47,9 @@ Package.onTest(function(api) {
   api.use('jorgeer:chatter-core');
   api.use('xolvio:cleaner');
   api.use('practicalmeteor:sinon');
+  api.addFiles([
+    'imports/api/setup.app-tests.js'
+  ], 'server');
   api.mainModule('chattercore.server.tests.js', 'server');
   api.mainModule('chattercore.client.tests.js', 'client');
 });

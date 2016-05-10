@@ -36,15 +36,14 @@ Meteor.methods({
   },
 
   "createTestRoom"() {
-    Chatter.Room.insert({
+    const roomId = Chatter.Room.insert({
       name: "Test Room",
       description: "This is the description of the test room"
     });
-    const room = ChatterRoom.findOne();
 
     Chatter.UserRoom.insert({
       userId: Chatter.User.findOne()._id,
-      roomId: room._id
+      roomId: roomId
     });
   }
 

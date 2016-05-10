@@ -37,7 +37,6 @@ Chatter.addUser = function(params) {
   });
 
   const {userId, userType} = params;
-
   let chatterUser = Chatter.User.findOne({userId});
 
   if (chatterUser) {
@@ -74,7 +73,6 @@ Chatter.addRoom = function(params) {
   });
 
   const {name, description} = params;
-
   const room = new Chatter.Room({
     name,
     description
@@ -102,7 +100,6 @@ Chatter.addUserToRoom = function(params) {
   });
 
   const {userId, roomId} = params;
-
   const chatterUser = Chatter.User.findOne({userId});
   const room = Chatter.Room.findOne({_id: roomId});
 

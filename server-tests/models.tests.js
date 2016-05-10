@@ -1,6 +1,8 @@
 import { chai } from "meteor/practicalmeteor:chai";
 
 describe("chatter models", function () {
+  const assert = chai.assert;
+
   describe("chatter message model", function () {
 
     //initilizing test message
@@ -19,14 +21,14 @@ describe("chatter models", function () {
     });
 
     it("message is inserted with correct attributes", function () {
-      chai.assert.equal(message.userId, attributes.userId);
-      chai.assert.equal(message.roomId, attributes.roomId);
-      chai.assert.equal(message.message, attributes.message);
+      assert.equal(message.userId, attributes.userId);
+      assert.equal(message.roomId, attributes.roomId);
+      assert.equal(message.message, attributes.message);
     });
 
 
     it("message returns the correct timeAgo when calling timeAgo()", function () {
-      chai.assert.equal(message.timeAgo(), "a few seconds ago");
+      assert.equal(message.timeAgo(), "a few seconds ago");
     });
 
   });
@@ -51,15 +53,15 @@ describe("chatter models", function () {
     });
 
     it("room is inserted with correct attributes", function () {
-      chai.assert.equal(room.name, attributes.name);
-      chai.assert.equal(room.description, attributes.description);
-      chai.assert.equal(room.createdBy, attributes.createdBy);
+      assert.equal(room.name, attributes.name);
+      assert.equal(room.description, attributes.description);
+      assert.equal(room.createdBy, attributes.createdBy);
     });
 
     it("room is inserted with correct defaults", function () {
-      chai.assert.equal(room.archived, false);
+      assert.equal(room.archived, false);
       const now = new Date();
-      chai.assert.equal(now.getTime() - room.lastActive.getTime() < 20000, true);
+      assert.equal(now.getTime() - room.lastActive.getTime() < 20000, true);
     });
 
   });
@@ -83,17 +85,17 @@ describe("chatter models", function () {
 
 
     it("User is inserted with correct attributes", function () {
-      chai.assert.equal(defaultUser.userType, attributes.userType);
-      chai.assert.equal(defaultUser.userId, attributes.userId);
-      chai.assert.equal(defaultUser.nickname, attributes.nickname);
+      assert.equal(defaultUser.userType, attributes.userType);
+      assert.equal(defaultUser.userId, attributes.userId);
+      assert.equal(defaultUser.nickname, attributes.nickname);
     });
 
     it("User is inserted with correct defaults", function () {
-      chai.assert.equal(defaultUser.avatar, "http://localhost:3000/packages/jorgeer_chatter-semantic/public/images/avatar.jpg");
+      assert.equal(defaultUser.avatar, "http://localhost:3000/packages/jorgeer_chatter-semantic/public/images/avatar.jpg");
     });
 
     it("User is inserted when overwritting defaults", function () {
-      chai.assert.equal(customUser.avatar, "test avatar");
+      assert.equal(customUser.avatar, "test avatar");
     });
   });
 
@@ -114,12 +116,12 @@ describe("chatter models", function () {
     });
 
     it("User Room is inserted with correct attributes", function () {
-      chai.assert.equal(userRoom.userId, attributes.userId);
-      chai.assert.equal(userRoom.roomId, attributes.roomId);
+      assert.equal(userRoom.userId, attributes.userId);
+      assert.equal(userRoom.roomId, attributes.roomId);
     });
 
     it("User Room is inserted with correct defaults", function () {
-      chai.assert.equal(userRoom.count, 0);
+      assert.equal(userRoom.count, 0);
     });
 
     Chatter.UserRoom.remove({_id: userRoomId});
