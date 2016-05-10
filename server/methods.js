@@ -1,9 +1,9 @@
 const getChatterId = function(userId) {
-  const results = Chatter.User.find({userId: userId}).fetch();
-  if (results.length === 0) {
+  const chatterUser = Chatter.User.findOne({userId: userId});
+  if (!chatterUser) {
     throw new Meteor.Error("unknown-user", "user has not been added to chatter");
   }
-  return results[0]._id;
+  return chatterUser._id;
 };
 
 const userInRoom = function(chatterId, roomId) {
@@ -25,23 +25,23 @@ Meteor.methods({
       roomId: String
     });
 
+    const {message, roomId} = params;
+
     const chatterId = getChatterId(Meteor.userId());
 
-    if (!userInRoom(chatterId, params.roomId)) {
+    if (!userInRoom(chatterId, roomId)) {
       throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");
     }
 
-    const message = new Chatter.Message({
-      message: params.message,
-      roomId: params.roomId,
+    const newMessage = new Chatter.Message({
       userId: chatterId
     });
 
-    if (message.validate()) {
+    if (newMessage.validate()) {
       return message.save();
     }
 
-    message.throwValidationException();
+    newMessage.throwValidationException();
   },
 
   "userroom.build" (form) {
@@ -52,13 +52,13 @@ Meteor.methods({
 
     const room = Chatter.Room.findOne({_id: form.roomId});
 
-    if (room === undefined) {
+    if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
     let userNotexists = false;
     _.each(form.invitees, function(chatterUserId) {
-      let user = Chatter.User.find({_id: chatterUserId}).fetch();
-      if (user.length > 0) {
+      let chatterUser = Chatter.User.findOne({_id: chatterUserId});
+      if (chatterUser) {
         Chatter.UserRoom.upsert({
           userId: chatterUserId,
           roomId: room._id
@@ -97,11 +97,13 @@ Meteor.methods({
         description: String
     });
 
+    const {name, description} = params;
+
     const chatterId = getChatterId(Meteor.userId());
 
     const room = new Chatter.Room({
-      name: params.name,
-      description: params.description,
+      name,
+      description,
       createdBy: chatterId
     })
 
@@ -125,18 +127,20 @@ Meteor.methods({
         archived: Boolean
     });
 
-    const rooms = Chatter.Room.find({_id: params.roomId}).fetch();
-    if (rooms.length === 0) {
+    const {roomId, archived} = params;
+
+    const room = Chatter.Room.findOne({_id: roomId});
+    if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
     Chatter.Room.update({
-      _id : params.roomId
+      _id : roomId
     },
     {
-      $set:{archived: params.archived}
+      $set:{archived: archived}
     });
-    return params.archived;
+    return archived;
   },
 
   "room.users" (roomId) {
@@ -153,8 +157,9 @@ Meteor.methods({
     check(roomId, String);
     const chatterId = getChatterId(Meteor.userId());
 
-    const rooms = Chatter.Room.find({_id: roomId}).fetch();
-    if (rooms.length === 0) {
+    const room = Chatter.Room.findOne({_id: roomId});
+
+    if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 

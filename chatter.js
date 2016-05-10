@@ -38,15 +38,15 @@ Chatter.addUser = function(params) {
 
   const {userId, userType} = params;
 
-  const chatterUser = Chatter.User.findOne({userId});
+  let chatterUser = Chatter.User.findOne({userId});
 
-  if (!chatterUser) {
+  if (chatterUser) {
     throw new Meteor.Error("user-already-exists", "user has already been added to chatter");
   }
 
   const user = Meteor.users.findOne({_id: userId});
 
-  const chatterUser = new Chatter.User({
+  chatterUser = new Chatter.User({
     userId,
     userType,
     nickname: getNickname(user)
