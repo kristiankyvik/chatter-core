@@ -1,4 +1,5 @@
 import { chai } from "meteor/practicalmeteor:chai";
+import emptyDatabase from "./test-helpers.js";
 
 describe("chatter api methods", function () {
   let chatterUser;
@@ -25,10 +26,7 @@ describe("chatter api methods", function () {
   });
 
   after(function() {
-    Chatter.User.remove({});
-    Chatter.UserRoom.remove({});
-    Chatter.Room.remove({});
-    Chatter.Message.remove({});
+    emptyDatabase();
   });
 
   it("chatter user is added", function() {

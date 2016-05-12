@@ -1,13 +1,11 @@
 import { chai } from "meteor/practicalmeteor:chai";
+import emptyDatabase from "./test-helpers.js";
 
 describe("chatter models", function() {
   const assert = chai.assert;
 
   after(function() {
-    Chatter.User.remove({});
-    Chatter.UserRoom.remove({});
-    Chatter.Room.remove({});
-    Chatter.Message.remove({});
+    emptyDatabase();
   });
 
   describe("chatter message model", function() {

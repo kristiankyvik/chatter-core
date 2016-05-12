@@ -1,3 +1,5 @@
+import emptyDatabase from "./test-helpers.js";
+
 const callbackWrapper = function(fn) {
   return function(error, response) {
     setTimeout(() => fn(error, response));
@@ -32,10 +34,7 @@ describe("chatter meteor methods", function() {
   });
 
   after(function() {
-    Chatter.User.remove({});
-    Chatter.UserRoom.remove({});
-    Chatter.Room.remove({});
-    Chatter.Message.remove({});
+    emptyDatabase();
   });
 
   describe("user.check method", function() {
