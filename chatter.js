@@ -1,8 +1,8 @@
 Chatter = {
   options: {
     messageLimit: 30,
-    roomLimit: 15,
-    nickProperty: "username"
+    nickProperty: "username",
+    initialRoomLoad: 5
   }
 };
 

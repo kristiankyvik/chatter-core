@@ -1,13 +1,41 @@
-import { resetDatabase } from "meteor/xolvio:cleaner";
+// const callbackWrapper = function(error, response) {
+//   return function() {
+//     return setTimeout();
+//   };
+// };
 
 describe("chatter meteor methods", function() {
-  let user;
+  let chatterUser;
+  let room;
   const assert = chai.assert;
+
+  const roomAttributes = {
+    name: "test room",
+    description: "test description"
+  };
+
 
   before(function() {
     const meteorUser = Meteor.users.findOne();
-    const userId = Chatter.addUser(meteorUser._id, "admin");
-    user = Chatter.User.findOne(userId);
+    const userId = new Chatter.User({
+      userId: meteorUser._id,
+      userType: "admin"
+    }).save();
+
+    const roomId =  new Chatter.Room({name: "test_room" }).save();
+
+    chatterUser = Chatter.User.findOne(userId);
+    room = Chatter.Room.findOne(roomId)
+
+    new Chatter.UserRoom({userId: chatterUser._id, roomId: roomId }).save();
+
+  });
+
+  after(function() {
+    Chatter.User.remove({});
+    Chatter.UserRoom.remove({});
+    Chatter.Room.remove({});
+    Chatter.Message.remove({});
   });
 
   describe("user.check method", function() {
@@ -42,17 +70,11 @@ describe("chatter meteor methods", function() {
     });
   });
 
-  describe("message.build method", function() {
-    let params;
+  describe("message.send method", function() {
 
-    before(function() {
-      params = {};
-      const roomId = params.roomId = Chatter.Room.insert({name: "test_room" });
-      Chatter.UserRoom.insert({userId: user._id, roomId: roomId });
-    });
-
-    it("message.build throws exception when parameters are missing", function(done) {
-      Meteor.call("message.build", params, function(error, response) {
+    it("message.send throws exception when parameters are missing", function(done) {
+      const params = {};
+      Meteor.call("message.send", params, function(error, response) {
         setTimeout(function() {
           assert.isUndefined(response);
           assert.equal(error.errorType, "Match.Error");
@@ -61,23 +83,13 @@ describe("chatter meteor methods", function() {
       });
     });
 
-    it("message.build succeeds when no parameters are missing", function(done) {
-      params.message = "test message";
-      Meteor.call("message.build", params, function(error, response) {
-        setTimeout(function() {
-          assert.isUndefined(error);
-          assert.isString(response);
-          done();
-        });
-      });
-    });
-
-
-    it("message.build throws an error when he message text is too long", function() {
+    it("message.send throws an error when he message text is too long", function() {
       const longMessage = "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?";
+      const params = {};
+      params.roomId = room._id;
       params.message = longMessage;
 
-      Meteor.call("message.build", params, function(error, response) {
+      Meteor.call("message.send", params, function(error, response) {
         setTimeout(function() {
           assert.isUndefined(response);
           assert.equal(error.error, "validation-error");
@@ -86,10 +98,12 @@ describe("chatter meteor methods", function() {
       });
     });
 
-    it("message.build throws exception when parameters are wrong type", function(done) {
+    it("message.send throws exception when parameters are wrong type", function(done) {
+      const params = {};
+      params.roomId = room._id;
       params.message = 123123;
 
-      Meteor.call("message.build", params, function(error, response) {
+      Meteor.call("message.send", params, function(error, response) {
         setTimeout(function() {
           assert.isUndefined(response);
           assert.equal(error.errorType, "Match.Error");
@@ -98,22 +112,26 @@ describe("chatter meteor methods", function() {
       });
     });
 
-    it("message.build throws exception when message text is empty", function(done) {
+    it("message.send throws exception when message text is empty", function(done) {
+      const params = {};
       params.message = "";
+      params.roomId = room._id;
 
-      Meteor.call("message.build", params, function(error, response) {
+      Meteor.call("message.send", params, function(error, response) {
         setTimeout(function() {
+          assert.isUndefined(response);
           assert.equal(error.error, "validation-error");
           done();
         })
       });
     });
 
-    it("message.build throws error when user is not part of room ", function(done) {
-      Chatter.UserRoom.remove({userId: user._id, roomId: params.roomId });
+    it("message.send throws error when user is not part of room ", function(done) {
+      const params = {};
+      params.roomId = room._id;
       params.message = "test message";
-
-      Meteor.call("message.build", params, function(error, response) {
+      Chatter.UserRoom.remove({userId: chatterUser._id, roomId: room._id });
+      Meteor.call("message.send", params, function(error, response) {
         setTimeout(function() {
           assert.isUndefined(response);
           assert.equal(error.error, "user-not-in-room");
@@ -124,31 +142,12 @@ describe("chatter meteor methods", function() {
   });
 
   describe("room methods", function() {
-    const roomAttributes = {
-      name: "test room",
-      description: "test description"
-    };
 
-    let params;
-    let room;
-    let user;
-
-
-    before(function() {
-      params = {};
-      const meteorUser = Meteor.users.findOne();
-      const userId = Chatter.addUser(meteorUser._id, "admin");
-
-      roomId = Chatter.Room.insert(roomAttributes);
-      room = Chatter.Room.findOne(roomId);
-      user = Chatter.User.findOne(userId);
-    });
-
-    describe("room.build", function() {
+    describe("room.create", function() {
       it("throws an error when required parameters are missing", function(done) {
         const params = {};
 
-        Meteor.call("room.build", params, function(error, response) {
+        Meteor.call("room.create", params, function(error, response) {
           setTimeout(function() {
             assert.isUndefined(response);
             assert.equal(error.errorType, "Match.Error");
@@ -159,7 +158,8 @@ describe("chatter meteor methods", function() {
 
       it("return roomId when parameters are correct", function(done) {
         const params = roomAttributes;
-        Meteor.call("room.build", params, function(error, response) {
+
+        Meteor.call("room.create", params, function(error, response) {
           setTimeout(function() {
             assert.isUndefined(error);
             assert.isString(response);
@@ -174,7 +174,7 @@ describe("chatter meteor methods", function() {
           description: "test description"
         };
 
-        Meteor.call("room.build", params, function(error, response) {
+        Meteor.call("room.create", params, function(error, response) {
           setTimeout(function() {
             assert.isUndefined(response);
             assert.equal(error.error, "validation-error");
@@ -192,7 +192,7 @@ describe("chatter meteor methods", function() {
           archived: false
         };
 
-        Meteor.call("room.archive", roomId, function(error, response) {
+        Meteor.call("room.archive", params, function(error, response) {
           setTimeout(function() {
             assert.isUndefined(response);
             assert.equal(error.errorType, "Match.Error");
@@ -206,7 +206,7 @@ describe("chatter meteor methods", function() {
           roomId: "124324324"
         };
 
-        Meteor.call("room.archive", roomId, function(error, response) {
+        Meteor.call("room.archive", params, function(error, response) {
           setTimeout(function() {
             assert.isUndefined(response);
             assert.equal(error.errorType, "Match.Error");
@@ -274,31 +274,13 @@ describe("chatter meteor methods", function() {
 
   describe("userRoom methods", function() {
 
-    const roomAttributes = {
-      name: "test room",
-      description: "test description",
-      createdBy: "test creator"
-    };
+    describe("room.join method", function() {
 
-    let params;
-    let room;
-    let user;
-
-    before(function() {
-      params = {};
-      const meteorUser = Meteor.users.findOne();
-      const userId = Chatter.addUser(meteorUser._id, "admin");
-
-      roomId = Chatter.Room.insert(roomAttributes);
-      room = Chatter.Room.findOne(roomId);
-      user = Chatter.User.findOne(userId);
-    });
-
-    describe("userroom.build method", function() {
       describe("when parameters are missing or wrong", function() {
-        it("returns exception when parameters are missing ", function(done) {
 
-          Meteor.call("userroom.build", params, function(error, response) {
+        it("returns exception when parameters are missing ", function(done) {
+          const params = {};
+          Meteor.call("room.join", params, function(error, response) {
             setTimeout(function() {
               assert.isUndefined(response);
               assert.equal(error.errorType, "Match.Error");
@@ -307,7 +289,7 @@ describe("chatter meteor methods", function() {
 
           params.roomId = room._id;
 
-          Meteor.call("userroom.build", params, function(error, response) {
+          Meteor.call("room.join", params, function(error, response) {
             setTimeout(function() {
               assert.isUndefined(response);
               assert.equal(error.errorType, "Match.Error");
@@ -317,10 +299,11 @@ describe("chatter meteor methods", function() {
         });
 
         it("returns 'room does not exist' error when roomId does not exist", function(done) {
+          const params = {};
           params.roomId = "non existent roomId";
-          params.invitees = [user._id];
+          params.invitees = [chatterUser._id];
 
-          Meteor.call("userroom.build", params, function(error, response) {
+          Meteor.call("room.join", params, function(error, response) {
             setTimeout(function() {
               assert.isUndefined(response);
               assert.equal(error.error, "non-existing-room");
@@ -330,10 +313,11 @@ describe("chatter meteor methods", function() {
         });
 
         it("returns 'user does not exist' error when userId does not exist", function(done) {
+          const params = {};
           params.invitees = ["non existent userId"];
           params.roomId = room._id;
 
-          Meteor.call("userroom.build", params, function(error, response) {
+          Meteor.call("room.join", params, function(error, response) {
             setTimeout(function() {
               assert.isUndefined(response);
               assert.equal(error.error, "non-existing-users");
@@ -346,10 +330,11 @@ describe("chatter meteor methods", function() {
       describe("when no parameters are missing or wrong", function() {
 
         it("creates a userRoom instance", function(done) {
-          params.invitees = [user._id];
+          const params = {};
+          params.invitees = [chatterUser._id];
           params.roomId = room._id;
 
-          Meteor.call("userroom.build", params, function(error, response) {
+          Meteor.call("room.join", params, function(error, response) {
             setTimeout(function() {
               assert.isUndefined(error);
               assert.isString(response);
@@ -360,12 +345,12 @@ describe("chatter meteor methods", function() {
       });
     });
 
-    describe("userroom.remove method", function() {
+    describe("room.leave method", function() {
 
       it("throw an error if missing parameters", function(done) {
         params = {};
 
-        Meteor.call("userroom.remove", params, function(error, response) {
+        Meteor.call("room.leave", params, function(error, response) {
           setTimeout(function() {
             assert.isUndefined(response);
             assert.equal(error.errorType, "Match.Error");
@@ -374,38 +359,38 @@ describe("chatter meteor methods", function() {
         });
       });
 
-      it("remove userroom if no missing parameters missing or incorrect", function() {
+      it("room.leave if no missing parameters missing or incorrect", function() {
 
-        Meteor.call("userroom.remove", {userId: user._id, roomId: room._id});
-        const results = Chatter.UserRoom.find({userId: user._id, roomId: room._id}).fetch();
+        Meteor.call("room.leave", {userId: chatterUser._id, roomId: room._id});
+        const results = Chatter.UserRoom.find({userId: chatterUser._id, roomId: room._id}).fetch();
         assert.equal(results.length, 0);
       });
     });
 
-    describe("userroom.count methods", function() {
+    describe("room.counter methods", function() {
 
       before(function() {
-        params.invitees = [user._id];
-        params.roomId = room._id;
-        Meteor.call("userroom.build", params);
+        new Chatter.UserRoom({userId: chatterUser._id, roomId: room._id }).save();
       });
 
-      it("useroom count is set to zero when reset method is called", function(done) {
+      it("room counter returns true when called with right parameters", function(done) {
 
-        Meteor.call("userroom.count.reset", roomId , function(error, response) {
+        Meteor.call("room.counter.reset", room._id , function(error, response) {
           setTimeout(function() {
             assert.isUndefined(error);
             assert.equal(response, true);
+            done();
           });
-          assert.equal(Chatter.UserRoom.findOne({roomId, userId: user._id}).count, 0);
-          done();
         });
       });
 
-      it("useroom count return error when wrong roomId is passed in", function(done) {
-        const roomId = "non-existing-room";
+      it("room counter does reset the counter to 0", function () {
+        assert.equal(Chatter.UserRoom.findOne({roomId: room._id, userId: chatterUser._id}).count, 0);
+      });
 
-        Meteor.call("userroom.count.reset", roomId , function(error, response) {
+      it("room counter return error when wrong roomId is passed in", function(done) {
+
+        Meteor.call("room.counter.reset", "wrong room id" , function(error, response) {
           setTimeout(function() {
             assert.isUndefined(response);
             assert.equal(error.error, "non-existing-room");
@@ -414,10 +399,10 @@ describe("chatter meteor methods", function() {
         });
       });
 
-      it("useroom count return error when user is not in room", function(done) {
-        Chatter.UserRoom.remove({userId: user._id, roomId});
+      it("room counter return error when user is not in room", function(done) {
+        Chatter.UserRoom.remove({userId: chatterUser._id, roomId: room._id});
 
-        Meteor.call("userroom.count.reset", roomId , function(error, response) {
+        Meteor.call("room.counter.reset", room._id , function(error, response) {
           setTimeout(function() {
             assert.isUndefined(response);
             assert.equal(error.error, "user-not-in-room");

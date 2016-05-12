@@ -3,6 +3,13 @@ import { chai } from "meteor/practicalmeteor:chai";
 describe("chatter models", function() {
   const assert = chai.assert;
 
+  after(function() {
+    Chatter.User.remove({});
+    Chatter.UserRoom.remove({});
+    Chatter.Room.remove({});
+    Chatter.Message.remove({});
+  });
+
   describe("chatter message model", function() {
 
     //initilizing test message
@@ -15,9 +22,10 @@ describe("chatter models", function() {
     let messageId;
     let message;
 
-    before(function() {
-      messageId = Chatter.Message.insert(attributes);
+    before(function(done) {
+      messageId = new Chatter.Message(attributes).save();
       message = Chatter.Message.findOne(messageId);
+      done();
     });
 
     it("message is inserted with correct attributes", function() {
@@ -35,7 +43,6 @@ describe("chatter models", function() {
 
   describe("chatter room model", function() {
 
-    //initilizing test room
     const attributes = {
       name: "test room",
       description: "test description",
@@ -48,7 +55,7 @@ describe("chatter models", function() {
 
     before(function() {
       then = new Date();
-      roomId = Chatter.Room.insert(attributes);
+      roomId = new Chatter.Room(attributes).save();
       room = Chatter.Room.findOne(roomId);
     });
 
@@ -75,27 +82,27 @@ describe("chatter models", function() {
       nickname: "test nickname"
     };
 
-    const defaultUserId = Chatter.User.insert(attributes);
-    const defaultUser = Chatter.User.findOne(defaultUserId);
+    const defaultChatterUserId = new Chatter.User(attributes).save();
+    const defaultChatterUser = Chatter.User.findOne(defaultChatterUserId);
 
     attributes.avatar = "test avatar";
 
-    const customUserId = Chatter.User.insert(attributes);
-    const customUser = Chatter.User.findOne(customUserId);
+    const customChatterUserId = new Chatter.User(attributes).save();
+    const customChatterUser = Chatter.User.findOne(customChatterUserId);
 
 
     it("User is inserted with correct attributes", function() {
-      assert.equal(defaultUser.userType, attributes.userType);
-      assert.equal(defaultUser.userId, attributes.userId);
-      assert.equal(defaultUser.nickname, attributes.nickname);
+      assert.equal(defaultChatterUser.userType, attributes.userType);
+      assert.equal(defaultChatterUser.userId, attributes.userId);
+      assert.equal(defaultChatterUser.nickname, attributes.nickname);
     });
 
     it("User is inserted with correct defaults", function() {
-      assert.equal(defaultUser.avatar, "http://localhost:3000/packages/jorgeer_chatter-semantic/public/images/avatar.jpg");
+      assert.equal(defaultChatterUser.avatar, "http://localhost:3000/packages/jorgeer_chatter-semantic/public/images/avatar.jpg");
     });
 
     it("User is inserted when overwritting defaults", function() {
-      assert.equal(customUser.avatar, "test avatar");
+      assert.equal(customChatterUser.avatar, "test avatar");
     });
   });
 
@@ -111,7 +118,7 @@ describe("chatter models", function() {
     let userRoom;
 
     before(function() {
-      userRoomId = Chatter.UserRoom.insert(attributes);
+      userRoomId = new Chatter.UserRoom(attributes).save();
       userRoom = Chatter.UserRoom.findOne(userRoomId);
     });
 

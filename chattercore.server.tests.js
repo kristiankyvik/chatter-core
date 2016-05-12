@@ -1,5 +1,4 @@
 import { chai } from "meteor/practicalmeteor:chai";
-import { resetDatabase } from "meteor/xolvio:cleaner";
 
 before(function() {
 
@@ -19,10 +18,7 @@ before(function() {
     _id: "meteor_user_two_id",
     username: "meteor_user_two_nickname"
   });
-});
 
-after(function() {
-  resetDatabase();
 });
 
 import { modelTests } from "./server-tests/models.tests.js";

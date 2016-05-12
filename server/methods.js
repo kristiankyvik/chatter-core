@@ -38,6 +38,7 @@ Meteor.methods({
       roomId
     });
 
+
     if (newMessage.validate()) {
       return newMessage.save();
     }

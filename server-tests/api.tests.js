@@ -1,7 +1,7 @@
 import { chai } from "meteor/practicalmeteor:chai";
 
 describe("chatter api methods", function () {
-  let user;
+  let chatterUser;
   let room;
   let meteorUser;
   const assert = chai.assert;
@@ -9,24 +9,43 @@ describe("chatter api methods", function () {
   before(function() {
     meteorUser = Meteor.users.findOne("id_of_user_one");
 
-    const userId = Chatter.addUser(meteorUser._id, "admin");
-    user = Chatter.User.findOne(userId);
+    const userId = new Chatter.User({
+      userId: meteorUser._id,
+      userType: "admin",
+      nickname: "test nickname"
+    }).save();
 
-    const roomId = Chatter.addRoom("test room");
+    chatterUser = Chatter.User.findOne(userId);
+
+    const roomId = new Chatter.Room({
+      name: "test room",
+      description: "test room description"
+    }).save();
     room = Chatter.Room.findOne(roomId);
   });
 
+  after(function() {
+    Chatter.User.remove({});
+    Chatter.UserRoom.remove({});
+    Chatter.Room.remove({});
+    Chatter.Message.remove({});
+  });
+
   it("chatter user is added", function() {
-    assert.equal(user.userId, meteorUser._id);
+    assert.equal(chatterUser.userId, meteorUser._id);
   });
 
   it("chatter room is added", function() {
     assert.equal(room.name, "test room");
+    assert.equal(room.description, "test room description");
   });
 
   it("chatter user is added to chatter room", function() {
-    Chatter.addUserToRoom(user.userId, room._id);
-    const roomUsers = Chatter.UserRoom.find({userId: user._id, roomId: room._id}).fetch();
+    new Chatter.UserRoom({
+      userId: chatterUser._id,
+      roomId: room._id
+    }).save();
+    const roomUsers = Chatter.UserRoom.find({userId: chatterUser._id, roomId: room._id}).fetch();
     assert.lengthOf(roomUsers, 1);
   });
 

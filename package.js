@@ -48,7 +48,8 @@ Package.onTest(function(api) {
   api.use('xolvio:cleaner');
   api.use('practicalmeteor:sinon');
   api.addFiles([
-    'imports/api/setup.app-tests.js'
+    'imports/api/fixtures.js'
+
   ], 'server');
   api.mainModule('chattercore.server.tests.js', 'server');
   api.mainModule('chattercore.client.tests.js', 'client');

@@ -32,7 +32,6 @@ Meteor.publish("chatterRooms", function () {
 
   return ChatterRoom.find({
   }, {
-    limit: Chatter.options.roomLimit,
     fields: {
       name: 1,
       description: 1,
