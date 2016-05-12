@@ -128,7 +128,7 @@ describe("chatter models", function() {
     });
 
     it("User Room is inserted with correct defaults", function() {
-      assert.equal(userRoom.count, 0);
+      assert.equal(userRoom.unreadMsgCount, 0);
     });
 
     Chatter.UserRoom.remove({_id: userRoomId});

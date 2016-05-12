@@ -63,7 +63,7 @@ const increaseCounter = function(message) {
       userId: userRoom.userId
     },
     {
-      $inc: { count: 1}
+      $inc: { unreadMsgCount: 1}
     });
   });
 };

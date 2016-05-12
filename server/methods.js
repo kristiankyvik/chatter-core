@@ -174,7 +174,7 @@ Meteor.methods({
       userId: chatterUserId
     },
     {
-      $set:{count: 0}
+      $set:{unreadMsgCount: 0}
     });
     return true
   }

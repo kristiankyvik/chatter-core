@@ -52,7 +52,7 @@ Meteor.publish("chatterUserRooms", function () {
   return ChatterUserRoom.find({
   }, {
     fields: {
-      count: 1,
+      unreadMsgCount: 1,
       userId: 1,
       roomId: 1
     }
