@@ -19,6 +19,24 @@ Meteor.methods({
     return chatterUsers.length > 0;
   },
 
+  "get.room.counts" () {
+    const chatterUserId = getChatterUserId(Meteor.userId());
+    const userRooms = Chatter.UserRoom.find({"userId": chatterUserId}).fetch();
+    const roomIds = userRooms.map(function(userRoom) {return userRoom.roomId});
+    const rooms = Chatter.Room.find({"_id": {$in: roomIds}})
+
+    const response = {
+      archivedCount: 0,
+      activeCount: 0
+    };
+
+    rooms.forEach(function(room){
+      room.archived ? response.archivedCount += 1 : response.activeCount += 1;
+    });
+
+    return response;
+  },
+
   "message.send" (params) {
     check(params, {
       message: String,
