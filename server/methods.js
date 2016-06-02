@@ -73,6 +73,13 @@ Meteor.methods({
       invitees: [String]
     });
 
+    const chatterUserId = getChatterUserId(Meteor.userId());
+    const chatterUser = Chatter.User.findOne(chatterUserId);
+
+    if( chatterUser.userType != "admin") {
+      throw new Meteor.Error("user-is-not-admin", "user must be admin to add users");
+    }
+
     const room = Chatter.Room.findOne(params.roomId);
 
     if (!room) {
@@ -108,6 +115,13 @@ Meteor.methods({
       roomId: String
     });
 
+    const chatterUserId = getChatterUserId(Meteor.userId());
+    const chatterUser = Chatter.User.findOne(chatterUserId);
+
+    if( chatterUser.userType != "admin") {
+      throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
+    }
+
     Chatter.UserRoom.remove({
       userId: params.userId,
       roomId: params.roomId
@@ -122,6 +136,11 @@ Meteor.methods({
 
     const {name, description} = params;
     const chatterUserId = getChatterUserId(Meteor.userId());
+    const chatterUser = Chatter.User.findOne(chatterUserId);
+
+    if( chatterUser.userType != "admin") {
+      throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
+    }
 
     const room = new Chatter.Room({
       name,

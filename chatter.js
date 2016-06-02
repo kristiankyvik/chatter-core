@@ -34,7 +34,7 @@ function getNickname(user) {
 Chatter.addUser = function(params) {
   check(params, {
     userId: String,
-    userType: Match.Maybe(String)
+    userType: Match.OneOf(String, undefined)
   });
 
   const {userId, userType} = params;
