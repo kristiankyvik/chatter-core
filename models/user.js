@@ -13,10 +13,7 @@ Chatter.User = ChatterUser = Astro.Class({
       type: "string"
     },
     avatar: {
-      type: "string",
-      default: function() {
-        return "http://localhost:3000/packages/jorgeer_chatter-semantic/public/images/avatar.jpg";
-      }
+      type: "string"
     }
   },
 
@@ -25,7 +22,10 @@ Chatter.User = ChatterUser = Astro.Class({
   },
 
   events: {
-
+    afterInit: function() {
+      var username = this.nickname;
+      this.avatar =  `http://api.adorable.io/avatars/${username}`;
+    }
   },
 
   methods: {

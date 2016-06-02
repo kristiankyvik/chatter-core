@@ -45,7 +45,6 @@ Chatter.addUser = function(params) {
   }
 
   const user = Meteor.users.findOne(userId);
-
   chatterUser = new Chatter.User({
     userId,
     userType,

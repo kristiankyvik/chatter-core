@@ -16,8 +16,8 @@ Meteor.publish("chatterMessages", function (params) {
     fields: {
       message: 1,
       roomId: 1,
-      userNick: 1,
-      userAvatar: 1,
+      nickname: 1,
+      avatar: 1,
       userId: 1,
       createdAt: 1
     }
@@ -65,7 +65,7 @@ Meteor.publish("users", function (roomId) {
   return Meteor.users.find({
     "status.online": true
   }, {
-    userNick: 1,
+    username: 1,
     avatar: 1
   });
 });

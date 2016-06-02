@@ -96,7 +96,7 @@ describe("chatter models", function() {
     });
 
     it("User is inserted with correct defaults", function() {
-      assert.equal(defaultChatterUser.avatar, "http://localhost:3000/packages/jorgeer_chatter-semantic/public/images/avatar.jpg");
+      assert.equal(defaultChatterUser.avatar, "http://chatter-widget.meteorapp.com/packages/jorgeer_chatter-semantic/public/images/avatar.jpg");
     });
 
     it("User is inserted when overwritting defaults", function() {

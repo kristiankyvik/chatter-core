@@ -49,7 +49,7 @@ Package.onTest(function(api) {
   api.use('practicalmeteor:sinon');
   api.addFiles([
     'server-tests/test-helpers.js',
-    'imports/api/fixtures.js'
+    'imports/api/fixtures.js',
 
   ], 'server');
   api.mainModule('chattercore.server.tests.js', 'server');

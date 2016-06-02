@@ -45,6 +45,7 @@ Meteor.methods({
 
     const {message, roomId} = params;
     const chatterUserId = getChatterUserId(Meteor.userId());
+    const chatterUser = Chatter.User.findOne(chatterUserId);
 
     if (!userInRoom(chatterUserId, roomId)) {
       throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");
@@ -53,7 +54,9 @@ Meteor.methods({
     const newMessage = new Chatter.Message({
       userId: chatterUserId,
       message,
-      roomId
+      roomId,
+      avatar: chatterUser.avatar,
+      nickname: chatterUser.nickname
     });
 
 
@@ -187,13 +190,15 @@ Meteor.methods({
       throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");
     }
 
+    const userRoomId = Chatter.UserRoom.findOne({roomId, userId: chatterUserId})._id;
+
     Chatter.UserRoom.update({
-      roomId: roomId,
-      userId: chatterUserId
+      _id: userRoomId
     },
     {
       $set:{unreadMsgCount: 0}
     });
+
     return true
   }
 });
