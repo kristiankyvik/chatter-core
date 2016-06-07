@@ -59,6 +59,29 @@ Chatter.addUser = function(params) {
 };
 
 /**
+ * @summary Removes user from Chatter
+ * @locus Server
+ * @param params Information about the new user.
+ * @param {string} params.userId Meteor user id.
+ * @param {string} params.userType Defines the restricitons on the new user. Can either be set to "admin" or "standard".
+ * @returns {string} chatterId
+ */
+Chatter.removeUser = function(params) {
+  check(params, {
+    userId: String
+  });
+
+  const {userId} = params;
+  let chatterUser = Chatter.User.findOne({userId});
+
+  if (!chatterUser) {
+    throw new  Meteor.Error("unknown-user", "user has not been added to chatter");
+  }
+
+  chatterUser.remove();
+};
+
+/**
  * @summary Adds empty room to Chatter.
  * @locus Server
  * @param {string} params Information about the new room.
@@ -84,6 +107,26 @@ Chatter.addRoom = function(params) {
 
   room.throwValidationException();
 };
+
+/**
+ * @summary Removes room from Chatter.
+ * @locus Server
+ * @param {string} roomId.
+ */
+Chatter.removeRoom = function(params) {
+  check(params, {
+    roomId: String
+  });
+
+  const room = Chatter.Room.findOne({roomId});
+  if (!room) {
+    throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
+  }
+
+  Chatter.UserRoom.remove({'roomId':{'$in':[room._id]}})
+  room.remove();
+};
+
 
 /**
  * @summary Adds user to room.
@@ -119,4 +162,36 @@ Chatter.addUserToRoom = function(params) {
   }
 
   userRoom.throwValidationException();
+};
+
+
+/**
+ * @summary Removes user from room.
+ * @locus Server
+ * @param {string} params.userId Unique string identifying user.
+ * @param {string} params.roomId Unique string identifying the room.
+ */
+Chatter.removeUserToRoom = function(params) {
+  check(params, {
+    userId: String,
+    roomId: String
+  });
+
+  const {userId, roomId} = params;
+  const chatterUser = Chatter.User.findOne({userId});
+  const room = Chatter.Room.findOne(roomId);
+
+  if (!room) {
+    throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
+  } else if (!chatterUser) {
+    throw new  Meteor.Error("unknown-user", "user has not been added to chatter");
+  }
+
+  const userRoom = Chatter.UserRoom.findOne({roomId, userId: chatterUser._id});
+
+  if (!userRoom) {
+    throw new Meteor.Error("user-has-not-been-added-to-room", "the room had not been added to room ");
+  }
+
+  userRoom.remove();
 };

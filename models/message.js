@@ -57,10 +57,10 @@ Chatter.Message = ChatterMessage = Astro.Class({
     timeAgo: function () {
       return moment(this.get("createdAt")).fromNow();
     },
-    hoursAgo: function () {
+    minutesAgo: function () {
       const now = moment(new Date());
       const then = this.get("createdAt");
-      const duration = moment.duration(now.diff(then)).asHours();
+      const duration = moment.duration(now.diff(then)).asMinutes();
       return duration;
     },
     timestamp: function () {
