@@ -118,7 +118,7 @@ Chatter.removeRoom = function(params) {
     roomId: String
   });
 
-  const room = Chatter.Room.findOne({roomId});
+  const room = Chatter.Room.findOne(params.roomId);
   if (!room) {
     throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
   }
@@ -171,7 +171,7 @@ Chatter.addUserToRoom = function(params) {
  * @param {string} params.userId Unique string identifying user.
  * @param {string} params.roomId Unique string identifying the room.
  */
-Chatter.removeUserToRoom = function(params) {
+Chatter.removeUserFromRoom = function(params) {
   check(params, {
     userId: String,
     roomId: String
@@ -180,6 +180,9 @@ Chatter.removeUserToRoom = function(params) {
   const {userId, roomId} = params;
   const chatterUser = Chatter.User.findOne({userId});
   const room = Chatter.Room.findOne(roomId);
+
+  console.log("chatterUser", chatterUser._id);
+  console.log("chatterroom", roomId);
 
   if (!room) {
     throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
@@ -190,7 +193,7 @@ Chatter.removeUserToRoom = function(params) {
   const userRoom = Chatter.UserRoom.findOne({roomId, userId: chatterUser._id});
 
   if (!userRoom) {
-    throw new Meteor.Error("user-has-not-been-added-to-room", "the room had not been added to room ");
+    throw new Meteor.Error("user-has-not-been-added-to-room", "the user had not been added to room ");
   }
 
   userRoom.remove();

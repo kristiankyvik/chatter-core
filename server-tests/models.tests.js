@@ -83,12 +83,6 @@ describe("chatter models", function() {
     const defaultChatterUserId = new Chatter.User(attributes).save();
     const defaultChatterUser = Chatter.User.findOne(defaultChatterUserId);
 
-    attributes.avatar = "test avatar";
-
-    const customChatterUserId = new Chatter.User(attributes).save();
-    const customChatterUser = Chatter.User.findOne(customChatterUserId);
-
-
     it("User is inserted with correct attributes", function() {
       assert.equal(defaultChatterUser.userType, attributes.userType);
       assert.equal(defaultChatterUser.userId, attributes.userId);
@@ -96,12 +90,9 @@ describe("chatter models", function() {
     });
 
     it("User is inserted with correct defaults", function() {
-      assert.equal(defaultChatterUser.avatar, "http://chatter-widget.meteorapp.com/packages/jorgeer_chatter-semantic/public/images/avatar.jpg");
+      assert.equal(defaultChatterUser.avatar, "http://api.adorable.io/avatars/test nickname");
     });
 
-    it("User is inserted when overwritting defaults", function() {
-      assert.equal(customChatterUser.avatar, "test avatar");
-    });
   });
 
   describe("chatter userroom model", function() {
