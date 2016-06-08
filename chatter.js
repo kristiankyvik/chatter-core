@@ -1,6 +1,6 @@
 Chatter = {
   options: {
-    messageLimit: 30,
+    messageLimit: 100,
     nickProperty: "username",
     initialRoomLoad: 5
   }
@@ -34,7 +34,7 @@ function getNickname(user) {
 Chatter.addUser = function(params) {
   check(params, {
     userId: String,
-    userType: Match.OneOf(String, undefined)
+    userType: Match.Optional(Match.OneOf(String, undefined))
   });
 
   const {userId, userType} = params;
@@ -78,7 +78,7 @@ Chatter.removeUser = function(params) {
     throw new  Meteor.Error("unknown-user", "user has not been added to chatter");
   }
 
-  chatterUser.remove();
+  return chatterUser.remove();
 };
 
 /**
@@ -124,7 +124,7 @@ Chatter.removeRoom = function(params) {
   }
 
   Chatter.UserRoom.remove({'roomId':{'$in':[room._id]}})
-  room.remove();
+  return room.remove();
 };
 
 
@@ -181,9 +181,6 @@ Chatter.removeUserFromRoom = function(params) {
   const chatterUser = Chatter.User.findOne({userId});
   const room = Chatter.Room.findOne(roomId);
 
-  console.log("chatterUser", chatterUser._id);
-  console.log("chatterroom", roomId);
-
   if (!room) {
     throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
   } else if (!chatterUser) {
@@ -196,5 +193,5 @@ Chatter.removeUserFromRoom = function(params) {
     throw new Meteor.Error("user-has-not-been-added-to-room", "the user had not been added to room ");
   }
 
-  userRoom.remove();
+  return userRoom.remove();
 };

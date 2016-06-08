@@ -63,12 +63,16 @@ Meteor.publish("users", function (roomId) {
   // TODO do some clever things here to determine
   // which users are visible
   return Meteor.users.find({
-    "status.online": true
   }, {
-    username: 1,
-    avatar: 1
+    fields: {
+      username: 1,
+      status:1,
+      lastLogin: 1,
+      profile: 1
+    }
   });
 });
+
 
 Meteor.publish("chatterUsers", function () {
   // TODO do some clever things here to determine
