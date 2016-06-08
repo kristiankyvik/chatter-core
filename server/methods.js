@@ -1,16 +1,7 @@
-const getChatterUserId = function(userId) {
-  const chatterUser = Chatter.User.findOne({userId: userId});
-  if (!chatterUser) {
-    throw new Meteor.Error("unknown-user", "user has not been added to chatter");
-  }
-  return chatterUser._id;
-};
-
 const userInRoom = function(userId, roomId) {
   const userRooms = Chatter.UserRoom.find({userId: userId, roomId}).fetch();
   return userRooms.length > 0;
 };
-
 
 Meteor.methods({
 
