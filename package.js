@@ -26,7 +26,6 @@ Package.onUse(function(api) {
   api.addFiles('models/message.js');
   api.addFiles('models/room.js');
   api.addFiles('models/userroom.js');
-  api.addFiles('models/user.js');
 
   api.addFiles([
     'server/publish.js',

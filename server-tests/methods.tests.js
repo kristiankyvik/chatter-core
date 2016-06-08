@@ -7,8 +7,8 @@ const callbackWrapper = function(fn) {
 };
 
 describe("chatter meteor methods", function() {
-  let chatterUser;
   let room;
+  let user;
   const assert = chai.assert;
 
   const roomAttributes = {
@@ -18,52 +18,16 @@ describe("chatter meteor methods", function() {
 
 
   before(function() {
-    const meteorUser = Meteor.users.findOne();
-    const userId = new Chatter.User({
-      userId: meteorUser._id,
-      userType: "admin"
-    }).save();
-
+    user = Meteor.users.findOne();
     const roomId =  new Chatter.Room({name: "test_room" }).save();
-
-    chatterUser = Chatter.User.findOne(userId);
     room = Chatter.Room.findOne(roomId)
-
-    new Chatter.UserRoom({userId: chatterUser._id, roomId: roomId }).save();
-
+    const userRoom = new Chatter.UserRoom({userId: user._id, roomId: roomId }).save();
   });
 
   after(function() {
     emptyDatabase();
   });
 
-  describe("user.check method", function() {
-    before(function() {
-      stubs.create("userId", Meteor, "userId");
-    });
-
-    it("user.check return false when user does not exist", function(done) {
-      // Creating stub for Meteor.userId() that return id from non-chatter user
-      stubs.userId.returns("meteor_unknown_id");
-
-      Meteor.call("user.check", callbackWrapper((error, response) => {
-        assert.isUndefined(error);
-        assert.equal(response, false);
-        done();
-      }));
-    });
-
-    it("user.check returns true when user exists", function() {
-      // Creating stub for Meteor.userId() that return id from chatter user
-      stubs.userId.returns("meteor_user_one_id");
-
-      Meteor.call("user.check", callbackWrapper((error, response) => {
-        assert.isUndefined(error);
-        assert.equal(response, true);
-        done();
-      }));
-    });
-  });
 
   describe("message.send method", function() {
 
@@ -117,13 +81,15 @@ describe("chatter meteor methods", function() {
       const params = {};
       params.roomId = room._id;
       params.message = "test message";
-      Chatter.UserRoom.remove({userId: chatterUser._id, roomId: room._id });
+      Chatter.UserRoom.remove({userId: user._id, roomId: room._id });
+
       Meteor.call("message.send", params, callbackWrapper((error, response) => {
         assert.isUndefined(response);
         assert.equal(error.error, "user-not-in-room");
         done();
       }));
     });
+
   });
 
   describe("room methods", function() {
@@ -131,7 +97,6 @@ describe("chatter meteor methods", function() {
     describe("room.create", function() {
       it("throws an error when required parameters are missing", function(done) {
         const params = {};
-
         Meteor.call("room.create", params, callbackWrapper((error, response) => {
           assert.isUndefined(response);
           assert.equal(error.errorType, "Match.Error");
@@ -266,7 +231,7 @@ describe("chatter meteor methods", function() {
         it("returns 'room does not exist' error when roomId does not exist", function(done) {
           const params = {};
           params.roomId = "non existent roomId";
-          params.invitees = [chatterUser._id];
+          params.invitees = [user._id];
 
           Meteor.call("room.join", params, callbackWrapper((error, response) => {
             assert.isUndefined(response);
@@ -292,7 +257,7 @@ describe("chatter meteor methods", function() {
 
         it("creates a userRoom instance", function(done) {
           const params = {};
-          params.invitees = [chatterUser._id];
+          params.invitees = [user._id];
           params.roomId = room._id;
 
           Meteor.call("room.join", params, callbackWrapper((error, response) => {
@@ -318,8 +283,8 @@ describe("chatter meteor methods", function() {
 
       it("room.leave if no missing parameters missing or incorrect", function() {
 
-        Meteor.call("room.leave", {userId: chatterUser._id, roomId: room._id});
-        const results = Chatter.UserRoom.find({userId: chatterUser._id, roomId: room._id}).fetch();
+        Meteor.call("room.leave", {userId: user._id, roomId: room._id});
+        const results = Chatter.UserRoom.find({userId: user._id, roomId: room._id}).fetch();
         assert.equal(results.length, 0);
       });
     });
@@ -327,7 +292,7 @@ describe("chatter meteor methods", function() {
     describe("room.counter methods", function() {
 
       before(function() {
-        new Chatter.UserRoom({userId: chatterUser._id, roomId: room._id }).save();
+        new Chatter.UserRoom({userId: user._id, roomId: room._id }).save();
       });
 
       it("room counter returns true when called with right parameters", function(done) {
@@ -340,7 +305,7 @@ describe("chatter meteor methods", function() {
       });
 
       it("room counter does reset the counter to 0", function () {
-        assert.equal(Chatter.UserRoom.findOne({roomId: room._id, userId: chatterUser._id}).unreadMsgCount, 0);
+        assert.equal(Chatter.UserRoom.findOne({roomId: room._id, userId: user._id}).unreadMsgCount, 0);
       });
 
       it("room counter return error when wrong roomId is passed in", function(done) {
@@ -353,7 +318,7 @@ describe("chatter meteor methods", function() {
       });
 
       it("room counter return error when user is not in room", function(done) {
-        Chatter.UserRoom.remove({userId: chatterUser._id, roomId: room._id});
+        Chatter.UserRoom.remove({userId: user._id, roomId: room._id});
 
         Meteor.call("room.counter.reset", room._id , callbackWrapper((error, response) => {
           assert.isUndefined(response);

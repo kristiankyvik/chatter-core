@@ -10,6 +10,19 @@ Chatter.configure = function (opts) {
   _.extend(this.options, opts);
 };
 
+// This adds a hook to the user create event and adds the default chatter attributes
+// const options = {
+//   profile : {
+//     isChatterUser: false
+//   }
+// };
+
+Accounts.onCreateUser(function(options, user) {
+  user.profile = options.profile ? options.profile : {};
+  user.profile.isChatterUser = false;
+  return user;
+});
+
 /**
  * @summary Retrieves nickname of user.
  * @locus Server
@@ -38,24 +51,18 @@ Chatter.addUser = function(params) {
   });
 
   const {userId, userType} = params;
-  let chatterUser = Chatter.User.findOne({userId});
 
-  if (chatterUser) {
+  const user = Meteor.users.findOne(userId);
+
+  if (!user) {
+    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
+  }
+
+  if (user.profile.isChatterUser) {
     throw new Meteor.Error("user-already-exists", "user has already been added to chatter");
   }
 
-  const user = Meteor.users.findOne(userId);
-  chatterUser = new Chatter.User({
-    userId,
-    userType,
-    nickname: getNickname(user)
-  })
-
-  if (chatterUser.validate()) {
-    return chatterUser.save();
-  }
-
-  chatterUser.throwValidationException();
+  return userId;
 };
 
 /**
@@ -72,13 +79,18 @@ Chatter.removeUser = function(params) {
   });
 
   const {userId} = params;
-  let chatterUser = Chatter.User.findOne({userId});
+  const user = Meteor.users.findOne(userId);
 
-  if (!chatterUser) {
-    throw new  Meteor.Error("unknown-user", "user has not been added to chatter");
+  if (!user) {
+    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
-  return chatterUser.remove();
+  if (!user.profile.isChatterUser) {
+    throw new Meteor.Error("user-is-not-chatter-user", "user is not a chatter user");
+  }
+
+  Meteor.users.update({_id: userId}, { $set: {"profile.isChatterUser": false} });
+  return userId;
 };
 
 /**
@@ -143,17 +155,20 @@ Chatter.addUserToRoom = function(params) {
   });
 
   const {userId, roomId} = params;
-  const chatterUser = Chatter.User.findOne({userId});
   const room = Chatter.Room.findOne(roomId);
+  const user = Meteor.users.findOne(userId);
+
 
   if (!room) {
     throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
-  } else if (!chatterUser) {
-    throw new  Meteor.Error("unknown-user", "user has not been added to chatter");
+  }
+
+  if (!user) {
+    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
   const userRoom = new Chatter.UserRoom({
-    userId: chatterUser._id,
+    userId,
     roomId
   })
 
@@ -178,13 +193,13 @@ Chatter.removeUserFromRoom = function(params) {
   });
 
   const {userId, roomId} = params;
-  const chatterUser = Chatter.User.findOne({userId});
+  const user = Meteor.users.findOne(userId);
   const room = Chatter.Room.findOne(roomId);
 
   if (!room) {
     throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
-  } else if (!chatterUser) {
-    throw new  Meteor.Error("unknown-user", "user has not been added to chatter");
+  } else if (!user) {
+    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
   const userRoom = Chatter.UserRoom.findOne({roomId, userId: chatterUser._id});

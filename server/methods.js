@@ -6,18 +6,13 @@ const getChatterUserId = function(userId) {
   return chatterUser._id;
 };
 
-const userInRoom = function(chatterId, roomId) {
-  const userRooms = Chatter.UserRoom.find({userId: chatterId, roomId}).fetch();
+const userInRoom = function(userId, roomId) {
+  const userRooms = Chatter.UserRoom.find({userId: userId, roomId}).fetch();
   return userRooms.length > 0;
 };
 
 
 Meteor.methods({
-
-  "user.check" () {
-    const chatterUsers = Chatter.User.find({userId: Meteor.userId()}).fetch();
-    return chatterUsers.length > 0;
-  },
 
   "get.room.counts" () {
     const chatterUserId = getChatterUserId(Meteor.userId());
@@ -44,21 +39,19 @@ Meteor.methods({
     });
 
     const {message, roomId} = params;
-    const chatterUserId = getChatterUserId(Meteor.userId());
-    const chatterUser = Chatter.User.findOne(chatterUserId);
+    const userId =  Meteor.userId();
 
-    if (!userInRoom(chatterUserId, roomId)) {
+    if (!userInRoom(userId, roomId)) {
       throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");
     }
 
     const newMessage = new Chatter.Message({
-      userId: chatterUserId,
+      userId,
       message,
       roomId,
-      avatar: chatterUser.avatar,
-      nickname: chatterUser.nickname
+      // avatar: chatterUser.avatar,
+      // nickname: chatterUser.nickname
     });
-
 
     if (newMessage.validate()) {
       return newMessage.save();
@@ -67,17 +60,44 @@ Meteor.methods({
     newMessage.throwValidationException();
   },
 
+  "room.create" (params) {
+    check(params, {
+        name: String,
+        description: String
+    });
+
+    const {name, description} = params;
+    const userId =  Meteor.userId();
+    const user = Meteor.users.findOne(userId);
+
+    if(!user.profile.isChatterAdmin) {
+      throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
+    }
+
+    const room = new Chatter.Room({
+      name,
+      description,
+      createdBy: userId
+    })
+
+    if (room.validate()) {
+      return room.save();
+    }
+
+    room.throwValidationException();
+  },
+
   "room.join" (params) {
     check(params, {
       roomId: String,
       invitees: [String]
     });
 
-    const chatterUserId = getChatterUserId(Meteor.userId());
-    const chatterUser = Chatter.User.findOne(chatterUserId);
+    const userId =  Meteor.userId();
+    const user = Meteor.users.findOne(userId);
 
-    if( chatterUser.userType != "admin") {
-      throw new Meteor.Error("user-is-not-admin", "user must be admin to add users");
+    if(!user.profile.isChatterAdmin) {
+      throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
     }
 
     const room = Chatter.Room.findOne(params.roomId);
@@ -85,16 +105,18 @@ Meteor.methods({
     if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
+
     let userNotexists = false;
-    _.each(params.invitees, function(chatterUserId) {
-      let chatterUser = Chatter.User.findOne(chatterUserId);
-      if (chatterUser) {
+    _.each(params.invitees, function(userId) {
+
+      let user = Meteor.users.findOne(userId);
+      if (user) {
         Chatter.UserRoom.upsert({
-          userId: chatterUserId,
+          userId: userId,
           roomId: room._id
         }, {
           $set: {
-            userId: chatterUserId,
+            userId: userId,
             roomId: room._id
           }
        });
@@ -115,45 +137,21 @@ Meteor.methods({
       roomId: String
     });
 
-    const chatterUserId = getChatterUserId(Meteor.userId());
-    const chatterUser = Chatter.User.findOne(chatterUserId);
+    const userIdToRemove = params.userId;
 
-    if( chatterUser.userType != "admin") {
+    const userId =  Meteor.userId();
+    const user = Meteor.users.findOne(userId);
+
+    if(!user.profile.isChatterAdmin) {
       throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
     }
 
     Chatter.UserRoom.remove({
-      userId: params.userId,
+      userId: userIdToRemove,
       roomId: params.roomId
     });
   },
 
-  "room.create" (params) {
-    check(params, {
-        name: String,
-        description: String
-    });
-
-    const {name, description} = params;
-    const chatterUserId = getChatterUserId(Meteor.userId());
-    const chatterUser = Chatter.User.findOne(chatterUserId);
-
-    if( chatterUser.userType != "admin") {
-      throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
-    }
-
-    const room = new Chatter.Room({
-      name,
-      description,
-      createdBy: chatterUserId
-    })
-
-    if (room.validate()) {
-      return room.save();
-    }
-
-    room.throwValidationException();
-  },
 
   "room.get" (id) {
     check(id, String);
@@ -198,18 +196,19 @@ Meteor.methods({
   "room.counter.reset" (roomId) {
     check(roomId, String);
 
-    const chatterUserId = getChatterUserId(Meteor.userId());
+    const userId =  Meteor.userId();
+    const user = Meteor.users.findOne(userId);
     const room = Chatter.Room.findOne(roomId);
 
     if (!room) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
-    if (!userInRoom(chatterUserId, roomId)) {
-      throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");
+    if (!userInRoom(userId, roomId)) {
+      throw new Meteor.Error("user-not-in-room", "user must be reset counter");
     }
 
-    const userRoomId = Chatter.UserRoom.findOne({roomId, userId: chatterUserId})._id;
+    const userRoomId = Chatter.UserRoom.findOne({roomId, userId: userId})._id;
 
     Chatter.UserRoom.update({
       _id: userRoomId
