@@ -6,6 +6,7 @@ Chatter = {
   }
 };
 
+
 Chatter.configure = function (opts) {
   _.extend(this.options, opts);
 };
@@ -17,11 +18,6 @@ Chatter.configure = function (opts) {
 //   }
 // };
 
-Accounts.onCreateUser(function(options, user) {
-  user.profile = options.profile ? options.profile : {};
-  user.profile.isChatterUser = false;
-  return user;
-});
 
 /**
  * @summary Retrieves nickname of user.

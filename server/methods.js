@@ -6,8 +6,8 @@ const userInRoom = function(userId, roomId) {
 Meteor.methods({
 
   "get.room.counts" () {
-    const chatterUserId = getChatterUserId(Meteor.userId());
-    const userRooms = Chatter.UserRoom.find({"userId": chatterUserId}).fetch();
+    const userId =  Meteor.userId();
+    const userRooms = Chatter.UserRoom.find({userId}).fetch();
     const roomIds = userRooms.map(function(userRoom) {return userRoom.roomId});
     const rooms = Chatter.Room.find({"_id": {$in: roomIds}})
 
@@ -72,7 +72,12 @@ Meteor.methods({
     })
 
     if (room.validate()) {
-      return room.save();
+      const roomId = room.save();
+      new Chatter.UserRoom({
+        userId,
+        roomId
+      }).save();
+      return roomId;
     }
 
     room.throwValidationException();
@@ -143,7 +148,6 @@ Meteor.methods({
     });
   },
 
-
   "room.get" (id) {
     check(id, String);
     return Chatter.Room.findOne({
@@ -178,7 +182,7 @@ Meteor.methods({
 
     const userRooms = Chatter.UserRoom.find({"roomId": roomId}).fetch();
     const users = userRooms.map(function(userRoom) {
-      return Chatter.User.findOne(userRoom.userId);
+      return Meteor.users.findOne(userRoom.userId);
     });
 
     return users;

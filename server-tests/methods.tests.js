@@ -317,7 +317,7 @@ describe("chatter meteor methods", function() {
         }));
       });
 
-      it("room counter return error when user is not in room", function(done) {
+      it("room counter returns error when user is not in room", function(done) {
         Chatter.UserRoom.remove({userId: user._id, roomId: room._id});
 
         Meteor.call("room.counter.reset", room._id , callbackWrapper((error, response) => {

@@ -65,24 +65,10 @@ Meteor.publish("users", function (roomId) {
   return Meteor.users.find({
   }, {
     fields: {
+      _id: 1,
       username: 1,
-      status:1,
-      lastLogin: 1,
-      profile: 1
+      profile: 1,
+      status: 1
     }
   });
 });
-
-
-Meteor.publish("chatterUsers", function () {
-  // TODO do some clever things here to determine
-  // which users are visible
-  return Chatter.User.find({
-  }, {
-    _id: 1,
-    userId: 1,
-    userType: 1,
-    nickname: 1
-  });
-});
-
