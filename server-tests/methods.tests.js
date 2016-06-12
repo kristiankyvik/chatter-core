@@ -22,6 +22,25 @@ describe("chatter meteor methods", function() {
     const roomId =  new Chatter.Room({name: "test_room" }).save();
     room = Chatter.Room.findOne(roomId)
     const userRoom = new Chatter.UserRoom({userId: user._id, roomId: roomId }).save();
+    // Simulate user has been added to chatter and has made admin
+    stubs.findOne.returns({
+      _id: "meteor_user_one_id",
+      username: "meteor_user_one_nickname",
+      profile: {
+        isChatterUser: true,
+        isChatterAdmin: true
+      }
+    });
+
+    stubs.findOne.withArgs({_id: "id_of_user_two"}).returns({
+      _id: "meteor_user_two_id",
+      username: "meteor_user_two_nickname",
+      profile: {
+        isChatterUser: true,
+        isChatterAdmin: true
+      }
+    });
+
   });
 
   after(function() {

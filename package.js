@@ -30,8 +30,7 @@ Package.onUse(function(api) {
   api.addFiles([
     'server/publish.js',
     'server/access.js',
-    'server/methods.js',
-    'server/config.js'
+    'server/methods.js'
 
   ], 'server');
 

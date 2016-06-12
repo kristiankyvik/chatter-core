@@ -3,10 +3,19 @@ const userInRoom = function(userId, roomId) {
   return userRooms.length > 0;
 };
 
+const checkIfChatterUser = function(userId) {
+  const user = Meteor.users.findOne(userId);
+  const addedToChatter =  user.profile.isChatterUser ? true : false;
+  if (!addedToChatter) {
+    throw new Meteor.Error("user-has-chatter-user", "user has not been added to chatter");
+  }
+};
+
 Meteor.methods({
 
   "get.room.counts" () {
     const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
     const userRooms = Chatter.UserRoom.find({userId}).fetch();
     const roomIds = userRooms.map(function(userRoom) {return userRoom.roomId});
     const rooms = Chatter.Room.find({"_id": {$in: roomIds}})
@@ -32,6 +41,8 @@ Meteor.methods({
     const {message, roomId} = params;
     const userId =  Meteor.userId();
 
+    checkIfChatterUser(userId);
+
     if (!userInRoom(userId, roomId)) {
       throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");
     }
@@ -39,9 +50,7 @@ Meteor.methods({
     const newMessage = new Chatter.Message({
       userId,
       message,
-      roomId,
-      // avatar: chatterUser.avatar,
-      // nickname: chatterUser.nickname
+      roomId
     });
 
     if (newMessage.validate()) {
@@ -59,6 +68,9 @@ Meteor.methods({
 
     const {name, description} = params;
     const userId =  Meteor.userId();
+
+    checkIfChatterUser(userId);
+
     const user = Meteor.users.findOne(userId);
 
     if(!user.profile.isChatterAdmin) {
@@ -90,6 +102,7 @@ Meteor.methods({
     });
 
     const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
     const user = Meteor.users.findOne(userId);
 
     if(!user.profile.isChatterAdmin) {
@@ -136,6 +149,7 @@ Meteor.methods({
     const userIdToRemove = params.userId;
 
     const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
     const user = Meteor.users.findOne(userId);
 
     if(!user.profile.isChatterAdmin) {
@@ -150,6 +164,7 @@ Meteor.methods({
 
   "room.get" (id) {
     check(id, String);
+    checkIfChatterUser(Meteor.userId());
     return Chatter.Room.findOne({
       _id : id
     });
@@ -188,10 +203,27 @@ Meteor.methods({
     return users;
   },
 
+
+  "user.changeNickname" (nickname) {
+    check(nickname, String);
+
+    const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
+
+    Meteor.users.update(
+      userId,
+    {
+      $set:{"profile.chatterNickname": nickname}
+    });
+
+    return nickname;
+  },
+
   "room.counter.reset" (roomId) {
     check(roomId, String);
 
     const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
     const user = Meteor.users.findOne(userId);
     const room = Chatter.Room.findOne(roomId);
 

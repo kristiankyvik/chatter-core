@@ -15,7 +15,6 @@ describe("chatter api methods", function () {
 
     before(function() {
       user = Meteor.users.findOne("id_of_user_one");
-
       const roomId = new Chatter.Room({
         name: "test room",
         description: "test room description"

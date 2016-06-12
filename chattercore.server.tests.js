@@ -10,10 +10,6 @@ before(function() {
   stubs.findOne.returns({
     _id: "meteor_user_one_id",
     username: "meteor_user_one_nickname",
-    profile: {
-      isChatterUser: true,
-      isChatterAdmin: true
-    }
   });
 
   stubs.findOne.withArgs("id_of_user_one").returns({
@@ -28,14 +24,21 @@ before(function() {
   stubs.findOne.withArgs({_id: "id_of_user_two"}).returns({
     _id: "meteor_user_two_id",
     username: "meteor_user_two_nickname",
-    profile: {
-      isChatterUser: true
-    }
   });
 
   stubs.findOne.withArgs("non existent userId").returns(undefined);
 
+  stubs.findOne.withArgs("id_of_user_one").returns({
+    _id: "meteor_user_one_id",
+    username: "meteor_user_one_nickname",
+    profile: {
+      isChatterUser: true,
+      isChatterAdmin: true
+    }
+  });
 
+  stubs.create("update", Meteor.users, "update");
+  stubs.update.returns("updating");
 
 });
 

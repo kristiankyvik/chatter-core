@@ -6,18 +6,9 @@ Chatter = {
   }
 };
 
-
 Chatter.configure = function (opts) {
   _.extend(this.options, opts);
 };
-
-// This adds a hook to the user create event and adds the default chatter attributes
-// const options = {
-//   profile : {
-//     isChatterUser: false
-//   }
-// };
-
 
 /**
  * @summary Retrieves nickname of user.
@@ -43,7 +34,7 @@ function getNickname(user) {
 Chatter.addUser = function(params) {
   check(params, {
     userId: String,
-    userType: Match.Optional(Match.OneOf(String, undefined))
+    admin: Match.Optional(Match.OneOf(Boolean, String, undefined))
   });
 
   const {userId, userType} = params;
@@ -57,6 +48,19 @@ Chatter.addUser = function(params) {
   if (user.profile.isChatterUser) {
     throw new Meteor.Error("user-already-exists", "user has already been added to chatter");
   }
+
+  const isAdmin = isChatterAdmin ? true : false;
+  const avatarURL = `http://api.adorable.io/avatars/${user.username}`;
+
+  Meteor.users.update(
+    {_id: userId},
+    { $set: {
+      "profile.isChatterUser": true,
+      "profile.isChatterAdmin": isAdmin,
+      "profile.chatterNickname": user.username,
+      "profile.chatterAvatar": avatarURL,
+    }
+  });
 
   return userId;
 };
@@ -135,7 +139,6 @@ Chatter.removeRoom = function(params) {
   return room.remove();
 };
 
-
 /**
  * @summary Adds user to room.
  * @locus Server
@@ -198,7 +201,7 @@ Chatter.removeUserFromRoom = function(params) {
     throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
-  const userRoom = Chatter.UserRoom.findOne({roomId, userId: chatterUser._id});
+  const userRoom = Chatter.UserRoom.findOne({roomId, userId: user._id});
 
   if (!userRoom) {
     throw new Meteor.Error("user-has-not-been-added-to-room", "the user had not been added to room ");
