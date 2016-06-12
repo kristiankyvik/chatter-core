@@ -16,7 +16,6 @@ describe("chatter meteor methods", function() {
     description: "test description"
   };
 
-
   before(function() {
     user = Meteor.users.findOne();
     const roomId =  new Chatter.Room({name: "test_room" }).save();
@@ -46,7 +45,6 @@ describe("chatter meteor methods", function() {
   after(function() {
     emptyDatabase();
   });
-
 
   describe("message.send method", function() {
 
@@ -108,7 +106,6 @@ describe("chatter meteor methods", function() {
         done();
       }));
     });
-
   });
 
   describe("room methods", function() {
