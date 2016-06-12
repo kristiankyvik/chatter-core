@@ -60,15 +60,6 @@ describe("chatter api methods", function () {
       userRoom = Chatter.UserRoom.findOne(userRoomId);
     });
 
-    // it("chatter user is removed from room", function() {
-    //   const params = {
-    //     userId: user._id,
-    //     roomId: room._id
-    //   };
-    //   Chatter.removeUserFromRoom(params);
-    //   assert.isUndefined(Chatter.UserRoom.findOne({userId: user._id, roomId: room._id}),  "user does no longer exist");
-    // });
-
     it("chatter room is removed", function() {
       const params = {
         roomId: room._id
@@ -77,14 +68,5 @@ describe("chatter api methods", function () {
       assert.isUndefined(Chatter.Room.findOne(room._id),  "room does no longer exist");
     });
 
-    // it("chatter user is removed", function() {
-    //   const params = {
-    //     userId: user._id
-    //   };
-    //   Chatter.removeUser(params);
-    //   assert.isUndefined(Meteor.users.findOne(user._id),  "user does no longer exist");
-    // });
-
   });
-
 });
