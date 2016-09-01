@@ -32,13 +32,6 @@ Chatter.Room = ChatterRoom = Astro.Class({
       }
     },
 
-    archived: {
-      type: "boolean",
-      default: function() {
-        return false;
-      }
-    },
-
     createdBy: "string"
   },
 
