@@ -59,6 +59,7 @@ Chatter.addUser = function(params) {
       "profile.isChatterAdmin": isAdmin,
       "profile.chatterNickname": user.username,
       "profile.chatterAvatar": avatarURL,
+      "profile.helpChatActive": false
     }
   });
 

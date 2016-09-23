@@ -11,6 +11,10 @@ const checkIfChatterUser = function(userId) {
   }
 };
 
+const capitalize = function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 Meteor.methods({
 
   "get.room.unreadMsgCount" () {
@@ -93,6 +97,13 @@ Meteor.methods({
     }
 
     room.throwValidationException();
+  },
+
+  "room.check" (roomId) {
+    check(roomId, String);
+
+    const room = Chatter.Room.findOne(roomId);
+    return room;
   },
 
   "room.join" (params) {
@@ -222,6 +233,37 @@ Meteor.methods({
     return nickname;
   },
 
+  "help.createRoom" () {
+    const users = [];
+
+    const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
+    users.push(userId);
+
+    const helpUserId = Meteor.users.findOne({username: Chatter.options.helpUser})._id;
+    users.push(helpUserId);
+
+    const room = new Chatter.Room({
+      name: "Help " + capitalize(Meteor.user().username),
+      description: "A room that gets you the help you need",
+      createdBy: userId,
+      roomType: "help"
+    });
+
+    if (room.validate()) {
+      const roomId = room.save();
+      users.forEach(function(user) {
+        new Chatter.UserRoom({
+          userId: user,
+          roomId: roomId
+        }).save();
+      });
+      return roomId;
+    }
+
+    room.throwValidationException();
+  },
+
   "room.unreadMsgCount.reset" (roomId) {
     check(roomId, String);
 
@@ -248,5 +290,35 @@ Meteor.methods({
     });
 
     return true
+  },
+
+  "room.delete" (roomId) {
+    check(roomId, String);
+
+    const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
+
+    const user = Meteor.users.findOne(userId);
+    const room = Chatter.Room.findOne(roomId);
+
+    if (!room) {
+      throw new Meteor.Error("non-existing-room", "room does not exist");
+    }
+
+    const userRooms = Chatter.UserRoom.find({roomId}).fetch();
+
+    room.remove(function(error, result) {
+      if (error) throw new Meteor.Error("remove-room-error", "room was not deleted");
+
+      userRooms.forEach(function(userRoom) {
+        userRoom.remove(function(error, result) {
+          if (error) throw new Meteor.Error("remove-userRoom-error", "userRoom was not deleted");
+        });
+      });
+
+
+
+    });
+    return roomId;
   }
 });
