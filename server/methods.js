@@ -1,19 +1,4 @@
-const userInRoom = function(userId, roomId) {
-  const userRooms = Chatter.UserRoom.find({userId: userId, roomId}).fetch();
-  return userRooms.length > 0;
-};
-
-const checkIfChatterUser = function(userId) {
-  const user = Meteor.users.findOne(userId);
-  const addedToChatter =  user.profile.isChatterUser ? true : false;
-  if (!addedToChatter) {
-    throw new Meteor.Error("user-has-chatter-user", "user has not been added to chatter");
-  }
-};
-
-const capitalize = function(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
+import {userInRoom, checkIfChatterUser, capitalize} from "../utils.js";
 
 Meteor.methods({
 
@@ -34,34 +19,6 @@ Meteor.methods({
     });
 
     return response;
-  },
-
-  "message.send" (params) {
-    check(params, {
-      message: String,
-      roomId: String
-    });
-
-    const {message, roomId} = params;
-    const userId =  Meteor.userId();
-
-    checkIfChatterUser(userId);
-
-    if (!userInRoom(userId, roomId)) {
-      throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");
-    }
-
-    const newMessage = new Chatter.Message({
-      userId,
-      message,
-      roomId
-    });
-
-    if (newMessage.validate()) {
-      return newMessage.save();
-    }
-
-    newMessage.throwValidationException();
   },
 
   "room.create" (params) {

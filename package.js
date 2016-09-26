@@ -31,8 +31,12 @@ Package.onUse(function(api) {
     'server/publish.js',
     'server/access.js',
     'server/methods.js'
-
   ], 'server');
+
+  api.addFiles([
+    'shared/methods.js',
+    'utils.js'
+  ], ['client', 'server']);
 
   api.export([
     'Chatter',

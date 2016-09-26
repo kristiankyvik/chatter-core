@@ -71,8 +71,7 @@ const increaseCounter = function(message) {
   const userRooms = Chatter.UserRoom.find({"roomId": message.roomId, "userId": {$nin:[message.userId]}}).fetch();
   const users = userRooms.map(function(userRoom) {
     Chatter.UserRoom.update({
-      roomId : userRoom.roomId,
-      userId: userRoom.userId
+      _id: userRoom._id,
     },
     {
       $inc: { unreadMsgCount: 1}
