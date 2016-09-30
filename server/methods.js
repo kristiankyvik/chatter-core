@@ -201,7 +201,7 @@ Meteor.methods({
     users.push(helpUserId);
 
     const room = new Chatter.Room({
-      name: "Help " + capitalize(Meteor.user().username),
+      name: "Help Chat (" + capitalize(Meteor.user().username) + ")",
       description: "A room that gets you the help you need",
       createdBy: userId,
       roomType: "help"
