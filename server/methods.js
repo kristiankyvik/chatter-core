@@ -192,8 +192,8 @@ Meteor.methods({
 
   "help.createRoom" () {
     const users = [];
-
-    const userId =  Meteor.userId();
+    const user = Meteor.user();
+    const userId =  user._id;
     checkIfChatterUser(userId);
     users.push(userId);
 
@@ -204,7 +204,8 @@ Meteor.methods({
       name: "Help Chat (" + capitalize(Meteor.user().username) + ")",
       description: "A room that gets you the help you need",
       createdBy: userId,
-      roomType: "help"
+      roomType: "help",
+      ref: user.username
     });
 
     if (room.validate()) {
@@ -272,8 +273,6 @@ Meteor.methods({
           if (error) throw new Meteor.Error("remove-userRoom-error", "userRoom was not deleted");
         });
       });
-
-
 
     });
     return roomId;

@@ -22,6 +22,13 @@ Chatter.Room = ChatterRoom = Astro.Class({
     },
 
     roomType: {
+      type: "string",
+      default: function() {
+        return "default";
+      }
+    },
+
+    ref: {
       type: "string"
     },
 

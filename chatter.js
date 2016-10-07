@@ -1,6 +1,6 @@
 Chatter = {
   options: {
-    messageLimit: 100,
+    messageLimit: 1000,
     nickProperty: "username",
     initialRoomLoad: 5
   }
@@ -79,7 +79,7 @@ Chatter.removeUser = function(params) {
     userId: String
   });
 
-  const {userId} = params;
+  let {userId} = params;
   const user = Meteor.users.findOne(userId);
 
   if (!user) {
@@ -90,7 +90,21 @@ Chatter.removeUser = function(params) {
     throw new Meteor.Error("user-is-not-chatter-user", "user is not a chatter user");
   }
 
-  Meteor.users.update({_id: userId}, { $set: {"profile.isChatterUser": false} });
+  userId = user._id;
+
+  Chatter.Message.remove({userId});
+  Meteor.users.remove(userId);
+
+  //removes all conversation of this user
+  Chatter.UserRoom.find({userId}).fetch().forEach(function(userRoom) {
+    const roomId = userRoom.roomId;
+    const usersInRoom = Chatter.UserRoom.find({roomId}).count();
+    if (usersInRoom < 3) {
+      Chatter.Room.remove(roomId);
+    }
+    userRoom.remove();
+  });
+
   return userId;
 };
 
@@ -105,13 +119,17 @@ Chatter.removeUser = function(params) {
 Chatter.addRoom = function(params) {
   check(params, {
     name: String,
-    description: String
+    description: String,
+    roomType: Match.Optional(Match.OneOf(String, undefined)),
+    ref: Match.Optional(Match.OneOf(String, undefined))
   });
 
-  const {name, description} = params;
+  const {name, description, roomType, ref} = params;
   const room = new Chatter.Room({
     name,
-    description
+    description,
+    roomType,
+    ref
   })
 
   if (room.validate()) {
@@ -119,6 +137,7 @@ Chatter.addRoom = function(params) {
   }
 
   room.throwValidationException();
+
 };
 
 /**
