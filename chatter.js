@@ -2,7 +2,8 @@ Chatter = {
   options: {
     messageLimit: 1000,
     nickProperty: "username",
-    initialRoomLoad: 5
+    initialRoomLoad: 5,
+    editableNickname: true
   }
 };
 
@@ -60,6 +61,30 @@ Chatter.addUser = function(params) {
       "profile.chatterNickname": user.username,
       "profile.chatterAvatar": avatarURL,
       "profile.helpChatActive": false
+    }
+  });
+
+  return userId;
+};
+
+Chatter.setNickname = function(params) {
+  check(params, {
+    userId: String,
+    nickname: String
+  });
+
+  const {userId, nickname} = params;
+
+  const user = Meteor.users.findOne(userId);
+
+  if (!user) {
+    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
+  }
+
+  Meteor.users.update(
+    {_id: userId},
+    { $set: {
+      "profile.chatterNickname": nickname
     }
   });
 
