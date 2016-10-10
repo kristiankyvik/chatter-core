@@ -34,6 +34,7 @@ Package.onUse(function(api) {
   ], 'server');
 
   api.addFiles([
+    'shared/config.js',
     'shared/methods.js',
     'utils.js'
   ], ['client', 'server']);

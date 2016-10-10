@@ -35,10 +35,11 @@ function getNickname(user) {
 Chatter.addUser = function(params) {
   check(params, {
     userId: String,
-    admin: Match.Optional(Match.OneOf(Boolean, String, undefined))
+    admin: Match.Optional(Match.OneOf(Boolean, String, undefined)),
+    supportUser: Match.Optional(Match.OneOf(String, undefined))
   });
 
-  const {userId, userType} = params;
+  const {userId, userType, supportUser} = params;
 
   const user = Meteor.users.findOne(userId);
 
@@ -60,7 +61,7 @@ Chatter.addUser = function(params) {
       "profile.isChatterAdmin": isAdmin,
       "profile.chatterNickname": user.username,
       "profile.chatterAvatar": avatarURL,
-      "profile.helpChatActive": false
+      "profile.supportUser": supportUser
     }
   });
 
