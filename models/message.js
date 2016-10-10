@@ -59,7 +59,10 @@ Chatter.Message = ChatterMessage = Astro.Class({
       return duration;
     },
     getDate: function () {
-      return moment(this.get("createdAt")).format("MMMM Do");
+      const date = moment(this.get("createdAt"));
+      const iscurrentDate = date.isSame(new Date(), "day");
+      const res = iscurrentDate ? "Today" : date.format("MMMM Do");
+      return res;
     }
   },
 

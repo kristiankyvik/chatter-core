@@ -194,17 +194,24 @@ Meteor.methods({
     const users = [];
     const user = Meteor.user();
     const userId =  user._id;
+
     checkIfChatterUser(userId);
+
     users.push(userId);
 
-    const helpUserId = Meteor.users.findOne({username: Chatter.options.helpUser})._id;
-    users.push(helpUserId);
+    const supportUser = Meteor.users.findOne({username: user.profile.supportUser});
+
+    if (!supportUser) {
+      throw new Meteor.Error("user-does-not-exist", "user does not exist");
+    }
+
+    users.push(supportUser._id);
 
     const room = new Chatter.Room({
-      name: "Help Chat (" + capitalize(Meteor.user().username) + ")",
+      name: "Support Chat (" + capitalize(Meteor.user().username) + ")",
       description: "A room that gets you the help you need",
       createdBy: userId,
-      roomType: "help",
+      roomType: "support",
       ref: user.username
     });
 
