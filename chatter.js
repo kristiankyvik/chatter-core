@@ -47,15 +47,12 @@ Chatter.addUser = function(params) {
     throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
-  const avatarURL = `http://api.adorable.io/avatars/${user.username}`;
-
   Meteor.users.update(
     {_id: userId},
     { $set: {
       "profile.isChatterUser": true,
       "profile.isChatterAdmin": isAdmin,
       "profile.chatterNickname": user.username,
-      "profile.chatterAvatar": avatarURL,
       "profile.supportUser": supportUser
     }
   });
