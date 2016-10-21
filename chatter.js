@@ -39,7 +39,7 @@ Chatter.addUser = function(params) {
     supportUser: Match.Optional(Match.OneOf(String, undefined))
   });
 
-  const {userId, userType, supportUser} = params;
+  const {userId, supportUser, isAdmin} = params;
 
   const user = Meteor.users.findOne(userId);
 
@@ -47,11 +47,6 @@ Chatter.addUser = function(params) {
     throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
-  if (user.profile.isChatterUser) {
-    throw new Meteor.Error("user-already-exists", "user has already been added to chatter");
-  }
-
-  const isAdmin = isChatterAdmin ? true : false;
   const avatarURL = `http://api.adorable.io/avatars/${user.username}`;
 
   Meteor.users.update(

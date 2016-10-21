@@ -3,14 +3,9 @@ Meteor.publish("chatterMessages", function (params) {
     roomId: String
   });
 
-  /*
-  let room = ChatterRoom.findOne({ name: params.roomName });
-  if (_.isUndefined(room)) return [];
-  // TODO Check for room restrictions here
-  */
-
+  // Only interested in sending rooms that the user has joined
   return ChatterMessage.find({
-    roomId: params.roomId,
+    roomId: params.roomId
   }, {
     limit: Chatter.options.messageLimit,
     fields: {
@@ -25,12 +20,13 @@ Meteor.publish("chatterMessages", function (params) {
 });
 
 Meteor.publish("chatterRooms", function () {
-  let user = Meteor.users.findOne(this.userId);
 
-  // TODO do some clever things here to determine
-  // which rooms are accessible
+  // Only interested in sending rooms that the user has joined
+  // const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
+  // const roomIds =  _.pluck(userRooms, "roomId");
 
   return ChatterRoom.find({
+    //"_id": {$in: roomIds}
   }, {
     fields: {
       name: 1,
@@ -43,12 +39,10 @@ Meteor.publish("chatterRooms", function () {
 });
 
 Meteor.publish("chatterUserRooms", function () {
-  let user = Meteor.users.findOne(this.userId);
 
-  // TODO do some clever things here to determine
-  // which rooms are accessible
-
+  // Only interested in sending userRooms belonging to the user
   return ChatterUserRoom.find({
+    userId: this.userId
   }, {
     fields: {
       unreadMsgCount: 1,
@@ -60,8 +54,8 @@ Meteor.publish("chatterUserRooms", function () {
 });
 
 Meteor.publish("users", function (roomId) {
-  // TODO do some clever things here to determine
-  // which users are visible
+
+  // Only interested in sending the rooms belonging to same class
   return Meteor.users.find({
   }, {
     fields: {
