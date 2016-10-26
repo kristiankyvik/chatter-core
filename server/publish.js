@@ -40,9 +40,8 @@ Meteor.publish("chatterRooms", function () {
 
 Meteor.publish("chatterUserRooms", function () {
 
-  // Only interested in sending userRooms belonging to the user
+  // I not admin, only interested in sending userRooms belonging to the user
   return ChatterUserRoom.find({
-    userId: this.userId
   }, {
     fields: {
       unreadMsgCount: 1,

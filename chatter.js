@@ -3,7 +3,9 @@ Chatter = {
     messageLimit: 1000,
     nickProperty: "username",
     initialRoomLoad: 5,
-    editableNickname: true
+    editableNickname: true,
+    chatName: "Chatter",
+    helpButton: false
   }
 };
 
