@@ -20,13 +20,14 @@ Meteor.publish("chatterMessages", function (params) {
 });
 
 Meteor.publish("chatterRooms", function () {
+  if (!this.userId) return;
 
   // Only interested in sending rooms that the user has joined
-  // const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
-  // const roomIds =  _.pluck(userRooms, "roomId");
+  const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
+  const roomIds =  _.pluck(userRooms, "roomId");
 
   return ChatterRoom.find({
-    //"_id": {$in: roomIds}
+    "_id": {$in: roomIds}
   }, {
     fields: {
       name: 1,
