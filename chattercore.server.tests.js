@@ -1,7 +1,6 @@
 import { chai } from "meteor/practicalmeteor:chai";
 
-before(function() {
-
+before(function () {
   stubs.create("userId", Meteor, "userId");
   stubs.userId.returns("meteor_user_one_id");
 
@@ -39,7 +38,6 @@ before(function() {
 
   stubs.create("update", Meteor.users, "update");
   stubs.update.returns("updating");
-
 });
 
 import { modelTests } from "./server-tests/models.tests.js";

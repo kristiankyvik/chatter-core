@@ -1,4 +1,4 @@
-import {userInRoom, checkIfChatterUser, capitalize} from "../utils.js";
+import {userInRoom, checkIfChatterUser} from "../utils.js";
 
 Meteor.methods({
   "message.send" (params) {
@@ -8,7 +8,7 @@ Meteor.methods({
     });
 
     const {message, roomId} = params;
-    const userId =  Meteor.userId();
+    const userId = Meteor.userId();
 
     checkIfChatterUser(userId);
 

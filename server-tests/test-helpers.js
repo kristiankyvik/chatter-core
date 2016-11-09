@@ -1,4 +1,4 @@
-const emptyDatabase = function() {
+const emptyDatabase = function () {
   Chatter.UserRoom.remove({});
   Chatter.Room.remove({});
   Chatter.Message.remove({});
