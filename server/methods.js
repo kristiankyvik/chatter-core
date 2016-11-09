@@ -283,5 +283,25 @@ Meteor.methods({
 
     });
     return roomId;
+  },
+
+  "message.count" (roomId) {
+    check(roomId, String);
+    console.log("calling message count");
+
+    const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
+
+    const user = Meteor.users.findOne(userId);
+    const room = Chatter.Room.findOne(roomId);
+
+    if (!room) {
+      throw new Meteor.Error("non-existing-room", "room does not exist");
+    }
+
+    const count = Chatter.Message.find({roomId}).fetch().length;
+
+    return count;
   }
+
 });

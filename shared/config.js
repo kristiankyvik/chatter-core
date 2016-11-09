@@ -6,12 +6,5 @@ if (Meteor.isServer) {
     user.profile.supportUser = null;
     return user;
   });
-
-  if ( Meteor.users.find().count() === 0 ) {
-    Accounts.createUser({
-      username: 'chatter-admin',
-      password: 'chatter-admin'
-    });
-  }
 }
 

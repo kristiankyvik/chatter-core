@@ -1,13 +1,13 @@
 Meteor.publish("chatterMessages", function (params) {
   check(params, {
-    roomId: String
+    roomId: String,
+    messageLimit: Number
   });
-
   // Only interested in sending rooms that the user has joined
   return ChatterMessage.find({
     roomId: params.roomId
   }, {
-    limit: Chatter.options.messageLimit,
+    limit: params.messageLimit,
     fields: {
       message: 1,
       roomId: 1,
@@ -15,7 +15,8 @@ Meteor.publish("chatterMessages", function (params) {
       avatar: 1,
       userId: 1,
       createdAt: 1
-    }
+    },
+    sort: {createdAt: -1}
   });
 });
 
@@ -41,7 +42,7 @@ Meteor.publish("chatterRooms", function () {
 
 Meteor.publish("chatterUserRooms", function () {
 
-  // I not admin, only interested in sending userRooms belonging to the user
+  // If not admin, only interested in sending userRooms belonging to the user
   return ChatterUserRoom.find({
   }, {
     fields: {

@@ -8,8 +8,6 @@ Chatter.Room = ChatterRoom = Astro.Class({
       validator: [
         Validators.required(),
         Validators.minLength(1)
-
-        //Validators.maxLength(30)
      ]
     },
 
