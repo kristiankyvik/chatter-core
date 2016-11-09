@@ -4,7 +4,7 @@ const reqStrNotNull = Validators.and([
   Validators.notNull()
 ]);
 
-const increaseCounter = function(message) {
+const increaseCounter = function (message) {
   const userRooms = Chatter.UserRoom.find({"roomId": message.roomId, "userId": {$nin: [message.userId]}}).fetch();
   userRooms.map(function(userRoom) {
     Chatter.UserRoom.update({
@@ -14,7 +14,7 @@ const increaseCounter = function(message) {
   });
 };
 
-const updateRoom = function(roomId) {
+const updateRoom = function (roomId) {
   Chatter.Room.update({
     _id: roomId
   },
@@ -52,23 +52,23 @@ Chatter.Message = ChatterMessage = Astro.Class({
   },
 
   events: {
-    beforeSave: function() {
+    beforeSave: function () {
       increaseCounter(this);
       updateRoom(this.roomId);
     }
   },
 
   methods: {
-    getTimeAgo: function() {
+    getTimeAgo: function () {
       return moment(this.get("createdAt")).fromNow();
     },
-    getMinutesAgo: function() {
+    getMinutesAgo: function () {
       const now = moment(new Date());
       const then = this.get("createdAt");
       const duration = moment.duration(now.diff(then)).asMinutes();
       return duration;
     },
-    getDate: function() {
+    getDate: function () {
       const date = moment(this.get("createdAt"));
       const iscurrentDate = date.isSame(new Date(), "day");
       const res = iscurrentDate ? "Today" : date.format("MMMM Do");

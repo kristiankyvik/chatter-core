@@ -25,7 +25,7 @@ Meteor.publish("chatterRooms", function () {
 
   // Only interested in sending rooms that the user has joined
   const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
-  const roomIds =  _.pluck(userRooms, "roomId");
+  const roomIds = _.pluck(userRooms, "roomId");
 
   return ChatterRoom.find({
     "_id": {$in: roomIds}
@@ -41,7 +41,6 @@ Meteor.publish("chatterRooms", function () {
 });
 
 Meteor.publish("chatterUserRooms", function () {
-
   // If not admin, only interested in sending userRooms belonging to the user
   return ChatterUserRoom.find({
   }, {
@@ -54,8 +53,7 @@ Meteor.publish("chatterUserRooms", function () {
   });
 });
 
-Meteor.publish("users", function (roomId) {
-
+Meteor.publish("users", function () {
   // Only interested in sending the rooms belonging to same class
   return Meteor.users.find({
   }, {

@@ -13,14 +13,14 @@ Chatter.UserRoom = ChatterUserRoom = Astro.Class({
 
     unreadMsgCount: {
       type: "number",
-      default: function() {
+      default: function () {
         return 0;
       }
     },
 
     archived: {
       type: "boolean",
-      default: function() {
+      default: function () {
         return false;
       }
     },

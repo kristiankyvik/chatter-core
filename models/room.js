@@ -8,7 +8,7 @@ Chatter.Room = ChatterRoom = Astro.Class({
       validator: [
         Validators.required(),
         Validators.minLength(1)
-     ]
+      ]
     },
 
     description: {
@@ -17,12 +17,12 @@ Chatter.Room = ChatterRoom = Astro.Class({
         Validators.required(),
         Validators.minLength(1),
         Validators.maxLength(150)
-     ]
+      ]
     },
 
     roomType: {
       type: "string",
-      default: function() {
+      default: function () {
         return "default";
       }
     },
@@ -33,7 +33,7 @@ Chatter.Room = ChatterRoom = Astro.Class({
 
     lastActive: {
       type: "date",
-      default: function() {
+      default: function () {
         return (new Date());
       }
     },
