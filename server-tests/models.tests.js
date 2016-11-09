@@ -1,16 +1,15 @@
 import { chai } from "meteor/practicalmeteor:chai";
 import emptyDatabase from "./test-helpers.js";
 
-describe("chatter models", function() {
+describe("chatter models", function () {
   const assert = chai.assert;
 
-  after(function() {
+  after(function () {
     emptyDatabase();
   });
 
-  describe("chatter message model", function() {
-
-    //initilizing test message
+  describe("chatter message model", function () {
+    // initilizing test message
     const attributes = {
       message: "test message",
       userId: "testUserId",
@@ -20,68 +19,62 @@ describe("chatter models", function() {
     let messageId;
     let message;
 
-    before(function(done) {
+    before(function (done) {
       messageId = new Chatter.Message(attributes).save();
       message = Chatter.Message.findOne(messageId);
       done();
     });
 
-    it("message is inserted with correct attributes", function() {
+    it("message is inserted with correct attributes", function () {
       assert.equal(message.userId, attributes.userId);
       assert.equal(message.roomId, attributes.roomId);
       assert.equal(message.message, attributes.message);
     });
 
-    it("message returns the correct timeAgo when calling getTimeAgo()", function() {
+    it("message returns the correct timeAgo when calling getTimeAgo()", function () {
       assert.equal(message.getTimeAgo(), "a few seconds ago");
     });
 
-    it("message returns the right ammount of minutes when calling getMinutesAgo()", function() {
+    it("message returns the right ammount of minutes when calling getMinutesAgo()", function () {
       assert.isBelow(message.getMinutesAgo(), 1);
     });
 
-    it("message returns the right date when calling getDate()", function() {
+    it("message returns the right date when calling getDate()", function () {
       assert.equal(message.getDate(), "Today");
     });
-
   });
 
-  describe("chatter room model", function() {
-
+  describe("chatter room model", function () {
     const attributes = {
       name: "test room",
       description: "test description",
       createdBy: "test creator"
     };
 
-    let then;
     let roomId;
     let room;
 
-    before(function() {
+    before(function () {
       then = new Date();
       roomId = new Chatter.Room(attributes).save();
       room = Chatter.Room.findOne(roomId);
     });
 
-    it("room is inserted with correct attributes", function() {
+    it("room is inserted with correct attributes", function () {
       assert.equal(room.name, attributes.name);
       assert.equal(room.description, attributes.description);
       assert.equal(room.createdBy, attributes.createdBy);
     });
 
-    it("room is inserted with correct defaults", function() {
+    it("room is inserted with correct defaults", function () {
       const now = new Date();
       assert.equal(now.getTime() - room.lastActive.getTime() < 20000, true);
       assert.equal(room.roomType, "default");
     });
-
   });
 
-
-  describe("chatter userroom model", function() {
-
-    //initilizing test user
+  describe("chatter userroom model", function () {
+    // initilizing test user
     const attributes = {
       userId: "test user id",
       roomId: "testRoomId"
@@ -90,22 +83,20 @@ describe("chatter models", function() {
     let userRoomId;
     let userRoom;
 
-    before(function() {
+    before(function () {
       userRoomId = new Chatter.UserRoom(attributes).save();
       userRoom = Chatter.UserRoom.findOne(userRoomId);
     });
 
-    it("User Room is inserted with correct attributes", function() {
+    it("User Room is inserted with correct attributes", function () {
       assert.equal(userRoom.userId, attributes.userId);
       assert.equal(userRoom.roomId, attributes.roomId);
       assert.equal(userRoom.archived, false);
-
     });
 
-    it("User Room is inserted with correct defaults", function() {
+    it("User Room is inserted with correct defaults", function () {
       assert.equal(userRoom.unreadMsgCount, 0);
       assert.equal(userRoom.archived, false);
-
     });
 
     Chatter.UserRoom.remove({_id: userRoomId});
