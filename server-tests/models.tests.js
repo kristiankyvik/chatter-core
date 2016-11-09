@@ -32,7 +32,6 @@ describe("chatter models", function() {
       assert.equal(message.message, attributes.message);
     });
 
-
     it("message returns the correct timeAgo when calling getTimeAgo()", function() {
       assert.equal(message.getTimeAgo(), "a few seconds ago");
     });
@@ -74,6 +73,7 @@ describe("chatter models", function() {
     it("room is inserted with correct defaults", function() {
       const now = new Date();
       assert.equal(now.getTime() - room.lastActive.getTime() < 20000, true);
+      assert.equal(room.roomType, "default");
     });
 
   });
@@ -104,6 +104,8 @@ describe("chatter models", function() {
 
     it("User Room is inserted with correct defaults", function() {
       assert.equal(userRoom.unreadMsgCount, 0);
+      assert.equal(userRoom.archived, false);
+
     });
 
     Chatter.UserRoom.remove({_id: userRoomId});
