@@ -37,6 +37,14 @@ describe("chatter models", function() {
       assert.equal(message.getTimeAgo(), "a few seconds ago");
     });
 
+    it("message returns the right ammount of minutes when calling getMinutesAgo()", function() {
+      assert.isBelow(message.getMinutesAgo(), 1);
+    });
+
+    it("message returns the right date when calling getDate()", function() {
+      assert.equal(message.getDate(), "Today");
+    });
+
   });
 
   describe("chatter room model", function() {

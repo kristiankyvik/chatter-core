@@ -30,14 +30,6 @@ Chatter.Message = ChatterMessage = Astro.Class({
         Validators.maxLength(1000),
         reqStrNotNull
       ]
-    },
-
-    nickname: {
-      type: "string"
-    },
-
-    avatar: {
-      type: "string"
     }
   },
 
