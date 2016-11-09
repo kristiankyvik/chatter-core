@@ -4,6 +4,24 @@ const reqStrNotNull = Validators.and([
   Validators.notNull()
 ]);
 
+const increaseCounter = function(message) {
+  const userRooms = Chatter.UserRoom.find({"roomId": message.roomId, "userId": {$nin: [message.userId]}}).fetch();
+  userRooms.map(function(userRoom) {
+    Chatter.UserRoom.update({
+      _id: userRoom._id,
+    },
+    { $inc: {unreadMsgCount: 1} });
+  });
+};
+
+const updateRoom = function(roomId) {
+  Chatter.Room.update({
+    _id: roomId
+  },
+  { $set: {lastActive: new Date()} }
+  );
+};
+
 Chatter.Message = ChatterMessage = Astro.Class({
   name: "ChatterMessage",
   collection: new Mongo.Collection("chattermessage"),
@@ -34,23 +52,23 @@ Chatter.Message = ChatterMessage = Astro.Class({
   },
 
   events: {
-    beforeSave: function(e) {
+    beforeSave: function() {
       increaseCounter(this);
       updateRoom(this.roomId);
     }
   },
 
   methods: {
-    getTimeAgo: function () {
+    getTimeAgo: function() {
       return moment(this.get("createdAt")).fromNow();
     },
-    getMinutesAgo: function () {
+    getMinutesAgo: function() {
       const now = moment(new Date());
       const then = this.get("createdAt");
       const duration = moment.duration(now.diff(then)).asMinutes();
       return duration;
     },
-    getDate: function () {
+    getDate: function() {
       const date = moment(this.get("createdAt"));
       const iscurrentDate = date.isSame(new Date(), "day");
       const res = iscurrentDate ? "Today" : date.format("MMMM Do");
@@ -62,23 +80,3 @@ Chatter.Message = ChatterMessage = Astro.Class({
 });
 
 
-const increaseCounter = function(message) {
-  const userRooms = Chatter.UserRoom.find({"roomId": message.roomId, "userId": {$nin:[message.userId]}}).fetch();
-  const users = userRooms.map(function(userRoom) {
-    Chatter.UserRoom.update({
-      _id: userRoom._id,
-    },
-    {
-      $inc: { unreadMsgCount: 1}
-    });
-  });
-};
-
-const updateRoom = function(roomId) {
-  Chatter.Room.update({
-    _id : roomId
-  },
-  {
-    $set:{lastActive : new Date()}
-  });
-};

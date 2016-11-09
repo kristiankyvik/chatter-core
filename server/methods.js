@@ -2,23 +2,19 @@ import {userInRoom, checkIfChatterUser, capitalize} from "../utils.js";
 
 Meteor.methods({
 
-  "get.room.unreadMsgCount" () {
+  "user.changeNickname" (nickname) {
+    check(nickname, String);
+
     const userId =  Meteor.userId();
     checkIfChatterUser(userId);
-    const userRooms = Chatter.UserRoom.find({userId}).fetch();
-    const roomIds = userRooms.map(function(userRoom) {return userRoom.roomId});
-    const rooms = Chatter.Room.find({"_id": {$in: roomIds}})
 
-    const response = {
-      archivedCount: 0,
-      activeCount: 0
-    };
-
-    rooms.forEach(function(room){
-      room.archived ? response.archivedCount += 1 : response.activeCount += 1;
+    Meteor.users.update(
+      userId,
+    {
+      $set:{"profile.chatterNickname": nickname}
     });
 
-    return response;
+    return nickname;
   },
 
   "room.create" (params) {
@@ -54,6 +50,34 @@ Meteor.methods({
     }
 
     room.throwValidationException();
+  },
+
+  "room.delete" (roomId) {
+    check(roomId, String);
+
+    const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
+
+    const user = Meteor.users.findOne(userId);
+    const room = Chatter.Room.findOne(roomId);
+
+    if (!room) {
+      throw new Meteor.Error("non-existing-room", "room does not exist");
+    }
+
+    const userRooms = Chatter.UserRoom.find({roomId}).fetch();
+
+    room.remove(function(error, result) {
+      if (error) throw new Meteor.Error("remove-room-error", "room was not deleted");
+
+      userRooms.forEach(function(userRoom) {
+        userRoom.remove(function(error, result) {
+          if (error) throw new Meteor.Error("remove-userRoom-error", "userRoom was not deleted");
+        });
+      });
+
+    });
+    return roomId;
   },
 
   "room.check" (roomId) {
@@ -174,20 +198,51 @@ Meteor.methods({
     return users;
   },
 
+  "room.getUnreadMsgCount" () {
+    const userId =  Meteor.userId();
+    checkIfChatterUser(userId);
+    const userRooms = Chatter.UserRoom.find({userId}).fetch();
+    const roomIds = userRooms.map(function(userRoom) {return userRoom.roomId});
+    const rooms = Chatter.Room.find({"_id": {$in: roomIds}})
 
-  "user.changeNickname" (nickname) {
-    check(nickname, String);
+    const response = {
+      archivedCount: 0,
+      activeCount: 0
+    };
+
+    rooms.forEach(function(room){
+      room.archived ? response.archivedCount += 1 : response.activeCount += 1;
+    });
+
+    return response;
+  },
+
+  "room.unreadMsgCount.reset" (roomId) {
+    check(roomId, String);
 
     const userId =  Meteor.userId();
     checkIfChatterUser(userId);
+    const user = Meteor.users.findOne(userId);
+    const room = Chatter.Room.findOne(roomId);
 
-    Meteor.users.update(
-      userId,
+    if (!room) {
+      throw new Meteor.Error("non-existing-room", "room does not exist");
+    }
+
+    if (!userInRoom(userId, roomId)) {
+      throw new Meteor.Error("user-not-in-room", "user must be reset counter");
+    }
+
+    const userRoomId = Chatter.UserRoom.findOne({roomId, userId: userId})._id;
+
+    Chatter.UserRoom.update({
+      _id: userRoomId
+    },
     {
-      $set:{"profile.chatterNickname": nickname}
+      $set:{unreadMsgCount: 0}
     });
 
-    return nickname;
+    return true
   },
 
   "help.createRoom" () {
@@ -227,62 +282,6 @@ Meteor.methods({
     }
 
     room.throwValidationException();
-  },
-
-  "room.unreadMsgCount.reset" (roomId) {
-    check(roomId, String);
-
-    const userId =  Meteor.userId();
-    checkIfChatterUser(userId);
-    const user = Meteor.users.findOne(userId);
-    const room = Chatter.Room.findOne(roomId);
-
-    if (!room) {
-      throw new Meteor.Error("non-existing-room", "room does not exist");
-    }
-
-    if (!userInRoom(userId, roomId)) {
-      throw new Meteor.Error("user-not-in-room", "user must be reset counter");
-    }
-
-    const userRoomId = Chatter.UserRoom.findOne({roomId, userId: userId})._id;
-
-    Chatter.UserRoom.update({
-      _id: userRoomId
-    },
-    {
-      $set:{unreadMsgCount: 0}
-    });
-
-    return true
-  },
-
-  "room.delete" (roomId) {
-    check(roomId, String);
-
-    const userId =  Meteor.userId();
-    checkIfChatterUser(userId);
-
-    const user = Meteor.users.findOne(userId);
-    const room = Chatter.Room.findOne(roomId);
-
-    if (!room) {
-      throw new Meteor.Error("non-existing-room", "room does not exist");
-    }
-
-    const userRooms = Chatter.UserRoom.find({roomId}).fetch();
-
-    room.remove(function(error, result) {
-      if (error) throw new Meteor.Error("remove-room-error", "room was not deleted");
-
-      userRooms.forEach(function(userRoom) {
-        userRoom.remove(function(error, result) {
-          if (error) throw new Meteor.Error("remove-userRoom-error", "userRoom was not deleted");
-        });
-      });
-
-    });
-    return roomId;
   },
 
   "message.count" (roomId) {
