@@ -14,19 +14,6 @@ Chatter.configure = function (opts) {
 };
 
 /**
- * @summary Retrieves nickname of user.
- * @locus Server
- * @param {object} meteor user.
- * @returns {string} the nickname of the user.
- */
-function getNickname(user) {
-  const nickPath = Chatter.options.nickProperty;
-  const nick = nickPath.split('.').reduce((prevVal, el) => prevVal[el] , user);
-
-  return nick;
-}
-
-/**
  * @summary Adds user to Chatter and defines its privileges
  * @locus Server
  * @param params Information about the new user.
@@ -34,7 +21,7 @@ function getNickname(user) {
  * @param {string} params.userType Defines the restricitons on the new user. Can either be set to "admin" or "standard".
  * @returns {string} chatterId
  */
-Chatter.addUser = function(params) {
+Chatter.addUser = function (params) {
   check(params, {
     userId: String,
     admin: Match.Optional(Match.OneOf(Boolean, String, undefined)),
@@ -45,7 +32,7 @@ Chatter.addUser = function(params) {
 
   const user = Meteor.users.findOne(userId);
 
-  if (!user) {
+  if (_.isUndefined(user)) {
     throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
@@ -56,13 +43,13 @@ Chatter.addUser = function(params) {
       "profile.isChatterAdmin": isAdmin,
       "profile.chatterNickname": user.username,
       "profile.supportUser": supportUser
-    }
-  });
+    }}
+  );
 
   return userId;
 };
 
-Chatter.setNickname = function(params) {
+Chatter.setNickname = function (params) {
   check(params, {
     userId: String,
     nickname: String
@@ -72,16 +59,14 @@ Chatter.setNickname = function(params) {
 
   const user = Meteor.users.findOne(userId);
 
-  if (!user) {
+  if (_.isUndefined(user)) {
     throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
   Meteor.users.update(
     {_id: userId},
-    { $set: {
-      "profile.chatterNickname": nickname
-    }
-  });
+    { $set: {"profile.chatterNickname": nickname}}
+  );
 
   return userId;
 };
@@ -94,7 +79,7 @@ Chatter.setNickname = function(params) {
  * @param {string} params.userType Defines the restricitons on the new user. Can either be set to "admin" or "standard".
  * @returns {string} chatterId
  */
-Chatter.removeUser = function(params) {
+Chatter.removeUser = function (params) {
   check(params, {
     userId: String
   });
@@ -102,7 +87,7 @@ Chatter.removeUser = function(params) {
   let {userId} = params;
   const user = Meteor.users.findOne(userId);
 
-  if (!user) {
+  if (_.isUndefined(user)) {
     throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
@@ -115,8 +100,8 @@ Chatter.removeUser = function(params) {
   Chatter.Message.remove({userId});
   Meteor.users.remove(userId);
 
-  //removes all conversation of this user
-  Chatter.UserRoom.find({userId}).fetch().forEach(function(userRoom) {
+  // removes all conversations of this user
+  Chatter.UserRoom.find({userId}).fetch().forEach(function (userRoom) {
     const roomId = userRoom.roomId;
     const usersInRoom = Chatter.UserRoom.find({roomId}).count();
     if (usersInRoom < 3) {
@@ -150,14 +135,13 @@ Chatter.addRoom = function(params) {
     description,
     roomType,
     ref
-  })
+  });
 
   if (room.validate()) {
     return room.save();
   }
 
   room.throwValidationException();
-
 };
 
 /**
@@ -165,17 +149,17 @@ Chatter.addRoom = function(params) {
  * @locus Server
  * @param {string} roomId.
  */
-Chatter.removeRoom = function(params) {
+Chatter.removeRoom = function (params) {
   check(params, {
     roomId: String
   });
 
   const room = Chatter.Room.findOne(params.roomId);
-  if (!room) {
+  if (_.isUndefined(room)) {
     throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
   }
 
-  Chatter.UserRoom.remove({'roomId':{'$in':[room._id]}})
+  Chatter.UserRoom.remove({'roomId': {'$in': [room._id]}});
   return room.remove();
 };
 
@@ -187,7 +171,7 @@ Chatter.removeRoom = function(params) {
  * @param {string} params.roomId Unique string identifying the room.
  * @returns {string} the string of the userRoom
  */
-Chatter.addUserToRoom = function(params) {
+Chatter.addUserToRoom = function (params) {
   check(params, {
     userId: String,
     roomId: String
@@ -197,19 +181,16 @@ Chatter.addUserToRoom = function(params) {
   const room = Chatter.Room.findOne(roomId);
   const user = Meteor.users.findOne(userId);
 
-
-  if (!room) {
+  if (_.isUndefined(room)) {
     throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
-  }
-
-  if (!user) {
+  } else if (_.isUndefined(user)) {
     throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
   }
 
   const userRoom = new Chatter.UserRoom({
     userId,
     roomId
-  })
+  });
 
   if (userRoom.validate()) {
     return userRoom.save();
@@ -225,7 +206,7 @@ Chatter.addUserToRoom = function(params) {
  * @param {string} params.userId Unique string identifying user.
  * @param {string} params.roomId Unique string identifying the room.
  */
-Chatter.removeUserFromRoom = function(params) {
+Chatter.removeUserFromRoom = function (params) {
   check(params, {
     userId: String,
     roomId: String
@@ -235,7 +216,7 @@ Chatter.removeUserFromRoom = function(params) {
   const user = Meteor.users.findOne(userId);
   const room = Chatter.Room.findOne(roomId);
 
-  if (!room) {
+  if (_.isUndefined(room)) {
     throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
   } else if (!user) {
     throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
@@ -243,7 +224,7 @@ Chatter.removeUserFromRoom = function(params) {
 
   const userRoom = Chatter.UserRoom.findOne({roomId, userId: user._id});
 
-  if (!userRoom) {
+  if (_.isUndefined(userRoom)) {
     throw new Meteor.Error("user-has-not-been-added-to-room", "the user had not been added to room ");
   }
 
