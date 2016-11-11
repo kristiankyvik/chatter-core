@@ -157,7 +157,7 @@ describe("Chatter Meteor methods", function () {
   describe("room methods", function () {
     let roomId;
 
-    describe("room.create", function () {
+    describe("room.create method", function () {
       it("throws an error when required parameters are missing", function (done) {
         const params = {};
         Meteor.call("room.create", params, callbackWrapper((error, response) => {
@@ -192,7 +192,7 @@ describe("Chatter Meteor methods", function () {
       });
     });
 
-    describe("room.check", function () {
+    describe("room.check method", function () {
       it("throws an error when required parameters are missing", function (done) {
         Meteor.call("room.check", null, callbackWrapper((error, response) => {
           assert.isUndefined(response);
@@ -218,7 +218,7 @@ describe("Chatter Meteor methods", function () {
       });
     });
 
-    describe("room.delete", function () {
+    describe("room.delete method", function () {
       it("throws an error when required parameters are missing", function (done) {
         const params = null;
         Meteor.call("room.delete", params, callbackWrapper((error, response) => {
@@ -305,7 +305,7 @@ describe("Chatter Meteor methods", function () {
       });
     });
 
-    describe("room.archive", function () {
+    describe("room.archive method", function () {
       it("throws an error when params are not right type", function (done) {
         const params = {
           roomId: 124324324,
@@ -478,7 +478,7 @@ describe("Chatter Meteor methods", function () {
         }));
       });
     });
-    describe("help.createRoom", function () {
+    describe("help.createRoom method", function () {
       it("returns error when user has no defined support user", function (done) {
         Meteor.call("help.createRoom", callbackWrapper((error, response) => {
           assert.isUndefined(response);
