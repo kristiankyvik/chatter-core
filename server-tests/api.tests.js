@@ -30,7 +30,7 @@ describe("Chatter API methods", function () {
   });
 
   describe("Chatter.addUser method", function () {
-    it("throws and error if parameters are missing", function () {
+    it("throws an error if parameters are missing", function () {
       assert.throws(Chatter.addUser.bind(Chatter, {}), Error, "Match error: Missing key \'userId\'");
     });
 
@@ -44,14 +44,14 @@ describe("Chatter API methods", function () {
       sinon.assert.calledOnce(update);
     });
 
-    it("throws and error if user does not exist", function () {
+    it("throws an error if user does not exist", function () {
       const params = {userId: "non-existent-id"};
       assert.throws(Chatter.addUser.bind(Chatter, params), Error, "user id provided is not correct [user-does-not-exist]");
     });
   });
 
   describe("Chatter.setNickname method", function () {
-    it("throws and error if parameters are missing", function () {
+    it("throws an error if parameters are missing", function () {
       assert.throws(Chatter.setNickname.bind(Chatter, {nickname: "test-nickname"}), Error, "Match error: Missing key \'userId\'");
     });
 
@@ -65,7 +65,7 @@ describe("Chatter API methods", function () {
       sinon.assert.calledOnce(update);
     });
 
-    it("throws and error if user does not exist", function () {
+    it("throws an error if user does not exist", function () {
       const params = {
         userId: "non-existent-id",
         nickname: "test_nickname"
@@ -75,7 +75,7 @@ describe("Chatter API methods", function () {
   });
 
   describe("Chatter.addRoom method", function () {
-    it("throws and error if parameters are missing", function () {
+    it("throws an error if parameters are missing", function () {
       assert.throws(Chatter.addRoom.bind(Chatter, {description: "test description"}), Error, "Match error: Missing key \'name\'");
     });
 
@@ -103,7 +103,7 @@ describe("Chatter API methods", function () {
   });
 
   describe("Chatter.addRoom method", function () {
-    it("throws and error if parameters are missing", function () {
+    it("throws an error if parameters are missing", function () {
       assert.throws(Chatter.addRoom.bind(Chatter, {description: "test description"}), Error, "Match error: Missing key \'name\'");
     });
 
@@ -131,11 +131,11 @@ describe("Chatter API methods", function () {
   });
 
   describe("Chatter.addUserToRoom method", function () {
-    it("throws and error if parameters are missing", function () {
+    it("throws an error if parameters are missing", function () {
       assert.throws(Chatter.addUserToRoom.bind(Chatter, {roomId: "test roomId"}), Error, "Match error: Missing key \'userId\'");
     });
 
-    it("throws and error if user does not exist", function () {
+    it("throws an error if user does not exist", function () {
       const params = {
         userId: "non_existing_user_id",
         roomId: room._id
@@ -143,7 +143,7 @@ describe("Chatter API methods", function () {
       assert.throws(Chatter.addUserToRoom.bind(Chatter, params), Error, "user id provided is not correct [user-does-not-exist]");
     });
 
-    it("throws and error if room does not exist", function () {
+    it("throws an error if room does not exist", function () {
       const params = {
         userId: user._id,
         roomId: "non_existing_room_id"
@@ -161,7 +161,7 @@ describe("Chatter API methods", function () {
       assert.isString(response);
     });
 
-    it("actually add the user to the room", function () {
+    it("actually adds the user to the room", function () {
       const params = {
         userId: user._id,
         roomId: room._id
@@ -175,11 +175,11 @@ describe("Chatter API methods", function () {
   });
 
   describe("Chatter.removeUserFromRoom method", function () {
-    it("throws and error if parameters are missing", function () {
+    it("throws an error if parameters are missing", function () {
       assert.throws(Chatter.removeUserFromRoom.bind(Chatter, {roomId: "test roomId"}), Error, "Match error: Missing key \'userId\'");
     });
 
-    it("throws and error if user does not exist", function () {
+    it("throws an error if user does not exist", function () {
       const params = {
         userId: "non_existing_user_id",
         roomId: room._id
@@ -187,7 +187,7 @@ describe("Chatter API methods", function () {
       assert.throws(Chatter.removeUserFromRoom.bind(Chatter, params), Error, "user id provided is not correct [user-does-not-exist]");
     });
 
-    it("throws and error if room does not exist", function () {
+    it("throws an error if room does not exist", function () {
       const params = {
         userId: user._id,
         roomId: "non_existing_user_id"
@@ -218,11 +218,11 @@ describe("Chatter API methods", function () {
   });
 
   describe("Chatter.removeRoom method", function () {
-    it("throws and error if parameters are missing", function () {
+    it("throws an error if parameters are missing", function () {
       assert.throws(Chatter.removeRoom.bind(Chatter, {}), Error, "Match error: Missing key \'roomId\'");
     });
 
-    it("throws and error if room does not exist", function () {
+    it("throws an error if room does not exist", function () {
       const params = {
         roomId: "non_existing_room_id"
       };
@@ -260,7 +260,7 @@ describe("Chatter API methods", function () {
       remove.restore();
     });
 
-    it("throws and error if parameters are missing", function () {
+    it("throws an error if parameters are missing", function () {
       assert.throws(Chatter.removeUser.bind(Chatter, {}), Error, "Match error: Missing key \'userId\'");
     });
 
@@ -283,7 +283,7 @@ describe("Chatter API methods", function () {
       assert.isUndefined(Chatter.Room.findOne(room._id));
     });
 
-    it("throws and error if user does not exist", function () {
+    it("throws an error if user does not exist", function () {
       const params = {
         userId: "non-existent-id"
       };
