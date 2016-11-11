@@ -17,35 +17,18 @@ describe("chatter meteor methods", function () {
   };
 
   before(function () {
-    user = Meteor.users.findOne();
+    user = Meteor.users.findOne("id_of_user_one");
+
     const roomId = new Chatter.Room({name: "test_room" }).save();
     room = Chatter.Room.findOne(roomId);
     userRoom = new Chatter.UserRoom({userId: user._id, roomId: roomId }).save();
-    // Simulate user has been added to chatter and has made admin
-    stubs.findOne.returns({
-      _id: "meteor_user_one_id",
-      username: "meteor_user_one_nickname",
-      profile: {
-        isChatterUser: true,
-        isChatterAdmin: true
-      }
-    });
-
-    stubs.findOne.withArgs({_id: "id_of_user_two"}).returns({
-      _id: "meteor_user_two_id",
-      username: "meteor_user_two_nickname",
-      profile: {
-        isChatterUser: true,
-        isChatterAdmin: true
-      }
-    });
   });
 
   after(function () {
     emptyDatabase();
   });
 
-  describe("message.send method", function () {
+  describe("message.send and message.count methods", function () {
     it("message.send throws exception when parameters are missing", function (done) {
       const params = {};
       Meteor.call("message.send", params, callbackWrapper((error, response) => {
@@ -92,6 +75,43 @@ describe("chatter meteor methods", function () {
       }));
     });
 
+    it("message.send returns id when all parameters are sent correctly", function (done) {
+      const params = {};
+      params.roomId = room._id;
+      params.message = "test message";
+
+      Meteor.call("message.send", params, callbackWrapper((error, response) => {
+        assert.isUndefined(error);
+        assert.isString(response);
+        done();
+      }));
+    });
+
+    it("message.count throws exception when parameters are missing", function (done) {
+      Meteor.call("message.count", null, callbackWrapper((error, response) => {
+        assert.isUndefined(response);
+        assert.equal(error.errorType, "Match.Error");
+        done();
+      }));
+    });
+
+    it("message.count returns error when room does not exist", function (done) {
+      Meteor.call("message.count", "non_existing_room_id", callbackWrapper((error, response) => {
+        assert.isUndefined(response);
+        assert.equal(error.error, "non-existing-room");
+        done();
+      }));
+    });
+
+    it("message.count returns id when all parameters are sent correctly", function (done) {
+      const messageCount = Chatter.Message.find({roomId: room._id}).fetch().length;
+      Meteor.call("message.count", room._id, callbackWrapper((error, response) => {
+        assert.isUndefined(error);
+        assert.equal(response, messageCount);
+        done();
+      }));
+    });
+
     it("message.send throws error when user is not part of room ", function (done) {
       const params = {};
       params.roomId = room._id;
@@ -106,7 +126,37 @@ describe("chatter meteor methods", function () {
     });
   });
 
+  describe("user.changeNickname method", function () {
+    let update;
+
+    before(function () {
+      update = sinon.spy(Meteor.users, "update");
+    });
+
+    after(function () {
+      update.restore();
+    });
+
+    it("user.changeNickname throws exception when parameters are missing", function (done) {
+      Meteor.call("user.changeNickname", null, callbackWrapper((error, response) => {
+        assert.isUndefined(response);
+        assert.equal(error.errorType, "Match.Error");
+        done();
+      }));
+    });
+
+    it("user.changeNickname triggers a Meteor.users.update call", function (done) {
+      Meteor.call("user.changeNickname", "new_nickname", callbackWrapper((error, response) => {
+        sinon.assert.calledOnce(update);
+        assert.equal(response, "new_nickname");
+        done();
+      }));
+    });
+  });
+
   describe("room methods", function () {
+    let roomId;
+
     describe("room.create", function () {
       it("throws an error when required parameters are missing", function (done) {
         const params = {};
@@ -123,6 +173,7 @@ describe("chatter meteor methods", function () {
         Meteor.call("room.create", params, callbackWrapper((error, response) => {
           assert.isUndefined(error);
           assert.isString(response);
+          roomId = response;
           done();
         }));
       });
@@ -140,9 +191,58 @@ describe("chatter meteor methods", function () {
         }));
       });
     });
+
+    describe("room.check", function () {
+      it("throws an error when required parameters are missing", function (done) {
+        Meteor.call("room.check", null, callbackWrapper((error, response) => {
+          assert.isUndefined(response);
+          assert.equal(error.errorType, "Match.Error");
+          done();
+        }));
+      });
+
+      it("returns true when succesfull", function (done) {
+        Meteor.call("room.check", roomId, callbackWrapper((error, response) => {
+          assert.isUndefined(error);
+          assert.isTrue(response);
+          done();
+        }));
+      });
+
+      it("returns undefined when room does not exist", function (done) {
+        Meteor.call("room.check", "none-existing-id", callbackWrapper((error, response) => {
+          assert.isUndefined(error);
+          assert.isFalse(response);
+          done();
+        }));
+      });
+    });
+
+    describe("room.delete", function () {
+      it("throws an error when required parameters are missing", function (done) {
+        const params = null;
+        Meteor.call("room.delete", params, callbackWrapper((error, response) => {
+          assert.isUndefined(response);
+          assert.equal(error.errorType, "Match.Error");
+          done();
+        }));
+      });
+
+      it("returns roomId when succesfull", function (done) {
+        Meteor.call("room.delete", roomId, callbackWrapper((error, response) => {
+          assert.isUndefined(error);
+          assert.isString(response);
+          done();
+        }));
+      });
+
+      it("actually deletes the room", function () {
+        assert.isUndefined(Chatter.Room.findOne(roomId));
+      });
+    });
   });
 
-  describe("userRoom methods", function () {
+  describe("Other methods", function () {
     describe("room.join method", function () {
       describe("when parameters are missing or wrong", function () {
         it("returns exception when parameters are missing ", function (done) {
@@ -180,7 +280,7 @@ describe("chatter meteor methods", function () {
 
           Meteor.call("room.join", params, callbackWrapper((error, response) => {
             assert.isUndefined(response);
-            assert.equal(error.error, "non-existing-users");
+            assert.equal(error.error, "non-existing-user");
             done();
           }));
         });
@@ -259,7 +359,7 @@ describe("chatter meteor methods", function () {
         }));
       });
 
-      it("actually changed archived status to true", function () {
+      it("actually changes archived status to true", function () {
         assert.equal(Chatter.UserRoom.findOne({userId: user._id, roomId: room._id}).archived, true);
       });
 
@@ -282,10 +382,45 @@ describe("chatter meteor methods", function () {
       });
     });
 
+    describe("room.get method", function () {
+      it("throw an error if missing parameters", function (done) {
+        Meteor.call("room.get", null, callbackWrapper((error, response) => {
+          assert.isUndefined(response);
+          assert.equal(error.errorType, "Match.Error");
+          done();
+        }));
+      });
+
+      it("returns room if no missing parameters missing or incorrect", function (done) {
+        Meteor.call("room.get", room._id, callbackWrapper((error, response) => {
+          assert.isUndefined(error);
+          assert.equal(response._id, room._id);
+          done();
+        }));
+      });
+    });
+
+    describe("room.users method", function () {
+      it("throw an error if missing parameters", function (done) {
+        Meteor.call("room.users", null, callbackWrapper((error, response) => {
+          assert.isUndefined(response);
+          assert.equal(error.errorType, "Match.Error");
+          done();
+        }));
+      });
+
+      it("returns room users if no missing parameters missing or incorrect", function (done) {
+        Meteor.call("room.users", room._id, callbackWrapper((error, response) => {
+          assert.isUndefined(error);
+          assert.equal(response[0]._id, user._id);
+          done();
+        }));
+      });
+    });
+
     describe("room.leave method", function () {
       it("throw an error if missing parameters", function (done) {
         params = {};
-
         Meteor.call("room.leave", params, callbackWrapper((error, response) => {
           assert.isUndefined(response);
           assert.equal(error.errorType, "Match.Error");
@@ -293,10 +428,18 @@ describe("chatter meteor methods", function () {
         }));
       });
 
-      it("room.leave if no missing parameters missing or incorrect", function () {
+      it("returns room id if no missing parameters missing or incorrect", function (done) {
+        Meteor.call("room.leave", {userId: user._id, roomId: room._id}, callbackWrapper((error, response) => {
+          assert.isUndefined(error);
+          assert.equal(response, room._id);
+          done();
+        }));
+      });
+
+      it("actually leaves room if called succesfuly", function () {
         Meteor.call("room.leave", {userId: user._id, roomId: room._id});
-        const results = Chatter.UserRoom.find({userId: user._id, roomId: room._id}).fetch();
-        assert.equal(results.length, 0);
+        const result = Chatter.UserRoom.findOne({userId: user._id, roomId: room._id});
+        assert.isUndefined(result);
       });
     });
 
@@ -334,6 +477,33 @@ describe("chatter meteor methods", function () {
           done();
         }));
       });
+    });
+  });
+  describe("help.createRoom", function () {
+    it("returns error when user has no defined support user", function (done) {
+      Meteor.call("help.createRoom", callbackWrapper((error, response) => {
+        assert.isUndefined(response);
+        assert.equal(error.error, "user-has-no-support-user");
+        done();
+      }));
+    });
+
+    it("returns help room id when user has support user assigned", function (done) {
+      stubs.findOne.withArgs("id_of_user_one").returns({
+        _id: "id_of_user_one",
+        username: "help_user",
+        profile: {
+          isChatterUser: true,
+          isChatterAdmin: true,
+          supportUser: "help_user"
+        }
+      });
+
+      Meteor.call("help.createRoom", callbackWrapper((error, response) => {
+        assert.isUndefined(error);
+        assert.isString(response);
+        done();
+      }));
     });
   });
 });

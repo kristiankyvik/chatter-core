@@ -58,7 +58,7 @@ Meteor.methods({
 
     const room = Chatter.Room.findOne(roomId);
 
-    if (!room) {
+    if (_.isUndefined(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
@@ -81,7 +81,7 @@ Meteor.methods({
     check(roomId, String);
 
     const room = Chatter.Room.findOne(roomId);
-    return room;
+    return !_.isUndefined(room);
   },
 
   "room.join" (params) {
@@ -100,13 +100,14 @@ Meteor.methods({
 
     const room = Chatter.Room.findOne(params.roomId);
 
-    if (!room) {
+    if (_.isUndefined(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
     let userNotexists = false;
     _.each(params.invitees, function (id) {
-      if (user) {
+      let checkUser = Meteor.users.findOne(id);
+      if (checkUser) {
         Chatter.UserRoom.upsert({
           userId: id,
           roomId: room._id
@@ -118,13 +119,13 @@ Meteor.methods({
         });
       } else {
         userNotexists = true;
-        return false;
       }
     });
 
     if (userNotexists) {
-      throw new Meteor.Error("non-existing-users", "user does not exist");
+      throw new Meteor.Error("non-existing-user", "user does not exist");
     }
+
     return Chatter.UserRoom.findOne()._id;
   },
 
@@ -148,6 +149,8 @@ Meteor.methods({
       userId: userIdToRemove,
       roomId: params.roomId
     });
+
+    return params.roomId;
   },
 
   "room.get" (id) {
@@ -169,7 +172,7 @@ Meteor.methods({
     const {roomId, archived} = params;
     const userRoom = Chatter.UserRoom.findOne({roomId, userId});
 
-    if (!userRoom) {
+    if (_.isUndefined(userRoom)) {
       throw new Meteor.Error("user-not-in-room", "user must be in room");
     }
 
@@ -183,12 +186,10 @@ Meteor.methods({
 
   "room.users" (roomId) {
     check(roomId, String);
-
     const userRooms = Chatter.UserRoom.find({"roomId": roomId}).fetch();
     const users = userRooms.map(function (userRoom) {
       return Meteor.users.findOne(userRoom.userId);
     });
-
     return users;
   },
 
@@ -218,7 +219,7 @@ Meteor.methods({
     checkIfChatterUser(userId);
     const room = Chatter.Room.findOne(roomId);
 
-    if (!room) {
+    if (_.isUndefined(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
@@ -238,23 +239,28 @@ Meteor.methods({
 
   "help.createRoom" () {
     const users = [];
-    const user = Meteor.user();
-    const userId = user._id;
+    const userId = Meteor.userId();
 
     checkIfChatterUser(userId);
 
     users.push(userId);
 
+    const user = Meteor.users.findOne(userId);
+
+    if (!_.has(user.profile, "supportUser")) {
+      throw new Meteor.Error("user-has-no-support-user", "user has no support user");
+    }
+
     const supportUser = Meteor.users.findOne({username: user.profile.supportUser});
 
-    if (!supportUser) {
+    if (_.isUndefined(supportUser)) {
       throw new Meteor.Error("user-does-not-exist", "user does not exist");
     }
 
     users.push(supportUser._id);
 
     const room = new Chatter.Room({
-      name: "Support Chat (" + capitalize(Meteor.user().username) + ")",
+      name: "Support Chat (" + capitalize(user.username) + ")",
       description: "A room that gets you the help you need",
       createdBy: userId,
       roomType: "support",
@@ -283,7 +289,7 @@ Meteor.methods({
 
     const room = Chatter.Room.findOne(roomId);
 
-    if (!room) {
+    if (_.isUndefined(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 

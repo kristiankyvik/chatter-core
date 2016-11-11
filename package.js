@@ -6,7 +6,7 @@ Package.describe({
   documentation: 'README.md'
 });
 
-Package.onUse(function(api) {
+Package.onUse(function (api) {
   api.versionsFrom('1.2.0.2');
 
   api.use('ecmascript');
@@ -44,7 +44,7 @@ Package.onUse(function(api) {
   ], ['client', 'server']);
 });
 
-Package.onTest(function(api) {
+Package.onTest(function (api) {
   api.use('accounts-base');
   api.use('ecmascript');
   api.use('practicalmeteor:chai');
