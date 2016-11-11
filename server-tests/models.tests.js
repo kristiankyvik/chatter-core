@@ -1,14 +1,14 @@
 import { chai } from "meteor/practicalmeteor:chai";
 import emptyDatabase from "./test-helpers.js";
 
-describe("chatter models", function () {
+describe("Chatter models", function () {
   const assert = chai.assert;
 
   after(function () {
     emptyDatabase();
   });
 
-  describe("chatter message model", function () {
+  describe("Chatter Message model", function () {
     // initilizing test message
     const attributes = {
       message: "test message",
@@ -44,7 +44,7 @@ describe("chatter models", function () {
     });
   });
 
-  describe("chatter room model", function () {
+  describe("Chatter Room model", function () {
     const attributes = {
       name: "test room",
       description: "test description",
@@ -73,7 +73,7 @@ describe("chatter models", function () {
     });
   });
 
-  describe("chatter userroom model", function () {
+  describe("Chatter UserRoom model", function () {
     // initilizing test user
     const attributes = {
       userId: "test user id",

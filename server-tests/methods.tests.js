@@ -6,7 +6,7 @@ const callbackWrapper = function (fn) {
   };
 };
 
-describe("chatter meteor methods", function () {
+describe("Chatter Meteor methods", function () {
   let room;
   let user;
   const assert = chai.assert;
@@ -242,7 +242,7 @@ describe("chatter meteor methods", function () {
     });
   });
 
-  describe("Other methods", function () {
+  describe("mixed methods", function () {
     describe("room.join method", function () {
       describe("when parameters are missing or wrong", function () {
         it("returns exception when parameters are missing ", function (done) {
@@ -383,7 +383,7 @@ describe("chatter meteor methods", function () {
     });
 
     describe("room.get method", function () {
-      it("throw an error if missing parameters", function (done) {
+      it("throws an error if missing parameters", function (done) {
         Meteor.call("room.get", null, callbackWrapper((error, response) => {
           assert.isUndefined(response);
           assert.equal(error.errorType, "Match.Error");
@@ -401,7 +401,7 @@ describe("chatter meteor methods", function () {
     });
 
     describe("room.users method", function () {
-      it("throw an error if missing parameters", function (done) {
+      it("throws an error if missing parameters", function (done) {
         Meteor.call("room.users", null, callbackWrapper((error, response) => {
           assert.isUndefined(response);
           assert.equal(error.errorType, "Match.Error");
@@ -419,7 +419,7 @@ describe("chatter meteor methods", function () {
     });
 
     describe("room.leave method", function () {
-      it("throw an error if missing parameters", function (done) {
+      it("throws an error if missing parameters", function (done) {
         params = {};
         Meteor.call("room.leave", params, callbackWrapper((error, response) => {
           assert.isUndefined(response);
@@ -478,32 +478,32 @@ describe("chatter meteor methods", function () {
         }));
       });
     });
-  });
-  describe("help.createRoom", function () {
-    it("returns error when user has no defined support user", function (done) {
-      Meteor.call("help.createRoom", callbackWrapper((error, response) => {
-        assert.isUndefined(response);
-        assert.equal(error.error, "user-has-no-support-user");
-        done();
-      }));
-    });
-
-    it("returns help room id when user has support user assigned", function (done) {
-      stubs.findOne.withArgs("id_of_user_one").returns({
-        _id: "id_of_user_one",
-        username: "help_user",
-        profile: {
-          isChatterUser: true,
-          isChatterAdmin: true,
-          supportUser: "help_user"
-        }
+    describe("help.createRoom", function () {
+      it("returns error when user has no defined support user", function (done) {
+        Meteor.call("help.createRoom", callbackWrapper((error, response) => {
+          assert.isUndefined(response);
+          assert.equal(error.error, "user-has-no-support-user");
+          done();
+        }));
       });
 
-      Meteor.call("help.createRoom", callbackWrapper((error, response) => {
-        assert.isUndefined(error);
-        assert.isString(response);
-        done();
-      }));
+      it("returns help room id when user has support user assigned", function (done) {
+        stubs.findOne.withArgs("id_of_user_one").returns({
+          _id: "id_of_user_one",
+          username: "help_user",
+          profile: {
+            isChatterUser: true,
+            isChatterAdmin: true,
+            supportUser: "help_user"
+          }
+        });
+
+        Meteor.call("help.createRoom", callbackWrapper((error, response) => {
+          assert.isUndefined(error);
+          assert.isString(response);
+          done();
+        }));
+      });
     });
   });
 });

@@ -24,8 +24,8 @@ Chatter.configure = function (opts) {
 Chatter.addUser = function (params) {
   check(params, {
     userId: String,
-    admin: Match.Optional(Match.OneOf(Boolean, String, undefined)),
-    supportUser: Match.Optional(Match.OneOf(String, undefined))
+    admin: Match.Maybe(Boolean, String, undefined),
+    supportUser: Match.Maybe(String, undefined)
   });
 
   const {userId, supportUser, isAdmin} = params;
@@ -33,7 +33,7 @@ Chatter.addUser = function (params) {
   const user = Meteor.users.findOne(userId);
 
   if (_.isUndefined(user)) {
-    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
+    throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
   Meteor.users.update(
@@ -60,7 +60,7 @@ Chatter.setNickname = function (params) {
   const user = Meteor.users.findOne(userId);
 
   if (_.isUndefined(user)) {
-    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
+    throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
   Meteor.users.update(
@@ -88,7 +88,7 @@ Chatter.removeUser = function (params) {
   const user = Meteor.users.findOne(userId);
 
   if (_.isUndefined(user)) {
-    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
+    throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
   if (!user.profile.isChatterUser) {
@@ -100,7 +100,6 @@ Chatter.removeUser = function (params) {
   Chatter.Message.remove({userId});
   Meteor.users.remove(userId);
 
-  // removes all conversations of this user
   Chatter.UserRoom.find({userId}).fetch().forEach(function (userRoom) {
     const roomId = userRoom.roomId;
     const usersInRoom = Chatter.UserRoom.find({roomId}).count();
@@ -121,12 +120,12 @@ Chatter.removeUser = function (params) {
  * @param {string} params.description The description of the room.
  * @returns {string} roomId
  */
-Chatter.addRoom = function(params) {
+Chatter.addRoom = function (params) {
   check(params, {
     name: String,
     description: String,
-    roomType: Match.Optional(Match.OneOf(String, undefined)),
-    ref: Match.Optional(Match.OneOf(String, undefined))
+    roomType: Match.Maybe(String, undefined),
+    ref: Match.Maybe(String, undefined)
   });
 
   const {name, description, roomType, ref} = params;
@@ -156,7 +155,7 @@ Chatter.removeRoom = function (params) {
 
   const room = Chatter.Room.findOne(params.roomId);
   if (_.isUndefined(room)) {
-    throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
+    throw new Meteor.Error("room-does-not-exist", "room id provided is not correct");
   }
 
   Chatter.UserRoom.remove({'roomId': {'$in': [room._id]}});
@@ -182,9 +181,9 @@ Chatter.addUserToRoom = function (params) {
   const user = Meteor.users.findOne(userId);
 
   if (_.isUndefined(room)) {
-    throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
+    throw new Meteor.Error("room-does-not-exist", "room id provided is not correct");
   } else if (_.isUndefined(user)) {
-    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
+    throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
   const userRoom = new Chatter.UserRoom({
@@ -198,7 +197,6 @@ Chatter.addUserToRoom = function (params) {
 
   userRoom.throwValidationException();
 };
-
 
 /**
  * @summary Removes user from room.
@@ -217,9 +215,9 @@ Chatter.removeUserFromRoom = function (params) {
   const room = Chatter.Room.findOne(roomId);
 
   if (_.isUndefined(room)) {
-    throw new Meteor.Error("room-does-not-exist", "the value provided for the roomId is incorrect");
+    throw new Meteor.Error("room-does-not-exist", "room id provided is not correct");
   } else if (!user) {
-    throw new Meteor.Error("user-does-not-exists", "user id provided is not correct");
+    throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
   const userRoom = Chatter.UserRoom.findOne({roomId, userId: user._id});
