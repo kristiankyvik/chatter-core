@@ -56,10 +56,17 @@ Meteor.methods({
     const userId = Meteor.userId();
     checkIfChatterUser(userId);
 
+    const user = Meteor.users.findOne(userId);
     const room = Chatter.Room.findOne(roomId);
 
     if (_.isUndefined(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
+    }
+
+    const isSupportRoom = room.roomType == "support" ? true : false;
+
+    if (!isSupportRoom && !user.profile.isChatterAdmin) {
+      throw new Meteor.Error("user-is-not-admin", "user must be admin to delete rooms");
     }
 
     const userRooms = Chatter.UserRoom.find({roomId}).fetch();
