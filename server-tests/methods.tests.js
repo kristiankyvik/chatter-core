@@ -129,6 +129,7 @@ describe("Chatter Meteor methods", function () {
 
     after(function () {
       update.restore();
+      Chatter.options.editableNickname = true;
     });
 
     it("user.changeNickname throws exception when parameters are missing", function (done) {
@@ -140,6 +141,17 @@ describe("Chatter Meteor methods", function () {
     });
 
     it("user.changeNickname triggers a Meteor.users.update call", function (done) {
+      Chatter.options.editableNickname = false;
+      Meteor.call("user.changeNickname", "new_nickname", callbackWrapper((error, response) => {
+        assert.isUndefined(response);
+        assert.equal(error.errorType, "Meteor.Error");
+        assert.equal(error.error, "nicknames-not-editable");
+        done();
+      }));
+    });
+
+    it("user.changeNickname triggers a Meteor.users.update call", function (done) {
+      Chatter.options.editableNickname = true;
       Meteor.call("user.changeNickname", "new_nickname", callbackWrapper((error, response) => {
         sinon.assert.calledOnce(update);
         assert.equal(response, "new_nickname");

@@ -8,6 +8,12 @@ Meteor.methods({
     const userId = Meteor.userId();
     checkIfChatterUser(userId);
 
+    // only allow to update nickname if editableNickname has been set to true
+
+    if(!Chatter.options.editableNickname) {
+      throw new Meteor.Error("nicknames-not-editable", "nickname are non editable");
+    }
+
     Meteor.users.update(
       userId,
     { $set: { "profile.chatterNickname": nickname } });
