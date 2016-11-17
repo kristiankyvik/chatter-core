@@ -1,11 +1,15 @@
 Meteor.publish("chatterMessages", function (params) {
   check(params, {
-    roomId: String,
     messageLimit: Number
   });
-  // Only interested in sending rooms that the user has joined
+  if (_.isUndefined(this.userId)) return;
+
+  // Only interested in sending messages from rooms the user is part of
+  const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
+  const roomIds = _.pluck(userRooms, "roomId");
+
   return ChatterMessage.find({
-    roomId: params.roomId
+    roomId: {$in: roomIds}
   }, {
     limit: params.messageLimit,
     fields: {
