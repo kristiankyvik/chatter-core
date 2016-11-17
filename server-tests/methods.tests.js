@@ -400,24 +400,6 @@ describe("Chatter Meteor methods", function () {
       });
     });
 
-    describe("room.users method", function () {
-      it("throws an error if missing parameters", function (done) {
-        Meteor.call("room.users", null, callbackWrapper((error, response) => {
-          assert.isUndefined(response);
-          assert.equal(error.errorType, "Match.Error");
-          done();
-        }));
-      });
-
-      it("returns room users if no missing parameters missing or incorrect", function (done) {
-        Meteor.call("room.users", room._id, callbackWrapper((error, response) => {
-          assert.isUndefined(error);
-          assert.equal(response[0]._id, user._id);
-          done();
-        }));
-      });
-    });
-
     describe("room.leave method", function () {
       it("throws an error if missing parameters", function (done) {
         params = {};

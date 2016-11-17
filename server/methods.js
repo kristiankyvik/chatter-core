@@ -184,15 +184,6 @@ Meteor.methods({
     return archived;
   },
 
-  "room.users" (roomId) {
-    check(roomId, String);
-    const userRooms = Chatter.UserRoom.find({"roomId": roomId}).fetch();
-    const users = userRooms.map(function (userRoom) {
-      return Meteor.users.findOne(userRoom.userId);
-    });
-    return users;
-  },
-
   "room.getUnreadMsgCount" () {
     const userId = Meteor.userId();
     checkIfChatterUser(userId);
