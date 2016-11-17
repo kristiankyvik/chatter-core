@@ -4,4 +4,10 @@ const emptyDatabase = function () {
   Chatter.Message.remove({});
 };
 
-export default emptyDatabase;
+const callbackWrapper = function (fn) {
+  return function (error, response) {
+    setTimeout(() => fn(error, response));
+  };
+};
+
+export {emptyDatabase, callbackWrapper};

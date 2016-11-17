@@ -1,10 +1,4 @@
-import emptyDatabase from "./test-helpers.js";
-
-const callbackWrapper = function (fn) {
-  return function (error, response) {
-    setTimeout(() => fn(error, response));
-  };
-};
+import {emptyDatabase, callbackWrapper} from "./test-helpers.js";
 
 describe("Chatter Meteor methods", function () {
   let room;

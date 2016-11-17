@@ -1,5 +1,5 @@
 import { chai } from "meteor/practicalmeteor:chai";
-import emptyDatabase from "./test-helpers.js";
+import { emptyDatabase } from "./test-helpers.js";
 
 describe("Chatter models", function () {
   const assert = chai.assert;
