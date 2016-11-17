@@ -4,8 +4,7 @@ Chatter = {
     nickProperty: "username",
     initialRoomLoad: 5,
     editableNickname: true,
-    chatName: "Chatter",
-    helpButton: false
+    chatName: "Chatter"
   }
 };
 
