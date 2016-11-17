@@ -6,7 +6,7 @@ describe("Chatter Meteor methods", function () {
   const assert = chai.assert;
 
   const roomAttributes = {
-    name: "test room",
+    name: "test_room",
     description: "test description"
   };
 
@@ -213,6 +213,16 @@ describe("Chatter Meteor methods", function () {
     });
 
     describe("room.delete method", function () {
+      let supportRoomId;
+      before(function () {
+        const params = {
+          name: "support_room",
+          roomType: "support"
+        };
+
+        supportRoomId = new Chatter.Room(params).save();
+      });
+
       it("throws an error when required parameters are missing", function (done) {
         const params = null;
         Meteor.call("room.delete", params, callbackWrapper((error, response) => {
@@ -222,7 +232,20 @@ describe("Chatter Meteor methods", function () {
         }));
       });
 
-      it("returns roomId when succesfull", function (done) {
+      it("throws error when user is not admin", function (done) {
+        console.log("when user not admin");
+        stubs.userId.returns("non_admin_user_id");
+        Meteor.call("room.delete", roomId, callbackWrapper((error, response) => {
+          assert.isUndefined(response);
+          assert.equal(error.errorType, "Meteor.Error");
+          assert.equal(error.error, "user-is-not-admin");
+          done();
+        }));
+      });
+
+      it("returns roomId when call is succesfull user is admin", function (done) {
+        console.log("when user is admin");
+        stubs.userId.returns("id_of_user_one");
         Meteor.call("room.delete", roomId, callbackWrapper((error, response) => {
           assert.isUndefined(error);
           assert.isString(response);
@@ -233,10 +256,22 @@ describe("Chatter Meteor methods", function () {
       it("actually deletes the room", function () {
         assert.isUndefined(Chatter.Room.findOne(roomId));
       });
+
+      it("allows when non admin tries to delete support room", function (done) {
+        stubs.userId.returns("non_admin_user_id");
+        Meteor.call("room.delete", supportRoomId, callbackWrapper((error, response) => {
+          assert.isUndefined(error);
+          assert.isString(response);
+          done();
+        }));
+      });
     });
   });
 
   describe("mixed methods", function () {
+    before(function () {
+      stubs.userId.returns("id_of_user_one");
+    });
     describe("room.join method", function () {
       describe("when parameters are missing or wrong", function () {
         it("returns exception when parameters are missing ", function (done) {

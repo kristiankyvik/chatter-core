@@ -57,6 +57,7 @@ Meteor.methods({
     checkIfChatterUser(userId);
 
     const user = Meteor.users.findOne(userId);
+    console.log(user);
     const room = Chatter.Room.findOne(roomId);
 
     if (_.isUndefined(room)) {
@@ -64,6 +65,10 @@ Meteor.methods({
     }
 
     const isSupportRoom = room.roomType == "support" ? true : false;
+
+    console.log(userId);
+    console.log(room);
+    console.log(isSupportRoom, user.profile.isChatterAdmin);
 
     if (!isSupportRoom && !user.profile.isChatterAdmin) {
       throw new Meteor.Error("user-is-not-admin", "user must be admin to delete rooms");

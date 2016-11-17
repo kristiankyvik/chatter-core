@@ -17,6 +17,15 @@ before(function () {
     }
   });
 
+  stubs.findOne.withArgs("non_admin_user_id").returns({
+    _id: "non_admin_user_id",
+    username: "non_admin_user_nickname",
+    profile: {
+      isChatterUser: true,
+      isChatterAdmin: false
+    }
+  });
+
   stubs.findOne.withArgs({username: "help_user"}).returns({
     _id: "help_user_id",
     username: "help_user",
