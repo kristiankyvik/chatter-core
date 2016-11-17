@@ -57,18 +57,13 @@ Meteor.methods({
     checkIfChatterUser(userId);
 
     const user = Meteor.users.findOne(userId);
-    console.log(user);
     const room = Chatter.Room.findOne(roomId);
 
     if (_.isUndefined(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
-    const isSupportRoom = room.roomType == "support" ? true : false;
-
-    console.log(userId);
-    console.log(room);
-    console.log(isSupportRoom, user.profile.isChatterAdmin);
+    const isSupportRoom = room.roomType === "support" ? true : false;
 
     if (!isSupportRoom && !user.profile.isChatterAdmin) {
       throw new Meteor.Error("user-is-not-admin", "user must be admin to delete rooms");
@@ -78,7 +73,6 @@ Meteor.methods({
 
     room.remove(function (error, result) {
       if (error) throw new Meteor.Error("remove-room-error", "room was not deleted");
-
       userRooms.forEach(function (userRoom) {
         userRoom.remove(function (error, result) {
           if (error) throw new Meteor.Error("remove-userRoom-error", "userRoom was not deleted");

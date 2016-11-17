@@ -233,7 +233,6 @@ describe("Chatter Meteor methods", function () {
       });
 
       it("throws error when user is not admin", function (done) {
-        console.log("when user not admin");
         stubs.userId.returns("non_admin_user_id");
         Meteor.call("room.delete", roomId, callbackWrapper((error, response) => {
           assert.isUndefined(response);
@@ -244,7 +243,6 @@ describe("Chatter Meteor methods", function () {
       });
 
       it("returns roomId when call is succesfull user is admin", function (done) {
-        console.log("when user is admin");
         stubs.userId.returns("id_of_user_one");
         Meteor.call("room.delete", roomId, callbackWrapper((error, response) => {
           assert.isUndefined(error);
