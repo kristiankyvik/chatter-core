@@ -4,9 +4,11 @@ const reqStrNotNull = Validators.and([
   Validators.notNull()
 ]);
 
+// This function increases the ammount of unread messages for all users
+// that have joined the room
 const increaseCounter = function (message) {
   const userRooms = Chatter.UserRoom.find({"roomId": message.roomId, "userId": {$nin: [message.userId]}}).fetch();
-  userRooms.map(function(userRoom) {
+  userRooms.map(function (userRoom) {
     Chatter.UserRoom.update({
       _id: userRoom._id,
     },
@@ -14,6 +16,8 @@ const increaseCounter = function (message) {
   });
 };
 
+// This function updates the lastActive attribute of the room,
+// to be used after new messages have been posted to the room
 const updateRoom = function (roomId) {
   Chatter.Room.update({
     _id: roomId
