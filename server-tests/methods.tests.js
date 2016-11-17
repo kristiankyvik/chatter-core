@@ -255,8 +255,21 @@ describe("Chatter Meteor methods", function () {
         assert.isUndefined(Chatter.Room.findOne(roomId));
       });
 
-      it("allows when non admin tries to delete support room", function (done) {
+      it("throws error when non admin tries to delete a support room he is not a part of", function (done) {
         stubs.userId.returns("non_admin_user_id");
+        Meteor.call("room.delete", supportRoomId, callbackWrapper((error, response) => {
+          assert.isUndefined(response);
+          assert.equal(error.errorType, "Meteor.Error");
+          assert.equal(error.error, "user-not-in-support-room");
+          done();
+        }));
+      });
+
+      it("allows when non admin tries to delete support room he has joined", function (done) {
+        new Chatter.UserRoom({
+          userId: "non_admin_user_id",
+          roomId: supportRoomId
+        }).save();
         Meteor.call("room.delete", supportRoomId, callbackWrapper((error, response) => {
           assert.isUndefined(error);
           assert.isString(response);
