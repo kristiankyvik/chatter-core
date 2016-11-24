@@ -21,13 +21,18 @@ Chatter.configure = function (opts) {
  * @returns {string} chatterId
  */
 Chatter.addUser = function (params) {
+  console.log("adduser", params.supportUser);
   check(params, {
     userId: String,
-    admin: Match.Maybe(Boolean, String, undefined),
-    supportUser: Match.Maybe(String, undefined)
+    admin: Match.Maybe(Match.OneOf(Boolean, null, undefined)),
+    supportUser: Match.Maybe(Match.OneOf(String, null, undefined))
   });
 
-  const {userId, supportUser, isAdmin} = params;
+  const {userId, supportUser, admin} = params;
+
+  const isAdmin = _.isUndefined(admin) ? false : true;
+
+  console.log("admin verison", admin, isAdmin);
 
   const user = Meteor.users.findOne(userId);
 
@@ -123,8 +128,8 @@ Chatter.addRoom = function (params) {
   check(params, {
     name: String,
     description: String,
-    roomType: Match.Maybe(String, undefined),
-    ref: Match.Maybe(String, undefined)
+    roomType: Match.Maybe(Match.OneOf(String, null, undefined)),
+    ref: Match.Maybe(Match.OneOf(String, null, undefined))
   });
 
   const {name, description, roomType, ref} = params;

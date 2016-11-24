@@ -1,7 +1,6 @@
 import { chai } from "meteor/practicalmeteor:chai";
 import sinon from "meteor/practicalmeteor:sinon";
 
-
 before(function () {
   stubs.create("userId", Meteor, "userId");
   stubs.userId.returns("id_of_user_one");
@@ -35,9 +34,6 @@ before(function () {
   });
 
   stubs.findOne.withArgs("non existent userId").returns(undefined);
-
-  // stubs.create("update", Meteor.users, "update");
-  // stubs.update.returns("updated");
 });
 
 import { modelTests } from "./server-tests/models.tests.js";
