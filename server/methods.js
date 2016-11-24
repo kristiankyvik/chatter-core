@@ -65,7 +65,7 @@ Meteor.methods({
     const user = Meteor.users.findOne(userId);
     const room = Chatter.Room.findOne(roomId);
 
-    if (_.isUndefined(room)) {
+    if (_.isEmpty(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
@@ -75,7 +75,7 @@ Meteor.methods({
       throw new Meteor.Error("user-is-not-admin", "user must be admin to delete rooms");
     }
 
-    const userNotInRoom = _.isUndefined(Chatter.UserRoom.findOne({roomId, userId}));
+    const userNotInRoom = _.isEmpty(Chatter.UserRoom.findOne({roomId, userId}));
 
     if (!user.profile.isChatterAdmin && userNotInRoom) {
       throw new Meteor.Error("user-not-in-support-room", "user must habe joined support room to delete it");
@@ -99,7 +99,7 @@ Meteor.methods({
     check(roomId, String);
 
     const room = Chatter.Room.findOne(roomId);
-    return !_.isUndefined(room);
+    return !_.isEmpty(room);
   },
 
   "room.join" (params) {
@@ -118,7 +118,7 @@ Meteor.methods({
 
     const room = Chatter.Room.findOne(params.roomId);
 
-    if (_.isUndefined(room)) {
+    if (_.isEmpty(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
@@ -190,7 +190,7 @@ Meteor.methods({
     const {roomId, archived} = params;
     const userRoom = Chatter.UserRoom.findOne({roomId, userId});
 
-    if (_.isUndefined(userRoom)) {
+    if (_.isEmpty(userRoom)) {
       throw new Meteor.Error("user-not-in-room", "user must be in room");
     }
 
@@ -228,7 +228,7 @@ Meteor.methods({
     checkIfChatterUser(userId);
     const room = Chatter.Room.findOne(roomId);
 
-    if (_.isUndefined(room)) {
+    if (_.isEmpty(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
@@ -262,7 +262,7 @@ Meteor.methods({
 
     const supportUser = Meteor.users.findOne({username: user.profile.supportUser});
 
-    if (_.isUndefined(supportUser)) {
+    if (_.isEmpty(supportUser)) {
       throw new Meteor.Error("user-does-not-exist", "user does not exist");
     }
 
@@ -298,7 +298,7 @@ Meteor.methods({
 
     const room = Chatter.Room.findOne(roomId);
 
-    if (_.isUndefined(room)) {
+    if (_.isEmpty(room)) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 

@@ -21,7 +21,6 @@ Chatter.configure = function (opts) {
  * @returns {string} chatterId
  */
 Chatter.addUser = function (params) {
-  console.log("adduser", params.supportUser);
   check(params, {
     userId: String,
     admin: Match.Maybe(Match.OneOf(Boolean, null, undefined)),
@@ -29,14 +28,10 @@ Chatter.addUser = function (params) {
   });
 
   const {userId, supportUser, admin} = params;
-
-  const isAdmin = _.isUndefined(admin) ? false : true;
-
-  console.log("admin verison", admin, isAdmin);
-
+  const isAdmin = _.isEmpty(admin) ? false : true;
   const user = Meteor.users.findOne(userId);
 
-  if (_.isUndefined(user)) {
+  if (_.isEmpty(user)) {
     throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
@@ -63,7 +58,7 @@ Chatter.setNickname = function (params) {
 
   const user = Meteor.users.findOne(userId);
 
-  if (_.isUndefined(user)) {
+  if (_.isEmpty(user)) {
     throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
@@ -91,7 +86,7 @@ Chatter.removeUser = function (params) {
   let {userId} = params;
   const user = Meteor.users.findOne(userId);
 
-  if (_.isUndefined(user)) {
+  if (_.isEmpty(user)) {
     throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
@@ -158,7 +153,7 @@ Chatter.removeRoom = function (params) {
   });
 
   const room = Chatter.Room.findOne(params.roomId);
-  if (_.isUndefined(room)) {
+  if (_.isEmpty(room)) {
     throw new Meteor.Error("room-does-not-exist", "room id provided is not correct");
   }
 
@@ -184,9 +179,9 @@ Chatter.addUserToRoom = function (params) {
   const room = Chatter.Room.findOne(roomId);
   const user = Meteor.users.findOne(userId);
 
-  if (_.isUndefined(room)) {
+  if (_.isEmpty(room)) {
     throw new Meteor.Error("room-does-not-exist", "room id provided is not correct");
-  } else if (_.isUndefined(user)) {
+  } else if (_.isEmpty(user)) {
     throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
@@ -218,7 +213,7 @@ Chatter.removeUserFromRoom = function (params) {
   const user = Meteor.users.findOne(userId);
   const room = Chatter.Room.findOne(roomId);
 
-  if (_.isUndefined(room)) {
+  if (_.isEmpty(room)) {
     throw new Meteor.Error("room-does-not-exist", "room id provided is not correct");
   } else if (!user) {
     throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
@@ -226,7 +221,7 @@ Chatter.removeUserFromRoom = function (params) {
 
   const userRoom = Chatter.UserRoom.findOne({roomId, userId: user._id});
 
-  if (_.isUndefined(userRoom)) {
+  if (_.isEmpty(userRoom)) {
     throw new Meteor.Error("user-has-not-been-added-to-room", "the user had not been added to room ");
   }
 

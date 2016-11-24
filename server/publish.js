@@ -1,8 +1,12 @@
+import {checkIfChatterUser} from "../utils.js";
+
 Meteor.publish("chatterMessages", function (params) {
   check(params, {
     messageLimit: Number
   });
-  if (_.isUndefined(this.userId)) return;
+  if (_.isEmpty(this.userId)) return;
+
+  checkIfChatterUser(this.userId);
 
   // Only interested in sending messages from rooms the user is part of
   const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
@@ -25,7 +29,9 @@ Meteor.publish("chatterMessages", function (params) {
 });
 
 Meteor.publish("chatterRooms", function () {
-  if (_.isUndefined(this.userId)) return;
+  if (_.isEmpty(this.userId)) return;
+
+  checkIfChatterUser(this.userId);
 
   // Only interested in sending rooms that the user has joined
   const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
@@ -46,7 +52,10 @@ Meteor.publish("chatterRooms", function () {
 
 Meteor.publish("chatterUserRooms", function () {
   // If not admin, only interested in sending userRooms belonging to the user
-  if (_.isUndefined(this.userId)) return;
+  if (_.isEmpty(this.userId)) return;
+
+  checkIfChatterUser(this.userId);
+
   const isAdmin = Meteor.users.findOne(this.userId).profile.isChatterAdmin;
   const selector = {};
 
@@ -67,7 +76,10 @@ Meteor.publish("chatterUserRooms", function () {
 });
 
 Meteor.publish("users", function () {
-  if (_.isUndefined(this.userId)) return;
+  if (_.isEmpty(this.userId)) return;
+
+  checkIfChatterUser(this.userId);
+
   const selector = {};
   const isAdmin = Meteor.users.findOne(this.userId).profile.isChatterAdmin;
 
