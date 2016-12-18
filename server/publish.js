@@ -28,17 +28,17 @@ Meteor.publish("chatterMessages", function (params) {
   });
 });
 
-Meteor.publish("chatterRooms", function () {
+Meteor.publish("chatterRooms", function (roomIds) {
   if (_.isEmpty(this.userId)) return;
 
   checkIfChatterUser(this.userId);
 
   // Only interested in sending rooms that the user has joined
   const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
-  const roomIds = _.pluck(userRooms, "roomId");
+  const theroomids = _.isEmpty(roomIds) ? _.pluck(userRooms, "roomId") : roomIds;
 
   return ChatterRoom.find({
-    "_id": {$in: roomIds}
+    "_id": {$in: theroomids}
   }, {
     fields: {
       name: 1,
