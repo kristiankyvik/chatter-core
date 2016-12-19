@@ -28,7 +28,7 @@ Chatter.addUser = function (params) {
   });
 
   const {userId, supportUser, admin} = params;
-  const isAdmin = _.isEmpty(admin) ? false : true;
+  const isAdmin = admin ? true : false;
   const user = Meteor.users.findOne(userId);
 
   if (_.isEmpty(user)) {
