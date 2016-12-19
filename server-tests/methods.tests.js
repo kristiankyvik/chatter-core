@@ -526,7 +526,6 @@ describe("Chatter Meteor methods", function () {
           _id: "id_of_user_one",
           username: "help_user",
           profile: {
-            isChatterUser: true,
             isChatterAdmin: true,
             supportUser: "help_user"
           }

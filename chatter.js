@@ -38,7 +38,6 @@ Chatter.addUser = function (params) {
   Meteor.users.update(
     {_id: userId},
     { $set: {
-      "profile.isChatterUser": true,
       "profile.isChatterAdmin": isAdmin,
       "profile.chatterNickname": user.username,
       "profile.supportUser": supportUser
@@ -88,10 +87,6 @@ Chatter.removeUser = function (params) {
 
   if (_.isEmpty(user)) {
     throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
-  }
-
-  if (!user.profile.isChatterUser) {
-    throw new Meteor.Error("user-is-not-chatter-user", "user is not a chatter user");
   }
 
   userId = user._id;

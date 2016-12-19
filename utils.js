@@ -5,10 +5,7 @@ const userInRoom = function (userId, roomId) {
 
 const checkIfChatterUser = function (userId) {
   const user = Meteor.users.findOne(userId);
-  const addedToChatter = user.profile.isChatterUser ? true : false;
-  if (!addedToChatter) {
-    throw new Meteor.Error("user-has-no-chatter-user", "user has not been added to chatter");
-  }
+  if (_.isEmpty(user)) throw new Meteor.Error("user-has-no-chatter-user", "user has not been added to chatter");
 };
 
 const capitalize = function (string) {

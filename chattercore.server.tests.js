@@ -11,7 +11,6 @@ before(function () {
     _id: "id_of_user_one",
     username: "user_one_nickname",
     profile: {
-      isChatterUser: true,
       isChatterAdmin: true
     }
   });
@@ -20,17 +19,13 @@ before(function () {
     _id: "non_admin_user_id",
     username: "non_admin_user_nickname",
     profile: {
-      isChatterUser: true,
       isChatterAdmin: false
     }
   });
 
   stubs.findOne.withArgs({username: "help_user"}).returns({
     _id: "help_user_id",
-    username: "help_user",
-    profile: {
-      isChatterUser: true
-    }
+    username: "help_user"
   });
 
   stubs.findOne.withArgs("non existent userId").returns(undefined);
