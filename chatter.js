@@ -1,6 +1,6 @@
 Chatter = {
   options: {
-    messageLimit: 1000,
+    messageLimit: 100,
     nickProperty: "username",
     initialRoomLoad: 5,
     editableNickname: true,

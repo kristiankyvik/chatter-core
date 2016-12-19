@@ -2,18 +2,23 @@ import {checkIfChatterUser} from "../utils.js";
 
 Meteor.publish("chatterMessages", function (params) {
   check(params, {
-    messageLimit: Number
+    messageLimit: Number,
+    roomId: String
   });
+
   if (_.isEmpty(this.userId)) return;
 
   checkIfChatterUser(this.userId);
 
+  const roomId = params.roomId;
+
   // Only interested in sending messages from rooms the user is part of
   const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
   const roomIds = _.pluck(userRooms, "roomId");
+  if (roomIds.indexOf(roomId) < 0) return;
 
   return ChatterMessage.find({
-    roomId: {$in: roomIds}
+    roomId
   }, {
     limit: params.messageLimit,
     fields: {
@@ -51,20 +56,12 @@ Meteor.publish("chatterRooms", function (roomIds) {
 });
 
 Meteor.publish("chatterUserRooms", function () {
-  // If not admin, only interested in sending userRooms belonging to the user
   if (_.isEmpty(this.userId)) return;
 
   checkIfChatterUser(this.userId);
 
-  const isAdmin = Meteor.users.findOne(this.userId).profile.isChatterAdmin;
-  const selector = {};
-
-  if (!isAdmin) {
-    selector.userId = this.userId;
-  }
-
   return ChatterUserRoom.find(
-    selector
+    {}
   , {
     fields: {
       unreadMsgCount: 1,
