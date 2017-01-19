@@ -4,11 +4,13 @@ Chatter.UserRoom = ChatterUserRoom = Astro.Class({
 
   fields: {
     userId: {
-      type: "string"
+      type: "string",
+      index: 1
     },
 
     roomId: {
-      type: "string"
+      type: "string",
+      index: 1
     },
 
     unreadMsgCount: {
