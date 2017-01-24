@@ -22,6 +22,7 @@ Meteor.methods({
   },
 
   "room.create" (params) {
+
     check(params, {
       name: String,
       description: String
