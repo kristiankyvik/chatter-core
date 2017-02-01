@@ -177,6 +177,7 @@ Meteor.methods({
   },
 
   "room.archive" (params) {
+    this.unblock();
     check(params, {
       roomId: String,
       userId: String,
@@ -224,6 +225,7 @@ Meteor.methods({
   },
 
   "room.unreadMsgCount.reset" (roomId) {
+    this.unblock();
     check(roomId, String);
 
     const user = Meteor.user();
@@ -251,6 +253,7 @@ Meteor.methods({
   },
 
   "help.createRoom" () {
+    this.unblock();
     const user = Meteor.user();
     checkIfChatterUser(user);
     const userId = user._id;
@@ -294,6 +297,7 @@ Meteor.methods({
   },
 
   "message.count" (roomId) {
+    this.unblock();
     check(roomId, String);
 
     const user = Meteor.user();
