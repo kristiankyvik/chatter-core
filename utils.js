@@ -1,6 +1,6 @@
 const userInRoom = function (userId, roomId) {
-  const userRooms = Chatter.UserRoom.find({userId: userId, roomId}).fetch();
-  return userRooms.length > 0;
+  const userRooms = Chatter.UserRoom.find({roomId, userId}, {_id: 1, limit: 1}).count();
+  return userRooms > 0;
 };
 
 const checkIfChatterUser = function (user) {

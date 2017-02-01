@@ -75,10 +75,10 @@ Meteor.methods({
       throw new Meteor.Error("user-is-not-admin", "user must be admin to delete rooms");
     }
 
-    const userNotInRoom = _.isEmpty(Chatter.UserRoom.findOne({roomId, userId}));
+    const userRoomCount = Chatter.UserRoom.find({roomId, userId}, {_id: 1, limit: 1}).count();
 
-    if (!user.profile.isChatterAdmin && userNotInRoom) {
-      throw new Meteor.Error("user-not-in-support-room", "user must habe joined support room to delete it");
+    if (!user.profile.isChatterAdmin && userRoomCount === 0) {
+      throw new Meteor.Error("user-not-in-support-room", "user must have joined support room to delete it");
     }
 
     const userRooms = Chatter.UserRoom.find({roomId}).fetch();
@@ -97,9 +97,8 @@ Meteor.methods({
 
   "room.check" (roomId) {
     check(roomId, String);
-
-    const room = Chatter.Room.findOne(roomId);
-    return !_.isEmpty(room);
+    const count = Chatter.Room.find({_id: roomId}, {_id: 1, limit: 1}).count();
+    return count > 0;
   },
 
   "room.join" (params) {
@@ -110,29 +109,30 @@ Meteor.methods({
 
     const user = Meteor.user();
     checkIfChatterUser(user);
-    const userId = user._id;
 
     if(!user.profile.isChatterAdmin) {
-      throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
+      throw new Meteor.Error("user-is-not-admin", "user must be admin to invite users");
     }
 
-    const room = Chatter.Room.findOne(params.roomId);
+    const rooms = Chatter.Room.find({_id: params.roomId}, {_id: 1, limit: 1});
 
-    if (_.isEmpty(room)) {
+    if (rooms.count() === 0) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
+    const roomId = rooms.fetch()[0]._id;
+
     let userNotexists = false;
     _.each(params.invitees, function (id) {
-      let checkUser = Meteor.users.findOne(id);
-      if (checkUser) {
+      let checkUser = Meteor.users.find({_id: id}, {_id: 1, limit: 1}).count();
+      if (checkUser > 0) {
         Chatter.UserRoom.upsert({
           userId: id,
-          roomId: room._id
+          roomId: roomId
         }, {
           $set: {
             userId: id,
-            roomId: room._id
+            roomId: roomId
           }
         });
       } else {
@@ -144,7 +144,7 @@ Meteor.methods({
       throw new Meteor.Error("non-existing-user", "user does not exist");
     }
 
-    return Chatter.UserRoom.findOne()._id;
+    return roomId;
   },
 
   "room.leave" (params) {
@@ -173,9 +173,7 @@ Meteor.methods({
   "room.get" (id) {
     check(id, String);
     checkIfChatterUser(Meteor.userId());
-    return Chatter.Room.findOne({
-      _id: id
-    });
+    return Chatter.Room.findOne(id);
   },
 
   "room.archive" (params) {
@@ -190,9 +188,10 @@ Meteor.methods({
     const userId = user._id;
 
     const {roomId, archived} = params;
-    const userRoom = Chatter.UserRoom.findOne({roomId, userId});
 
-    if (_.isEmpty(userRoom)) {
+    const userRoom = Chatter.UserRoom.find({roomId, userId}, {_id: 1, limit: 1}).count();
+
+    if (userRoom === 0) {
       throw new Meteor.Error("user-not-in-room", "user must be in room");
     }
 
@@ -232,9 +231,9 @@ Meteor.methods({
     checkIfChatterUser(user);
     const userId = user._id;
 
-    const room = Chatter.Room.findOne(roomId);
+    const room = Chatter.Room.find({_id: roomId}, {_id: 1, limit: 1}).count();
 
-    if (_.isEmpty(room)) {
+    if (room === 0) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
@@ -265,13 +264,13 @@ Meteor.methods({
       throw new Meteor.Error("user-has-no-support-user", "user has no support user");
     }
 
-    const supportUser = Meteor.users.findOne({username: user.profile.supportUser});
+    const supportUser = Meteor.users.find({username: user.profile.supportUser}, {_id: 1, limit: 1});
 
-    if (_.isEmpty(supportUser)) {
+    if (supportUser.count() === 0) {
       throw new Meteor.Error("user-does-not-exist", "user does not exist");
     }
 
-    users.push(supportUser._id);
+    users.push(supportUser.fetch()[0]._id);
 
     const room = new Chatter.Room({
       name: "Support Chat (" + capitalize(user.username) + ")",
@@ -301,13 +300,13 @@ Meteor.methods({
     const user = Meteor.user();
     checkIfChatterUser(user);
 
-    const room = Chatter.Room.findOne(roomId);
+    const room = Chatter.Room.find({roomId}, {_id: 1, limit: 1}).count();
 
-    if (_.isEmpty(room)) {
+    if (room === 0) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
 
-    const count = Chatter.Message.find({roomId}).fetch().length;
+    const count = Chatter.Message.find({roomId}).count();
 
     return count;
   }
