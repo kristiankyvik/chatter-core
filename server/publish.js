@@ -29,7 +29,7 @@ Meteor.publish("chatterMessages", function (params) {
       userId: 1,
       createdAt: 1
     },
-    sort: {createdAt: -1}
+    sort: {createdAt: 1}
   });
 });
 
@@ -103,33 +103,3 @@ Meteor.publish("users", function () {
   });
 });
 
-// Meteor.publish("users", function () {
-//   if (_.isEmpty(this.userId)) return;
-
-//   checkIfChatterUser(this.userId);
-
-//   const selector = {};
-//   const isAdmin = Meteor.users.findOne(this.userId).profile.isChatterAdmin;
-
-//   // only sends users that are in rooms where the subscribing user has joined
-//   const roomUserIsPartOf = Chatter.UserRoom.find({userId: this.userId}).fetch();
-//   const roomIdsUserIsPartOf = _.pluck(roomUserIsPartOf, "roomId");
-//   const userRooms = Chatter.UserRoom.find({"roomId": {$in: roomIdsUserIsPartOf}}).fetch();
-//   const userIds = _.pluck(userRooms, "userId");
-
-//   if (!isAdmin) {
-//     selector._id = {"$in": userIds};
-//   }
-
-//   // TODO: Limit ammount of users bieng sent to the client, especially if admin!
-//   return Meteor.users.find(
-//     selector
-//   , {
-//     fields: {
-//       _id: 1,
-//       username: 1,
-//       profile: 1,
-//       status: 1
-//     }
-//   });
-// });

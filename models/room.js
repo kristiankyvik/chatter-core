@@ -28,7 +28,8 @@ Chatter.Room = ChatterRoom = Astro.Class({
     },
 
     ref: {
-      type: "string"
+      type: "string",
+      index: 1
     },
 
     lastActive: {

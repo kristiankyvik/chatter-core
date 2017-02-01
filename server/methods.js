@@ -22,21 +22,19 @@ Meteor.methods({
   },
 
   "room.create" (params) {
-
     check(params, {
       name: String,
       description: String
     });
 
+    const user = Meteor.user();
+    checkIfChatterUser(user);
+
     const {name, description} = params;
-    const userId = Meteor.userId();
-
-    checkIfChatterUser(userId);
-
-    const user = Meteor.users.findOne(userId);
+    const userId = user._id;
 
     if(!user.profile.isChatterAdmin) {
-      throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
+      throw new Meteor.Error("user-is-not-admin", "user must be admin to create rooms");
     }
 
     const room = new Chatter.Room({
@@ -60,10 +58,11 @@ Meteor.methods({
   "room.delete" (roomId) {
     check(roomId, String);
 
-    const userId = Meteor.userId();
-    checkIfChatterUser(userId);
+    const user = Meteor.user();
 
-    const user = Meteor.users.findOne(userId);
+    checkIfChatterUser(user);
+
+    const userId = user._id;
     const room = Chatter.Room.findOne(roomId);
 
     if (_.isEmpty(room)) {
@@ -109,9 +108,9 @@ Meteor.methods({
       invitees: [String]
     });
 
-    const userId = Meteor.userId();
-    checkIfChatterUser(userId);
-    const user = Meteor.users.findOne(userId);
+    const user = Meteor.user();
+    checkIfChatterUser(user);
+    const userId = user._id;
 
     if(!user.profile.isChatterAdmin) {
       throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
@@ -154,11 +153,10 @@ Meteor.methods({
       roomId: String
     });
 
-    const userIdToRemove = params.userId;
+    const user = Meteor.user();
+    checkIfChatterUser(user);
 
-    const userId = Meteor.userId();
-    checkIfChatterUser(userId);
-    const user = Meteor.users.findOne(userId);
+    const userIdToRemove = params.userId;
 
     if(!user.profile.isChatterAdmin) {
       throw new Meteor.Error("user-is-not-admin", "user must be admin to remove users");
@@ -187,7 +185,10 @@ Meteor.methods({
       archived: Boolean
     });
 
-    const userId = Meteor.userId();
+    const user = Meteor.user();
+    checkIfChatterUser(user);
+    const userId = user._id;
+
     const {roomId, archived} = params;
     const userRoom = Chatter.UserRoom.findOne({roomId, userId});
 
@@ -204,8 +205,10 @@ Meteor.methods({
   },
 
   "room.getUnreadMsgCount" () {
-    const userId = Meteor.userId();
-    checkIfChatterUser(userId);
+    const user = Meteor.user();
+    checkIfChatterUser(user);
+    const userId = user._id;
+
     const userRooms = Chatter.UserRoom.find({userId}).fetch();
     const roomIds = userRooms.map(function (userRoom) {return userRoom.roomId;});
     const rooms = Chatter.Room.find({"_id": {$in: roomIds}});
@@ -225,8 +228,10 @@ Meteor.methods({
   "room.unreadMsgCount.reset" (roomId) {
     check(roomId, String);
 
-    const userId = Meteor.userId();
-    checkIfChatterUser(userId);
+    const user = Meteor.user();
+    checkIfChatterUser(user);
+    const userId = user._id;
+
     const room = Chatter.Room.findOne(roomId);
 
     if (_.isEmpty(room)) {
@@ -248,14 +253,13 @@ Meteor.methods({
   },
 
   "help.createRoom" () {
-    const users = [];
-    const userId = Meteor.userId();
+    const user = Meteor.user();
+    checkIfChatterUser(user);
+    const userId = user._id;
 
-    checkIfChatterUser(userId);
+    const users = [];
 
     users.push(userId);
-
-    const user = Meteor.users.findOne(userId);
 
     if (!_.has(user.profile, "supportUser")) {
       throw new Meteor.Error("user-has-no-support-user", "user has no support user");
@@ -294,8 +298,8 @@ Meteor.methods({
   "message.count" (roomId) {
     check(roomId, String);
 
-    const userId = Meteor.userId();
-    checkIfChatterUser(userId);
+    const user = Meteor.user();
+    checkIfChatterUser(user);
 
     const room = Chatter.Room.findOne(roomId);
 
