@@ -2,6 +2,7 @@ import {userInRoom, checkIfChatterUser} from "../utils.js";
 
 Meteor.methods({
   "message.send" (params) {
+    this.unblock();
     check(params, {
       message: String,
       roomId: String

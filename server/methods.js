@@ -209,12 +209,8 @@ Meteor.methods({
     checkIfChatterUser(user);
     const userId = user._id;
 
-    const userRooms = Chatter.UserRoom.find({userId}, {fields: {roomId: 1}}).fetch();
-
-    const roomIds = _.pluck(userRooms, "roomId");
-
-    const archivedCount = Chatter.Room.find({"_id": {$in: roomIds}, archived: true}, {fields: {_id: 1}}).count();
-    const activeCount = Chatter.Room.find({"_id": {$in: roomIds}, archived: false}, {fields: {_id: 1}}).count();
+    const archivedCount = Chatter.UserRoom.find({userId, archived: true}, {fields: {_id: 1}}).count();
+    const activeCount = Chatter.UserRoom.find({userId, archived: false}, {fields: {_id: 1}}).count();
 
     const response = {
       archivedCount,
@@ -297,7 +293,6 @@ Meteor.methods({
   },
 
   "message.count" (roomId) {
-    this.unblock();
     check(roomId, String);
 
     const user = Meteor.user();
