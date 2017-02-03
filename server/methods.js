@@ -63,11 +63,13 @@ Meteor.methods({
     checkIfChatterUser(user);
 
     const userId = user._id;
-    const room = Chatter.Room.find({_id: roomId}, {fields: {roomType: 1}, limit: 1});
+    const roomCursor = Chatter.Room.find({_id: roomId}, {fields: {roomType: 1}, limit: 1});
 
-    if (_.isEmpty(room)) {
+    if (roomCursor.count() === 0) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
     }
+
+    const room = roomCursor.fetch()[0];
 
     const isSupportRoom = room.roomType === "support" ? true : false;
 
@@ -93,12 +95,6 @@ Meteor.methods({
     });
 
     return roomId;
-  },
-
-  "room.check" (roomId) {
-    check(roomId, String);
-    const count = Chatter.Room.find({_id: roomId}, {fields: {_id: 1}, limit: 1}).count();
-    return count > 0;
   },
 
   "room.join" (params) {
