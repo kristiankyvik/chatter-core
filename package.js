@@ -20,7 +20,7 @@ Package.onUse(function (api) {
   api.use('jagi:astronomy-timestamp-behavior@1.0.0');
   api.use('jagi:astronomy-validators');
   api.use('xolvio:cleaner');
-  api.use('xolvio:cleaner');
+  api.use('reywood:publish-composite');
 
   api.addFiles('chatter.js');
   api.addFiles('models/message.js');
