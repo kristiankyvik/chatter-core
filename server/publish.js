@@ -72,7 +72,42 @@ Meteor.publish("chatterUserRooms", function () {
   });
 });
 
-Meteor.publishComposite('roomData', function (userId) {
+
+Meteor.publishComposite('roomData', function (roomId) {
+  return {
+    find: function () {
+      // Find the current user's rooms
+      return Chatter.UserRoom.find({ roomId },
+        {
+          fields: {
+            userId: 1,
+            roomId: 1
+          },
+          sort: {createdAt: 1}
+        }
+      );
+    },
+    children: [
+      {
+        find: function (userRoom) {
+          return Meteor.users.find({_id: userRoom.userId},
+            {
+              fields: {
+                _id: 1,
+                username: 1,
+                profile: 1,
+                status: 1
+              }
+            }
+          );
+        }
+      }
+    ]
+  };
+});
+
+
+Meteor.publishComposite('roomListData', function (userId, refreshPub) {
   return {
     find: function () {
       // Find the current user's rooms
@@ -98,7 +133,8 @@ Meteor.publishComposite('roomData', function (userId) {
                 roomType: 1,
                 lastActive: 1,
                 archived: 1
-              }
+              },
+              sort: {lastActive: -1}
             }
           );
         },
@@ -115,7 +151,7 @@ Meteor.publishComposite('roomData', function (userId) {
                   userId: 1,
                   createdAt: 1
                 },
-                sort: {createdAt: 1}
+                sort: {createdAt: -1}
               }
             );
           },
@@ -125,7 +161,7 @@ Meteor.publishComposite('roomData', function (userId) {
                 {
                   limit: 1,
                   fields: {
-                    status: 1
+                    "status.online": 1
                   }
                 }
               );
