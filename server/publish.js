@@ -49,8 +49,7 @@ Meteor.publish("chatterRooms", function (roomIds) {
       name: 1,
       description: 1,
       roomType: 1,
-      lastActive: 1,
-      createdAt: 1
+      lastActive: 1
     }
   });
 });
@@ -74,6 +73,8 @@ Meteor.publish("chatterUserRooms", function () {
 
 
 Meteor.publishComposite('roomData', function (roomId) {
+  console.log("subbed to roomData");
+
   return {
     find: function () {
       // Find the current user's rooms
@@ -101,13 +102,31 @@ Meteor.publishComposite('roomData', function (roomId) {
             }
           );
         }
+      },
+      {
+        find: function (userRoom) {
+          return Chatter.Room.find({_id: userRoom.roomId},
+            {
+              limit: 1,
+              fields: {
+                name: 1,
+                description: 1,
+                roomType: 1,
+                lastActive: 1,
+                archived: 1,
+                createdAt: 1
+              }
+            }
+          );
+        }
       }
     ]
   };
 });
 
 
-Meteor.publishComposite('roomListData', function (userId, refreshPub) {
+Meteor.publishComposite('roomListData', function (userId) {
+  console.log("subbed to roomlistdata");
   return {
     find: function () {
       // Find the current user's rooms
