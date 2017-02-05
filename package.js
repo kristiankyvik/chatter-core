@@ -21,6 +21,8 @@ Package.onUse(function (api) {
   api.use('jagi:astronomy-validators');
   api.use('xolvio:cleaner');
   api.use('reywood:publish-composite');
+  api.use('tmeasday:publish-counts');
+
 
   api.addFiles('chatter.js');
   api.addFiles('models/message.js');

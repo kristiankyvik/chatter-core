@@ -1,21 +1,13 @@
-import {checkIfChatterUser} from "../utils.js";
-
 Meteor.publish("chatterMessages", function (params) {
+  console.log("subbed to chatterMessages");
   check(params, {
     messageLimit: Number,
     roomId: String
   });
 
-  if (_.isEmpty(this.userId)) return;
-
-  checkIfChatterUser(this.userId);
+  if (_.isEmpty(this.userId)) return this.ready();
 
   const roomId = params.roomId;
-
-  // Only interested in sending messages from rooms the user is part of
-  const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
-  const roomIds = _.pluck(userRooms, "roomId");
-  if (roomIds.indexOf(roomId) < 0) return;
 
   return ChatterMessage.find({
     roomId
@@ -29,51 +21,21 @@ Meteor.publish("chatterMessages", function (params) {
       userId: 1,
       createdAt: 1
     },
-    sort: {createdAt: 1}
+    // Sending only new messages
+    sort: {createdAt: -1}
   });
 });
 
-Meteor.publish("chatterRooms", function (roomIds) {
-  if (_.isEmpty(this.userId)) return;
+Meteor.publishComposite('widgetData', function () {
+  console.log("subbed to widgetData");
+  if (_.isEmpty(this.userId)) return this.ready();
 
-  checkIfChatterUser(this.userId);
-
-  // Only interested in sending rooms that the user has joined
-  const userRooms = Chatter.UserRoom.find({userId: this.userId}).fetch();
-  const theroomids = _.isEmpty(roomIds) ? _.pluck(userRooms, "roomId") : roomIds;
-
-  return ChatterRoom.find({
-    "_id": {$in: theroomids}
-  }, {
-    fields: {
-      name: 1,
-      description: 1,
-      roomType: 1,
-      lastActive: 1
-    }
-  });
+  Counts.publish(this, 'widgetCounter', Chatter.UserRoom.find({userId: this.userId, unreadMsgCount: { $gt: 0 }}));
 });
-
-Meteor.publish("chatterUserRooms", function () {
-  if (_.isEmpty(this.userId)) return;
-
-  checkIfChatterUser(this.userId);
-
-  return ChatterUserRoom.find(
-    {}
-  , {
-    fields: {
-      unreadMsgCount: 1,
-      userId: 1,
-      roomId: 1,
-      archived: 1
-    }
-  });
-});
-
 
 Meteor.publishComposite('roomData', function (roomId) {
   console.log("subbed to roomData");
+  if (_.isEmpty(this.userId)) return this.ready();
 
   return {
     find: function () {
@@ -125,20 +87,27 @@ Meteor.publishComposite('roomData', function (roomId) {
 });
 
 
-Meteor.publishComposite('roomListData', function (userId) {
+Meteor.publishComposite('roomListData', function (params) {
   console.log("subbed to roomlistdata");
+
+  const filter = {
+    fields: {
+      unreadMsgCount: 1,
+      userId: 1,
+      roomId: 1,
+      archived: 1
+    }
+  };
+
+  if (!_.isNull(params.roomLimit)) {
+    filter.limit = params.roomLimit;
+  }
+
   return {
     find: function () {
       // Find the current user's rooms
-      return Chatter.UserRoom.find({ userId },
-        {
-          fields: {
-            unreadMsgCount: 1,
-            userId: 1,
-            roomId: 1,
-            archived: 1
-          }
-        }
+      return Chatter.UserRoom.find({ userId: params.userId },
+        filter
       );
     },
     children: [
@@ -166,7 +135,6 @@ Meteor.publishComposite('roomListData', function (userId) {
                   message: 1,
                   roomId: 1,
                   nickname: 1,
-                  avatar: 1,
                   userId: 1,
                   createdAt: 1
                 },
@@ -192,34 +160,38 @@ Meteor.publishComposite('roomListData', function (userId) {
   };
 });
 
-Meteor.publish("users", function () {
-  if (_.isEmpty(this.userId)) return;
+Meteor.publishComposite('addUsers', function () {
+  console.log("subbed to addUsersData");
+  if (_.isEmpty(this.userId)) return this.ready();
 
-  checkIfChatterUser(this.userId);
-
-  const selector = {};
-  const isAdmin = Meteor.users.findOne(this.userId).profile.isChatterAdmin;
-
-  // only sends users that are in rooms where the subscribing user has joined
-  const roomUserIsPartOf = Chatter.UserRoom.find({userId: this.userId}).fetch();
-  const roomIdsUserIsPartOf = _.pluck(roomUserIsPartOf, "roomId");
-  const userRooms = Chatter.UserRoom.find({"roomId": {$in: roomIdsUserIsPartOf}}).fetch();
-  const userIds = _.pluck(userRooms, "userId");
-
-  if (!isAdmin) {
-    selector._id = {"$in": userIds};
-  }
-
-  // TODO: Limit ammount of users bieng sent to the client, especially if admin!
-  return Meteor.users.find(
-    selector
-  , {
-    fields: {
-      _id: 1,
-      username: 1,
-      profile: 1,
-      status: 1
-    }
-  });
+  return {
+    find: function () {
+      return Chatter.UserRoom.find({},
+        {
+          limit: 5,
+          fields: {
+            userId: 1,
+            roomId: 1
+          }
+        }
+      );
+    },
+    children: [
+      {
+        find: function (userRoom) {
+          return Meteor.users.find({_id: userRoom.userId},
+            {
+              iimit: 5,
+              fields: {
+                _id: 1,
+                username: 1,
+                profile: 1,
+                status: 1
+              }
+            }
+          );
+        }
+      }
+    ]
+  };
 });
-

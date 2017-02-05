@@ -200,20 +200,12 @@ Meteor.methods({
     return archived;
   },
 
-  "room.getUnreadMsgCount" () {
+  "room.getCount" () {
     const user = Meteor.user();
     checkIfChatterUser(user);
     const userId = user._id;
-
-    const archivedCount = Chatter.UserRoom.find({userId, archived: true}, {fields: {_id: 1}}).count();
-    const activeCount = Chatter.UserRoom.find({userId, archived: false}, {fields: {_id: 1}}).count();
-
-    const response = {
-      archivedCount,
-      activeCount
-    };
-
-    return response;
+    const roomCount = Chatter.UserRoom.find({userId}, {fields: {_id: 1}}).count();
+    return {roomCount};
   },
 
   "room.unreadMsgCount.reset" (roomId) {
@@ -294,7 +286,7 @@ Meteor.methods({
     const user = Meteor.user();
     checkIfChatterUser(user);
 
-    const room = Chatter.Room.find({roomId}, {fields: {_id: 1}, limit: 1}).count();
+    const room = Chatter.Room.find({_id: roomId}, {fields: {_id: 1}, limit: 1}).count();
 
     if (room === 0) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
