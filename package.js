@@ -22,7 +22,8 @@ Package.onUse(function (api) {
   api.use('xolvio:cleaner');
   api.use('reywood:publish-composite');
   api.use('tmeasday:publish-counts');
-
+  api.use('meteorhacks:unblock');
+  api.use('meteorhacks:fast-render');
 
   api.addFiles('chatter.js');
   api.addFiles('models/message.js');

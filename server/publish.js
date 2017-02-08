@@ -181,7 +181,6 @@ Meteor.publishComposite('addUsers', function () {
         find: function (userRoom) {
           return Meteor.users.find({_id: userRoom.userId},
             {
-              iimit: 5,
               fields: {
                 _id: 1,
                 username: 1,
