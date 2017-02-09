@@ -131,6 +131,7 @@ Meteor.methods({
             roomId: roomId
           }
         });
+        console.log("succesfully", id, roomId);
       } else {
         userNotexists = true;
       }
@@ -209,7 +210,6 @@ Meteor.methods({
   },
 
   "room.unreadMsgCount.reset" (roomId) {
-    this.unblock();
     check(roomId, String);
 
     const user = Meteor.user();
@@ -296,5 +296,4 @@ Meteor.methods({
 
     return count;
   }
-
 });

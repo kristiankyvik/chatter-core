@@ -1,4 +1,5 @@
 Meteor.publish("chatterMessages", function (params) {
+  this.unblock();
   console.log("subbed to chatterMessages");
   check(params, {
     messageLimit: Number,
@@ -27,6 +28,7 @@ Meteor.publish("chatterMessages", function (params) {
 });
 
 Meteor.publishComposite('widgetData', function () {
+  this.unblock();
   console.log("subbed to widgetData");
   if (_.isEmpty(this.userId)) return this.ready();
 
@@ -34,6 +36,7 @@ Meteor.publishComposite('widgetData', function () {
 });
 
 Meteor.publishComposite('roomData', function (roomId) {
+  this.unblock();
   console.log("subbed to roomData");
   if (_.isEmpty(this.userId)) return this.ready();
 
@@ -88,6 +91,7 @@ Meteor.publishComposite('roomData', function (roomId) {
 
 
 Meteor.publishComposite('roomListData', function (params) {
+  this.unblock();
   console.log("subbed to roomlistdata");
 
   const filter = {
@@ -161,6 +165,7 @@ Meteor.publishComposite('roomListData', function (params) {
 });
 
 Meteor.publishComposite('addUsers', function () {
+  this.unblock();
   console.log("subbed to addUsersData");
   if (_.isEmpty(this.userId)) return this.ready();
 
@@ -168,7 +173,6 @@ Meteor.publishComposite('addUsers', function () {
     find: function () {
       return Chatter.UserRoom.find({},
         {
-          limit: 5,
           fields: {
             userId: 1,
             roomId: 1

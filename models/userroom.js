@@ -20,6 +20,13 @@ Chatter.UserRoom = ChatterUserRoom = Astro.Class({
       }
     },
 
+    lastActive: {
+      type: "date",
+      default: function () {
+        return (new Date());
+      }
+    },
+
     archived: {
       type: "boolean",
       default: function () {
