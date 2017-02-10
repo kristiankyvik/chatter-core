@@ -4,26 +4,20 @@ const reqStrNotNull = Validators.and([
   Validators.notNull()
 ]);
 
-// This function increases the ammount of unread messages for all users
-// that have joined the room
-const increaseCounter = function (message) {
-  const userRooms = Chatter.UserRoom.find({"roomId": message.roomId, "userId": {$nin: [message.userId]}}).fetch();
-  userRooms.map(function (userRoom) {
-    Chatter.UserRoom.update({
-      _id: userRoom._id,
-    },
-    { $inc: {unreadMsgCount: 1} });
-  });
-};
 
-// This function updates the lastActive attribute of the room,
-// to be used after new messages have been posted to the room
-const updateRoom = function (roomId) {
-  Chatter.Room.update({
-    _id: roomId
-  },
-  { $set: {lastActive: new Date()} }
-  );
+const cascadeUpdate = function (message) {
+  if (Meteor.isServer) {
+    // This increases the ammount of unread messages for all users
+    // that have joined the room
+    Chatter.UserRoom.update({userId: {$nin: [message.userId]}, roomId: message.roomId}, {$inc: {unreadMsgCount: 1} }, {multi: true});
+    // This updates the lastActive attribute of the room,
+    // to be used after new messages have been posted to the room
+    Chatter.Room.update({
+      _id: message.roomId
+    },
+    { $set: {lastActive: new Date()} }
+    );
+  }
 };
 
 Chatter.Message = ChatterMessage = Astro.Class({
@@ -58,9 +52,8 @@ Chatter.Message = ChatterMessage = Astro.Class({
   },
 
   events: {
-    beforeSave: function () {
-      increaseCounter(this);
-      updateRoom(this.roomId);
+    afterSave: function () {
+      cascadeUpdate(this);
     }
   },
 
