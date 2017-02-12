@@ -50,7 +50,8 @@ Meteor.publishComposite('roomData', function (roomId) {
         {
           fields: {
             userId: 1,
-            roomId: 1
+            roomId: 1,
+            archived: 1
           },
           sort: {createdAt: 1}
         }
@@ -81,7 +82,6 @@ Meteor.publishComposite('roomData', function (roomId) {
                 description: 1,
                 roomType: 1,
                 lastActive: 1,
-                archived: 1,
                 createdAt: 1
               }
             }
@@ -180,7 +180,7 @@ Meteor.publishComposite('addUsers', function () {
                 _id: 1,
                 username: 1,
                 profile: 1,
-                status: 1
+                "status.online": 1
               }
             }
           );
