@@ -15,13 +15,13 @@ const cascadeUpdate = function (message) {
     if (userRoomIds > 10 ) {
       var bulkOp = Chatter.UserRoom.getCollection().rawCollection().initializeUnorderedBulkOp();
       _.forEach(userRoomIds, function (userRoomId) {
-        bulkOp.find({_id: userRoomId}).update({$inc: {unreadMsgCount: 1}});
+        bulkOp.find({_id: userRoomId}).update({$set: {lastActive: new Date()}, $inc: {unreadMsgCount: 1}});
       });
       bulkOp.execute(function (e, r) {
         console.info('r.nMatched', r.nMatched, 'r.nModified', r.nModified);
       });
     } else {
-      Chatter.UserRoom.update({_id: {$in: userRoomIds}, roomId: message.roomId}, {$inc: {unreadMsgCount: 1} }, {multi: true});
+      Chatter.UserRoom.update({_id: {$in: userRoomIds}}, {$set: {lastActive: new Date()}, $inc: {unreadMsgCount: 1} }, {multi: true});
     }
 
     // This updates the lastActive attribute of the room,

@@ -24,6 +24,8 @@ Package.onUse(function (api) {
   api.use('tmeasday:publish-counts');
   api.use('meteorhacks:unblock');
   api.use('meteorhacks:fast-render');
+  api.use('cottz:publish-relations');
+
 
   api.addFiles('chatter.js');
   api.addFiles('models/message.js');

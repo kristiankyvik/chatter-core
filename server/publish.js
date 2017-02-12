@@ -1,3 +1,6 @@
+import PublishRelations from 'meteor/cottz:publish-relations';
+
+
 Meteor.publish("chatterMessages", function (params) {
   this.unblock();
   console.log("subbed to chatterMessages");
@@ -89,81 +92,67 @@ Meteor.publishComposite('roomData', function (roomId) {
   };
 });
 
-
-Meteor.publishComposite('roomListData', function (params) {
+PublishRelations('roomListData', function (params) {
   this.unblock();
-  console.log("subbed to roomlistdata");
+  console.log("subbed to roomlistdata2");
 
-  const filter = {
+  if (_.isEmpty(this.userId)) return this.ready();
+
+  const userRoomFilter = {
     fields: {
       unreadMsgCount: 1,
       userId: 1,
       roomId: 1,
       archived: 1
     },
-    // This will prioritize sending rooms with many unread messages first
-    sort: {unreadMsgCount: -1}
+    // This will prioritize sending userRooms that have changed recently
+    sort: {lastActive: -1}
   };
 
   if (!_.isNull(params.roomLimit)) {
-    filter.limit = params.roomLimit;
+    userRoomFilter.limit = params.roomLimit;
   }
 
-  return {
-    find: function () {
-      // Find the current user's rooms
-      return Chatter.UserRoom.find({ userId: params.userId },
-        filter
-      );
-    },
-    children: [
-      {
-        find: function (userRoom) {
-          return Chatter.Room.find({_id: userRoom.roomId},
-            {
-              fields: {
-                name: 1,
-                description: 1,
-                roomType: 1,
-                lastActive: 1,
-                archived: 1
-              },
-              sort: {lastActive: -1}
-            }
-          );
-        },
-        children: [{
-          find: function (room) {
-            return Chatter.Message.find({roomId: room._id},
-              {
-                limit: 1,
-                fields: {
-                  message: 1,
-                  roomId: 1,
-                  nickname: 1,
-                  userId: 1,
-                  createdAt: 1
-                },
-                sort: {createdAt: -1}
-              }
-            );
-          },
-          children: [{
-            find: function (message) {
-              return Meteor.users.find({_id: message.userId},
-                {
-                  limit: 1,
-                  fields: {
-                    "status.online": 1
-                  }
-                }
-              );
-            }
-          }]
-        }]
-      }
-    ]
+  const roomFilter = {
+    fields: {
+      _id: 1,
+      name: 1,
+      description: 1,
+      roomType: 1,
+      lastActive: 1
+    }
   };
+
+  const messageFilter = {
+    limit: 1,
+    fields: {
+      message: 1,
+      roomId: 1,
+      nickname: 1,
+      userId: 1,
+      createdAt: 1
+    },
+    sort: {createdAt: -1}
+  };
+
+  const userFilter = {
+    limit: 1,
+    fields: {
+      "status.online": 1
+    }
+  };
+
+  this.cursor(Chatter.UserRoom.find({ userId: params.userId }, userRoomFilter), function (id, userRoom) {
+    this.cursor(Chatter.Room.find({_id: userRoom.roomId}, roomFilter), function (id, room) {
+      this.cursor(Chatter.Message.find({roomId: id}, messageFilter), function (id, message) {
+        this.cursor(Meteor.users.find({_id: message.userId}, userFilter), function (id, user) {
+        });
+      });
+    });
+    //doc.interests = this.paginate({interests: doc.interests}, 5);
+  });
+
+  return this.ready();
 });
 
 Meteor.publishComposite('addUsers', function () {
