@@ -100,7 +100,9 @@ Meteor.publishComposite('roomListData', function (params) {
       userId: 1,
       roomId: 1,
       archived: 1
-    }
+    },
+    // This will prioritize sending rooms with many unread messages first
+    sort: {unreadMsgCount: -1}
   };
 
   if (!_.isNull(params.roomLimit)) {
