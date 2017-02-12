@@ -9,7 +9,21 @@ const cascadeUpdate = function (message) {
   if (Meteor.isServer) {
     // This increases the ammount of unread messages for all users
     // that have joined the room
-    Chatter.UserRoom.update({userId: {$nin: [message.userId]}, roomId: message.roomId}, {$inc: {unreadMsgCount: 1} }, {multi: true});
+    const userRoomIds = _.pluck(Chatter.UserRoom.find({"roomId": message.roomId, "userId": {$nin: [message.userId]}}).fetch(), "_id");
+
+    // Performs update via bulk update if moe than 10 items wll be updated.
+    if (userRoomIds > 10 ) {
+      var bulkOp = Chatter.UserRoom.getCollection().rawCollection().initializeUnorderedBulkOp();
+      _.forEach(userRoomIds, function (userRoomId) {
+        bulkOp.find({_id: userRoomId}).update({$inc: {unreadMsgCount: 1}});
+      });
+      bulkOp.execute(function (e, r) {
+        console.info('r.nMatched', r.nMatched, 'r.nModified', r.nModified);
+      });
+    } else {
+      Chatter.UserRoom.update({_id: {$in: userRoomIds}, roomId: message.roomId}, {$inc: {unreadMsgCount: 1} }, {multi: true});
+    }
+
     // This updates the lastActive attribute of the room,
     // to be used after new messages have been posted to the room
     Chatter.Room.update({
