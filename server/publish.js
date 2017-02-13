@@ -37,63 +37,58 @@ Meteor.publish('widgetData', function () {
   Counts.publish(this, 'widgetCounter', Chatter.UserRoom.find({userId: this.userId, unreadMsgCount: { $gt: 0 }}));
 });
 
-Meteor.publishComposite('roomData', function (roomId) {
+PublishRelations('roomData', function (roomId) {
   this.unblock();
   console.log("subbed to roomData");
   if (_.isEmpty(this.userId)) return this.ready();
 
-  return {
-    find: function () {
-      // Find the current user's rooms
-      return Chatter.UserRoom.find({ roomId },
-        {
-          fields: {
-            userId: 1,
-            roomId: 1,
-            archived: 1
-          },
-          sort: {createdAt: 1}
-        }
-      );
-    },
-    children: [
-      {
-        find: function (userRoom) {
-          return Meteor.users.find({_id: userRoom.userId},
-            {
-              fields: {
-                _id: 1,
-                username: 1,
-                profile: 1,
-                "status.online": 1
-              }
-            }
-          );
-        }
-      },
-      {
-        find: function (userRoom) {
-          return Chatter.Room.find({_id: userRoom.roomId},
-            {
-              limit: 1,
-              fields: {
-                name: 1,
-                description: 1,
-                roomType: 1,
-                lastActive: 1,
-                createdAt: 1
-              }
-            }
-          );
-        }
-      }
-    ]
+  const roomFilter = {
+    fields: {
+      name: 1,
+      description: 1,
+      roomType: 1,
+      lastActive: 1,
+      createdAt: 1
+    }
   };
+
+  const userFilter = {
+    fields: {
+      _id: 1,
+      username: 1,
+      profile: 1,
+      "status.online": 1
+    }
+  };
+
+  const userRoomFilter = {
+    fields: {
+      roomId: 1,
+      userId: 1,
+      name: 1,
+      description: 1,
+      roomType: 1,
+      lastActive: 1,
+      createdAt: 1
+    }
+  };
+
+  let rooms = this.join(Chatter.Room, roomFilter);
+  let users = this.join(Meteor.users, userFilter);
+
+  this.cursor(Chatter.UserRoom.find({ roomId }, userRoomFilter), function (id, userRoom) {
+    users.push(userRoom.userId);
+    rooms.push(userRoom.roomId);
+  });
+
+  users.send();
+  rooms.send();
+  return this.ready();
 });
 
 PublishRelations('roomListData', function (params) {
   this.unblock();
-  console.log("subbed to roomlistdata2");
+  console.log("subbed to roomlistdata");
 
   if (_.isEmpty(this.userId)) return this.ready();
 
@@ -113,6 +108,7 @@ PublishRelations('roomListData', function (params) {
   }
 
   const roomFilter = {
+    limit: 1,
     fields: {
       _id: 1,
       name: 1,
@@ -148,7 +144,6 @@ PublishRelations('roomListData', function (params) {
         });
       });
     });
-    //doc.interests = this.paginate({interests: doc.interests}, 5);
   });
   return this.ready();
 });
