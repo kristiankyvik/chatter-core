@@ -30,11 +30,10 @@ Meteor.publish("chatterMessages", function (params) {
   });
 });
 
-Meteor.publishComposite('widgetData', function () {
+Meteor.publish('widgetData', function () {
   this.unblock();
   console.log("subbed to widgetData");
   if (_.isEmpty(this.userId)) return this.ready();
-
   Counts.publish(this, 'widgetCounter', Chatter.UserRoom.find({userId: this.userId, unreadMsgCount: { $gt: 0 }}));
 });
 
@@ -66,7 +65,7 @@ Meteor.publishComposite('roomData', function (roomId) {
                 _id: 1,
                 username: 1,
                 profile: 1,
-                status: 1
+                "status.online": 1
               }
             }
           );
@@ -151,18 +150,41 @@ PublishRelations('roomListData', function (params) {
     });
     //doc.interests = this.paginate({interests: doc.interests}, 5);
   });
-
   return this.ready();
 });
 
-Meteor.publishComposite('addUsers', function () {
+Meteor.publish('addUsersSearch', function (query) {
+  this.unblock();
+  console.log("subbed to addUserSearch");
+
+  if (_.isEmpty(query)) {
+    return this.ready();
+  }
+
+  const regex = new RegExp(".*" + query + ".*", "i"); // 'i' for case insensitive search
+
+  return Meteor.users.find({
+    username: {$regex: regex}
+  }, {
+    fields: {
+      _id: 1,
+      username: 1,
+      profile: 1,
+      "status.online": 1
+    },
+    // Sending only new messages
+    sort: {createdAt: -1}
+  });
+});
+
+Meteor.publishComposite('addUsers', function (roomId) {
   this.unblock();
   console.log("subbed to addUsersData");
   if (_.isEmpty(this.userId)) return this.ready();
 
   return {
     find: function () {
-      return Chatter.UserRoom.find({},
+      return Chatter.UserRoom.find({roomId},
         {
           fields: {
             userId: 1,
