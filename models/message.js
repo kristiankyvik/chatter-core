@@ -7,12 +7,19 @@ const reqStrNotNull = Validators.and([
 
 const cascadeUpdate = function (message) {
   if (Meteor.isServer) {
+    // This updates the lastActive attribute of the room,
+    // to be used after new messages have been posted to the room
+    Chatter.Room.update({
+      _id: message.roomId
+    },
+    { $set: {lastActive: new Date()} }
+    );
     // This increases the ammount of unread messages for all users
     // that have joined the room
     const userRoomIds = _.pluck(Chatter.UserRoom.find({"roomId": message.roomId, "userId": {$nin: [message.userId]}}).fetch(), "_id");
 
     // Performs update via bulk update if moe than 10 items wll be updated.
-    if (userRoomIds > 10 ) {
+    if (userRoomIds.length > 10 ) {
       var bulkOp = Chatter.UserRoom.getCollection().rawCollection().initializeUnorderedBulkOp();
       _.forEach(userRoomIds, function (userRoomId) {
         bulkOp.find({_id: userRoomId}).update({$set: {lastActive: new Date()}, $inc: {unreadMsgCount: 1}});
@@ -23,14 +30,6 @@ const cascadeUpdate = function (message) {
     } else {
       Chatter.UserRoom.update({_id: {$in: userRoomIds}}, {$set: {lastActive: new Date()}, $inc: {unreadMsgCount: 1} }, {multi: true});
     }
-
-    // This updates the lastActive attribute of the room,
-    // to be used after new messages have been posted to the room
-    Chatter.Room.update({
-      _id: message.roomId
-    },
-    { $set: {lastActive: new Date()} }
-    );
   }
 };
 
