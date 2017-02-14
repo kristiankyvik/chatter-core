@@ -88,7 +88,6 @@ PublishRelations('roomData', function (roomId) {
 Meteor.publishComposite('roomListData', function (params) {
   this.unblock();
   console.log("subbed to roomlistdata");
-
   const filter = {
 
     fields: {

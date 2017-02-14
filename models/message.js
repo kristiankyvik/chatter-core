@@ -25,7 +25,6 @@ const cascadeUpdate = function (message) {
         bulkOp.find({_id: userRoomId}).update({$set: {lastActive: new Date()}, $inc: {unreadMsgCount: 1}});
       });
       bulkOp.execute(function (e, r) {
-        console.info(e);
       });
     } else {
       Chatter.UserRoom.update({_id: {$in: userRoomIds}}, {$set: {lastActive: new Date()}, $inc: {unreadMsgCount: 1} }, {multi: true});
