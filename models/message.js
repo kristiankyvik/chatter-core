@@ -12,7 +12,7 @@ const cascadeUpdate = function (message) {
     Chatter.Room.update({
       _id: message.roomId
     },
-    { $set: {lastActive: new Date()} }
+    { $set: {lastActive: new Date(), lastMessage: message.message, lastMessageOwner: message.userId} }
     );
     // This increases the ammount of unread messages for all users
     // that have joined the room
@@ -25,7 +25,7 @@ const cascadeUpdate = function (message) {
         bulkOp.find({_id: userRoomId}).update({$set: {lastActive: new Date()}, $inc: {unreadMsgCount: 1}});
       });
       bulkOp.execute(function (e, r) {
-        console.info('r.nMatched', r.nMatched, 'r.nModified', r.nModified);
+        console.info(e);
       });
     } else {
       Chatter.UserRoom.update({_id: {$in: userRoomIds}}, {$set: {lastActive: new Date()}, $inc: {unreadMsgCount: 1} }, {multi: true});

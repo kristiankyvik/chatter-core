@@ -119,6 +119,8 @@ Meteor.publishComposite('roomListData', function (params) {
                 description: 1,
                 roomType: 1,
                 lastActive: 1,
+                lastMessage: 1,
+                lastMessageOwner: 1,
                 archived: 1
               },
               sort: {lastActive: -1}
@@ -127,32 +129,15 @@ Meteor.publishComposite('roomListData', function (params) {
         },
         children: [{
           find: function (room) {
-            return Chatter.Message.find({roomId: room._id},
+            return Meteor.users.find({_id: room.lastMessageOwner},
               {
                 limit: 1,
                 fields: {
-                  message: 1,
-                  roomId: 1,
-                  nickname: 1,
-                  userId: 1,
-                  createdAt: 1
-                },
-                sort: {createdAt: -1}
+                  "status.online": 1
+                }
               }
             );
-          },
-          children: [{
-            find: function (message) {
-              return Meteor.users.find({_id: message.userId},
-                {
-                  limit: 1,
-                  fields: {
-                    "status.online": 1
-                  }
-                }
-              );
-            }
-          }]
+          }
         }]
       }
     ]

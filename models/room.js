@@ -39,6 +39,20 @@ Chatter.Room = ChatterRoom = Astro.Class({
       }
     },
 
+    lastMessage: {
+      type: "string",
+      default: function () {
+        return null;
+      }
+    },
+
+    lastMessageOwner: {
+      type: "string",
+      default: function () {
+        return null;
+      }
+    },
+
     createdBy: "string"
   },
 
