@@ -131,7 +131,6 @@ Meteor.methods({
             roomId: roomId
           }
         });
-        console.log("succesfully", id, roomId);
       } else {
         userNotexists = true;
       }

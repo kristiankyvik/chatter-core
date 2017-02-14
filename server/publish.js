@@ -90,12 +90,15 @@ Meteor.publishComposite('roomListData', function (params) {
   console.log("subbed to roomlistdata");
 
   const filter = {
+
     fields: {
       unreadMsgCount: 1,
       userId: 1,
       roomId: 1,
       archived: 1
-    }
+    },
+    // This will prioritize sending userRooms that have changed recently
+    sort: {lastActive: -1}
   };
 
   if (!_.isNull(params.roomLimit)) {
@@ -191,7 +194,6 @@ PublishRelations('addUsers', function (roomId) {
   };
 
   //let users = this.join(Meteor.users, userFilter);
-
   this.cursor(Chatter.UserRoom.find({ roomId }, userRoomFilter), function (id, userRoom) {
     this.cursor(Meteor.users.find({ _id: userRoom.userId }, userFilter), function (id, user) {
     });

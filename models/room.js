@@ -62,7 +62,7 @@ Chatter.Room = ChatterRoom = Astro.Class({
 
   methods: {
     getTimeAgo: function () {
-      return moment(this.get("createdAt")).fromNow();
+      return moment(this.get("lastActive")).fromNow();
     }
   },
 
