@@ -73,16 +73,15 @@ PublishRelations('roomData', function (roomId) {
     }
   };
 
-  let rooms = this.join(Chatter.Room, roomFilter);
-  let users = this.join(Meteor.users, userFilter);
-
-  this.cursor(Chatter.UserRoom.find({ roomId }, userRoomFilter), function (id, userRoom) {
-    users.push(userRoom.userId);
-    rooms.push(userRoom.roomId);
+  //let users = this.join(Meteor.users, userFilter);
+  this.cursor(Chatter.Room.find({ _id: roomId }, roomFilter), function (id, room) {
+    this.cursor(Chatter.UserRoom.find({ roomId }, userRoomFilter), function (id, userRoom) {
+      this.cursor(Meteor.users.find({ _id: userRoom.userId }, userFilter), function (id, user) {
+      });
+      //users.push(userRoom.userId);
+    });
   });
-
-  users.send();
-  rooms.send();
+  //users.send();
   return this.ready();
 });
 
@@ -172,37 +171,37 @@ Meteor.publish('addUsersSearch', function (query) {
   });
 });
 
-Meteor.publishComposite('addUsers', function (roomId) {
+PublishRelations('addUsers', function (roomId) {
   this.unblock();
   console.log("subbed to addUsersData");
   if (_.isEmpty(this.userId)) return this.ready();
 
-  return {
-    find: function () {
-      return Chatter.UserRoom.find({roomId},
-        {
-          fields: {
-            userId: 1,
-            roomId: 1
-          }
-        }
-      );
-    },
-    children: [
-      {
-        find: function (userRoom) {
-          return Meteor.users.find({_id: userRoom.userId},
-            {
-              fields: {
-                _id: 1,
-                username: 1,
-                profile: 1,
-                "status.online": 1
-              }
-            }
-          );
-        }
-      }
-    ]
+  const userFilter = {
+    fields: {
+      _id: 1,
+      username: 1,
+      userId: 1,
+      profile: 1,
+      "status.online": 1
+    }
   };
+
+  const userRoomFilter = {
+    fields: {
+      userId: 1,
+      roomId: 1
+    }
+  };
+
+  //let users = this.join(Meteor.users, userFilter);
+
+  this.cursor(Chatter.UserRoom.find({ roomId }, userRoomFilter), function (id, userRoom) {
+    this.cursor(Meteor.users.find({ _id: userRoom.userId }, userFilter), function (id, user) {
+    });
+    //users.push(userRoom.userId);
+  });
+
+  //users.send();
+  return this.ready();
 });
+

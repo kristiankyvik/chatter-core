@@ -19,7 +19,7 @@ const cascadeUpdate = function (message) {
     const userRoomIds = _.pluck(Chatter.UserRoom.find({"roomId": message.roomId, "userId": {$nin: [message.userId]}}).fetch(), "_id");
 
     // Performs update via bulk update if moe than 10 items wll be updated.
-    if (userRoomIds.length > 10 ) {
+    if (userRoomIds.length > 2 ) {
       var bulkOp = Chatter.UserRoom.getCollection().rawCollection().initializeUnorderedBulkOp();
       _.forEach(userRoomIds, function (userRoomId) {
         bulkOp.find({_id: userRoomId}).update({$set: {lastActive: new Date()}, $inc: {unreadMsgCount: 1}});
