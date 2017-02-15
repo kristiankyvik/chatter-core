@@ -56,9 +56,9 @@ Chatter.Room = ChatterRoom = Astro.Class({
   },
 
   indexes: {
-    roomIndex: {
+    hashedIndex: {
       fields: {
-        ref: 1
+        ref: "hashed"
       },
       options: {}
     }

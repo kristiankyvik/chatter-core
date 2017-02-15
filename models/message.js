@@ -62,10 +62,15 @@ Chatter.Message = ChatterMessage = Astro.Class({
   },
 
   indexes: {
-    messageIndex: {
+    sortIndex: {
       fields: {
-        roomId: 1,
         createdAt: -1
+      },
+      options: {}
+    },
+    hashedIndex: {
+      fields: {
+        roomId: "hashed"
       },
       options: {}
     }

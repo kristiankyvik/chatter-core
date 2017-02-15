@@ -34,13 +34,25 @@ Chatter.UserRoom = ChatterUserRoom = Astro.Class({
   },
 
   indexes: {
-    userRoomIndex: {
+    sortIndex: {
       fields: {
-        roomId: -1,
-        userId: 1,
         lastActive: -1
       },
       options: {}
+    },
+    hashedIndexRoomId: {
+      fields: {
+        roomId: "hashed"
+      },
+      options: {
+      }
+    },
+    hashedIndexUserId: {
+      fields: {
+        userId: "hashed"
+      },
+      options: {
+      }
     }
   },
 
