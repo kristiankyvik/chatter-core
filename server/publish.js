@@ -73,15 +73,15 @@ PublishRelations('roomData', function (roomId) {
     }
   };
 
-  //let users = this.join(Meteor.users, userFilter);
-  this.cursor(Chatter.Room.find({ _id: roomId }, roomFilter), function (id, room) {
-    this.cursor(Chatter.UserRoom.find({ roomId }, userRoomFilter), function (id, userRoom) {
-      this.cursor(Meteor.users.find({ _id: userRoom.userId }, userFilter), function (id, user) {
+  let users = this.join(Meteor.users, userFilter);
+  this.cursor(Chatter.Room.find({ _id: roomId }, roomFilter), function (id, room, changed) {
+    if (!changed) {
+      this.cursor(Chatter.UserRoom.find({ roomId }, userRoomFilter), function (id, userRoom) {
+        users.push(userRoom.userId);
       });
-      //users.push(userRoom.userId);
-    });
+    }
   });
-  //users.send();
+  users.send();
   return this.ready();
 });
 
@@ -192,14 +192,12 @@ PublishRelations('addUsers', function (roomId) {
     }
   };
 
-  //let users = this.join(Meteor.users, userFilter);
+  let users = this.join(Meteor.users, userFilter);
   this.cursor(Chatter.UserRoom.find({ roomId }, userRoomFilter), function (id, userRoom) {
-    this.cursor(Meteor.users.find({ _id: userRoom.userId }, userFilter), function (id, user) {
-    });
-    //users.push(userRoom.userId);
+    users.push(userRoom.userId);
   });
 
-  //users.send();
+  users.send();
   return this.ready();
 });
 
