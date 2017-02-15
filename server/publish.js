@@ -124,8 +124,7 @@ Meteor.publishComposite('roomListData', function (params) {
                 lastMessage: 1,
                 lastMessageOwner: 1,
                 archived: 1
-              },
-              sort: {lastActive: -1}
+              }
             }
           );
         },
@@ -164,9 +163,7 @@ Meteor.publish('addUsersSearch', function (query) {
       username: 1,
       profile: 1,
       "status.online": 1
-    },
-    // Sending only new messages
-    sort: {createdAt: -1}
+    }
   });
 });
 

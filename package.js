@@ -25,7 +25,7 @@ Package.onUse(function (api) {
   api.use('meteorhacks:unblock');
   api.use('meteorhacks:fast-render');
   api.use('cottz:publish-relations@2.0.7');
-
+  api.use('essentials:semantic-ui');
 
   api.addFiles('chatter.js');
   api.addFiles('models/message.js');
