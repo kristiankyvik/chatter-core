@@ -39,7 +39,6 @@ Chatter.Message = ChatterMessage = Astro.Class({
   fields: {
     userId: {
       type: "string",
-      index: 1,
       validator: [
         reqStrNotNull
       ]
@@ -47,7 +46,6 @@ Chatter.Message = ChatterMessage = Astro.Class({
 
     roomId: {
       type: "string",
-      index: 1,
       validator: [
         reqStrNotNull
       ]
@@ -60,6 +58,16 @@ Chatter.Message = ChatterMessage = Astro.Class({
         Validators.maxLength(1000),
         reqStrNotNull
       ]
+    }
+  },
+
+  indexes: {
+    messageIndex: {
+      fields: {
+        roomId: 1,
+        createdAt: -1
+      },
+      options: {}
     }
   },
 

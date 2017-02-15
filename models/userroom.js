@@ -4,13 +4,11 @@ Chatter.UserRoom = ChatterUserRoom = Astro.Class({
 
   fields: {
     userId: {
-      type: "string",
-      index: 1
+      type: "string"
     },
 
     roomId: {
-      type: "string",
-      index: 1
+      type: "string"
     },
 
     unreadMsgCount: {
@@ -33,6 +31,17 @@ Chatter.UserRoom = ChatterUserRoom = Astro.Class({
         return false;
       }
     },
+  },
+
+  indexes: {
+    userRoomIndex: {
+      fields: {
+        roomId: -1,
+        userId: 1,
+        lastActive: -1
+      },
+      options: {}
+    }
   },
 
   validators: {
