@@ -1,6 +1,5 @@
 import PublishRelations from 'meteor/cottz:publish-relations';
 
-
 Meteor.publish("chatterMessages", function (params) {
   this.unblock();
   console.log("subbed to chatterMessages");
@@ -39,6 +38,7 @@ Meteor.publish('widgetData', function () {
 
 PublishRelations('roomData', function (roomId) {
   this.unblock();
+  check(roomId, String);
   console.log("subbed to roomData");
   if (_.isEmpty(this.userId)) return this.ready();
 
@@ -87,6 +87,10 @@ PublishRelations('roomData', function (roomId) {
 
 Meteor.publishComposite('roomListData', function (params) {
   this.unblock();
+  check(params, {
+    roomLimit: Number,
+    userId: String
+  });
   console.log("subbed to roomlistdata");
   const filter = {
 

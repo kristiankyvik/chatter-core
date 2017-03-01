@@ -9,9 +9,12 @@ Meteor.methods({
     });
 
     const {message, roomId} = params;
-    const userId = Meteor.userId();
 
-    checkIfChatterUser(userId);
+    const user = Meteor.user();
+
+    checkIfChatterUser(user);
+
+    const userId = user._id;
 
     if (!userInRoom(userId, roomId)) {
       throw new Meteor.Error("user-not-in-room", "user must be in room to post messages");

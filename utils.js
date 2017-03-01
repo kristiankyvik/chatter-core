@@ -4,7 +4,7 @@ const userInRoom = function (userId, roomId) {
 };
 
 const checkIfChatterUser = function (user) {
-  if (_.isUndefined(user)) throw new Meteor.Error("user-has-no-chatter-user", "user is not logged in");
+  if (_.isEmpty(user)) throw new Meteor.Error("user-has-no-chatter-user", "user is not logged in");
 };
 
 const capitalize = function (string) {

@@ -4,6 +4,8 @@ import sinon from "meteor/practicalmeteor:sinon";
 before(function () {
   stubs.create("userId", Meteor, "userId");
   stubs.userId.returns("id_of_user_one");
+  stubs.create("userId", Meteor, "user");
+  stubs.userId.returns({_id: "id_of_user_one"});
 
   stubs.create("findOne", Meteor.users, "findOne");
 

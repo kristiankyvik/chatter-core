@@ -283,6 +283,7 @@ Meteor.methods({
     check(roomId, String);
 
     const user = Meteor.user();
+    console.log(user);
     checkIfChatterUser(user);
 
     const room = Chatter.Room.find({_id: roomId}, {fields: {_id: 1}, limit: 1}).count();
