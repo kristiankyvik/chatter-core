@@ -1,58 +1,72 @@
-Chatter.Room = ChatterRoom = Astro.Class({
+import { Class } from 'meteor/jagi:astronomy';
+
+Chatter.Room = ChatterRoom = Class.create({
   name: "ChatterRoom",
   collection: new Mongo.Collection("chatterroom"),
 
   fields: {
     name: {
-      type: "string",
-      validator: [
-        Validators.required(),
-        Validators.minLength(1)
-      ]
+      type: String,
+      validators: [{
+        type: "required"
+      }, {
+        type: "string"
+      },
+      {
+        type: "minLength",
+        param: 1
+      }]
     },
-
     description: {
-      type: "string",
-      validator: [
-        Validators.required(),
-        Validators.minLength(1),
-        Validators.maxLength(150)
-      ]
+      type: String,
+      validators: [{
+        type: "required"
+      }, {
+        type: "string"
+      },
+      {
+        type: "minLength",
+        param: 1
+      },
+      {
+        type: 'maxLength',
+        param: 150
+      }]
     },
 
     roomType: {
-      type: "string",
+      type: String,
       default: function () {
         return "default";
       }
     },
 
     ref: {
-      type: "string"
+      type: String
     },
 
     lastActive: {
-      type: "date",
+      type: Date,
       default: function () {
         return (new Date());
       }
     },
 
     lastMessage: {
-      type: "string",
+      type: String,
       default: function () {
         return null;
       }
     },
 
     lastMessageOwner: {
-      type: "string",
+      type: String,
       default: function () {
         return null;
       }
     },
 
-    createdBy: "string"
+    createdBy: String
   },
 
   indexes: {
@@ -68,7 +82,7 @@ Chatter.Room = ChatterRoom = Astro.Class({
 
   },
 
-  methods: {
+  helpers: {
     getTimeAgo: function () {
       return moment(this.get("lastActive")).fromNow();
     }

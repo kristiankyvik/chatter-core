@@ -7,7 +7,7 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-  api.versionsFrom('1.2.0.2');
+  api.versionsFrom('1.4.2.3');
 
   api.use('ecmascript');
   api.use('underscore');
@@ -16,9 +16,8 @@ Package.onUse(function (api) {
   api.use('accounts-base');
 
   api.use('momentjs:moment@2.8.4');
-  api.use('jagi:astronomy@1.2.1');
-  api.use('jagi:astronomy-timestamp-behavior@1.0.0');
-  api.use('jagi:astronomy-validators');
+  api.use('jagi:astronomy@2.3.6');
+  api.use('jagi:astronomy-timestamp-behavior@2.0.0');
   api.use('xolvio:cleaner');
   api.use('reywood:publish-composite');
   api.use('tmeasday:publish-counts');

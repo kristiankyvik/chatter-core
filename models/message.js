@@ -1,9 +1,4 @@
-const reqStrNotNull = Validators.and([
-  Validators.required(),
-  Validators.string(),
-  Validators.notNull()
-]);
-
+import { Class } from 'meteor/jagi:astronomy';
 
 const cascadeUpdate = function (message) {
   if (Meteor.isServer) {
@@ -32,32 +27,51 @@ const cascadeUpdate = function (message) {
   }
 };
 
-Chatter.Message = ChatterMessage = Astro.Class({
+Chatter.Message = ChatterMessage = Class.create({
   name: "ChatterMessage",
   collection: new Mongo.Collection("chattermessage"),
 
   fields: {
     userId: {
-      type: "string",
-      validator: [
-        reqStrNotNull
-      ]
+      type: String,
+      validators: [{
+        type: "required"
+      }, {
+        type: "string"
+      }, {
+        type: "notNull"
+      }]
     },
 
     roomId: {
-      type: "string",
-      validator: [
-        reqStrNotNull
-      ]
+      type: String,
+      validators: [{
+        type: "required"
+      }, {
+        type: "string"
+      }, {
+        type: "notNull"
+      }]
     },
 
     message: {
-      type: "string",
-      validator: [
-        Validators.minLength(1, 'The message must not be empty!'),
-        Validators.maxLength(1000),
-        reqStrNotNull
-      ]
+      type: String,
+      validators: [{
+        type: "required"
+      }, {
+        type: "string"
+      }, {
+        type: "notNull"
+      },
+      {
+        type: "minLength",
+        param: 1,
+        message: "The message must not be empty!"
+      },
+      {
+        type: 'maxLength',
+        param: 1000
+      }]
     }
   },
 
@@ -82,7 +96,7 @@ Chatter.Message = ChatterMessage = Astro.Class({
     }
   },
 
-  methods: {
+  helpers: {
     getTimeAgo: function () {
       return moment(this.get("createdAt")).fromNow();
     },

@@ -1,32 +1,34 @@
-Chatter.UserRoom = ChatterUserRoom = Astro.Class({
+import { Class } from 'meteor/jagi:astronomy';
+
+Chatter.UserRoom = ChatterUserRoom = Class.create({
   name: "ChatterUserRoom",
   collection: new Mongo.Collection("chatteruserroom"),
 
   fields: {
     userId: {
-      type: "string"
+      type: String
     },
 
     roomId: {
-      type: "string"
+      type: String
     },
 
     unreadMsgCount: {
-      type: "number",
+      type: Number,
       default: function () {
         return 0;
       }
     },
 
     lastActive: {
-      type: "date",
+      type: Date,
       default: function () {
         return (new Date());
       }
     },
 
     archived: {
-      type: "boolean",
+      type: Boolean,
       default: function () {
         return false;
       }
@@ -64,7 +66,7 @@ Chatter.UserRoom = ChatterUserRoom = Astro.Class({
 
   },
 
-  methods: {
+  helpers: {
 
   },
 
