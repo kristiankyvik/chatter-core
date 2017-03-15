@@ -1,4 +1,5 @@
-import PublishRelations from 'meteor/cottz:publish-relations';
+import PublishRelations from "meteor/cottz:publish-relations";
+import { Counts } from "meteor/tmeasday:publish-counts";
 
 Meteor.publish("chatterMessages", function (params) {
   this.unblock();
@@ -160,7 +161,7 @@ Meteor.publish('addUsersSearch', function (query) {
   const regex = new RegExp(".*" + query + ".*", "i"); // 'i' for case insensitive search
 
   return Meteor.users.find({
-    username: {$regex: regex}
+    "profile.chatterNickname": {$regex: regex}
   }, {
     fields: {
       _id: 1,

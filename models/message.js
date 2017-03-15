@@ -91,8 +91,8 @@ Chatter.Message = ChatterMessage = Class.create({
   },
 
   events: {
-    afterSave: function () {
-      cascadeUpdate(this);
+    afterSave: function (e) {
+      cascadeUpdate(e.target);
     }
   },
 

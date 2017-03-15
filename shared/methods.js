@@ -26,10 +26,6 @@ Meteor.methods({
       roomId
     });
 
-    if (newMessage.validate()) {
-      return newMessage.save();
-    }
-
-    newMessage.throwValidationException();
+    return newMessage.save();
   }
 });

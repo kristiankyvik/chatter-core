@@ -43,16 +43,19 @@ Meteor.methods({
       createdBy: userId
     });
 
-    if (room.validate()) {
-      const roomId = room.save();
-      new Chatter.UserRoom({
-        userId,
-        roomId
-      }).save();
-      return roomId;
-    }
-
-    room.throwValidationException();
+    let res;
+    room.validate(function (err) {
+      if (err) {
+        res = err;
+      } else {
+        res = room.save();
+        new Chatter.UserRoom({
+          userId,
+          roomId: res
+        }).save();
+      }
+    });
+    return res;
   },
 
   "room.delete" (roomId) {
@@ -249,7 +252,9 @@ Meteor.methods({
       throw new Meteor.Error("user-has-no-support-user", "user has no support user");
     }
 
-    const supportUser = Meteor.users.find({username: user.profile.supportUser}, {fields: {_id: 1}, limit: 1});
+    const query = {};
+    query[Chatter.options.supportUserReference] = user.profile.supportUser;
+    const supportUser = Meteor.users.find(query, {fields: {_id: 1}, limit: 1});
 
     if (supportUser.count() === 0) {
       throw new Meteor.Error("user-does-not-exist", "user does not exist");
@@ -258,32 +263,32 @@ Meteor.methods({
     users.push(supportUser.fetch()[0]._id);
 
     const room = new Chatter.Room({
-      name: "Support Chat (" + capitalize(user.username) + ")",
+      name: "Support Chat",
       description: "A room that gets you the help you need",
       createdBy: userId,
       roomType: "support",
-      ref: user.username
+      ref: userId
     });
 
-    if (room.validate()) {
-      const roomId = room.save();
-      users.forEach(function (id) {
+    let res;
+    room.validate(function (err) {
+      if (err) {
+        res = err;
+      } else {
+        res = room.save();
         new Chatter.UserRoom({
-          userId: id,
-          roomId: roomId
+          userId,
+          roomId: res
         }).save();
-      });
-      return roomId;
-    }
-
-    room.throwValidationException();
+      }
+    });
+    return res;
   },
 
   "message.count" (roomId) {
     check(roomId, String);
 
     const user = Meteor.user();
-    console.log(user);
     checkIfChatterUser(user);
 
     const room = Chatter.Room.find({_id: roomId}, {fields: {_id: 1}, limit: 1}).count();

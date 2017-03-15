@@ -8,8 +8,6 @@ Chatter.Room = ChatterRoom = Class.create({
     name: {
       type: String,
       validators: [{
-        type: "required"
-      }, {
         type: "string"
       },
       {
@@ -20,8 +18,6 @@ Chatter.Room = ChatterRoom = Class.create({
     description: {
       type: String,
       validators: [{
-        type: "required"
-      }, {
         type: "string"
       },
       {
@@ -36,17 +32,20 @@ Chatter.Room = ChatterRoom = Class.create({
 
     roomType: {
       type: String,
+      optional: true,
       default: function () {
         return "default";
       }
     },
 
     ref: {
-      type: String
+      type: String,
+      optional: true
     },
 
     lastActive: {
       type: Date,
+      optional: true,
       default: function () {
         return (new Date());
       }
@@ -54,6 +53,7 @@ Chatter.Room = ChatterRoom = Class.create({
 
     lastMessage: {
       type: String,
+      optional: true,
       default: function () {
         return null;
       }
@@ -61,6 +61,7 @@ Chatter.Room = ChatterRoom = Class.create({
 
     lastMessageOwner: {
       type: String,
+      optional: true,
       default: function () {
         return null;
       }

@@ -3,9 +3,24 @@ Chatter = {
     messageLimit: 25,
     nickProperty: "username",
     initialRoomLoad: 5,
-    editableNickname: true,
-    chatName: "Chatter"
+    editableNickname: false,
+    chatName: "Chatter",
+    customToggleHandlers: false,
+    defaultUsers: [],
+    supportUserReference: "_id"
   }
+};
+
+Chatter.getNickname = function (user) {
+  for (var i = 0, path = this.options.nickProperty.split('.'), len = path.length; i < len; i++) {
+    if ( user[path[i]].constructor === Array ) {
+      user = user[path[i]][ path[i + 1]];
+      i++;
+    } else {
+      user = user[path[i]];
+    }
+  }
+  return user;
 };
 
 Chatter.configure = function (opts) {
@@ -39,7 +54,7 @@ Chatter.addUser = function (params) {
     {_id: userId},
     { $set: {
       "profile.isChatterAdmin": isAdmin,
-      "profile.chatterNickname": user.username,
+      "profile.chatterNickname": Chatter.getNickname(user),
       "profile.supportUser": supportUser
     }}
   );
@@ -64,6 +79,28 @@ Chatter.setNickname = function (params) {
   Meteor.users.update(
     {_id: userId},
     { $set: {"profile.chatterNickname": nickname}}
+  );
+
+  return userId;
+};
+
+Chatter.setSupportUser = function (params) {
+  check(params, {
+    userId: String,
+    supportUserRef: String
+  });
+
+  const {userId, supportUserRef} = params;
+
+  const user = Meteor.users.findOne(userId);
+
+  if (_.isEmpty(user)) {
+    throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
+  }
+
+  Meteor.users.update(
+    {_id: userId},
+    { $set: {"profile.supportUser": supportUserRef}}
   );
 
   return userId;

@@ -20,7 +20,7 @@ Package.onUse(function (api) {
   api.use('jagi:astronomy-timestamp-behavior@2.0.0');
   api.use('xolvio:cleaner');
   api.use('reywood:publish-composite');
-  api.use('tmeasday:publish-counts');
+  api.use('tmeasday:publish-counts@0.8.0');
   api.use('meteorhacks:unblock');
   api.use('meteorhacks:fast-render');
   api.use('cottz:publish-relations@2.0.7');
@@ -38,7 +38,6 @@ Package.onUse(function (api) {
   ], 'server');
 
   api.addFiles([
-    'shared/config.js',
     'shared/methods.js',
     'utils.js'
   ], ['client', 'server']);

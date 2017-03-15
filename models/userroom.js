@@ -15,6 +15,7 @@ Chatter.UserRoom = ChatterUserRoom = Class.create({
 
     unreadMsgCount: {
       type: Number,
+      optional: true,
       default: function () {
         return 0;
       }
@@ -22,6 +23,7 @@ Chatter.UserRoom = ChatterUserRoom = Class.create({
 
     lastActive: {
       type: Date,
+      optional: true,
       default: function () {
         return (new Date());
       }
@@ -29,6 +31,7 @@ Chatter.UserRoom = ChatterUserRoom = Class.create({
 
     archived: {
       type: Boolean,
+      optional: true,
       default: function () {
         return false;
       }
