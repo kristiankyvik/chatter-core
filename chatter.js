@@ -85,6 +85,7 @@ Chatter.setNickname = function (params) {
 };
 
 Chatter.setSupportUser = function (params) {
+  console.log("call of method received with params", params);
   check(params, {
     userId: String,
     supportUserRef: String
@@ -167,11 +168,7 @@ Chatter.addRoom = function (params) {
     ref
   });
 
-  if (room.validate()) {
-    return room.save();
-  }
-
-  room.throwValidationException();
+  return room.save();
 };
 
 /**
@@ -222,11 +219,7 @@ Chatter.addUserToRoom = function (params) {
     roomId
   });
 
-  if (userRoom.validate()) {
-    return userRoom.save();
-  }
-
-  userRoom.throwValidationException();
+  return userRoom.save();
 };
 
 /**
@@ -258,4 +251,20 @@ Chatter.removeUserFromRoom = function (params) {
   }
 
   return userRoom.remove();
+};
+
+/**
+ * @summary Fetches the room given a reference ref.
+ * @locus Server
+ * @param {string} ref Unique string identifying room.
+ */
+Chatter.getRoomId = function (ref) {
+  check(ref, String);
+  const room = Chatter.Room.findOne({ref});
+
+  if (_.isEmpty(room)) {
+    throw new Meteor.Error("ref-does-not-point-to-any-room", "the ref room does not point to any room");
+  }
+
+  return room._id;
 };

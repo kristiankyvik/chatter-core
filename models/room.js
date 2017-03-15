@@ -67,7 +67,10 @@ Chatter.Room = ChatterRoom = Class.create({
       }
     },
 
-    createdBy: String
+    createdBy: {
+      type: String,
+      optional: true
+    }
   },
 
   indexes: {

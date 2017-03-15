@@ -244,10 +244,6 @@ Meteor.methods({
     checkIfChatterUser(user);
     const userId = user._id;
 
-    const users = [];
-
-    users.push(userId);
-
     if (!_.has(user.profile, "supportUser")) {
       throw new Meteor.Error("user-has-no-support-user", "user has no support user");
     }
@@ -260,7 +256,7 @@ Meteor.methods({
       throw new Meteor.Error("user-does-not-exist", "user does not exist");
     }
 
-    users.push(supportUser.fetch()[0]._id);
+    const supportUserId = supportUser.fetch()[0]._id;
 
     const room = new Chatter.Room({
       name: "Support Chat",
@@ -278,6 +274,11 @@ Meteor.methods({
         res = room.save();
         new Chatter.UserRoom({
           userId,
+          roomId: res
+        }).save();
+
+        new Chatter.UserRoom({
+          userId: supportUserId,
           roomId: res
         }).save();
       }
