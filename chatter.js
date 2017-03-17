@@ -214,12 +214,23 @@ Chatter.addUserToRoom = function (params) {
     throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
-  const userRoom = new Chatter.UserRoom({
+  const checkUser = Meteor.users.find({_id: userId}, {fields: {_id: 1}, limit: 1}).count();
+
+  if (checkUser === 0) {
+    throw new Meteor.Error("non-existing-user", "user does not exist");
+  }
+
+  Chatter.UserRoom.upsert({
     userId,
     roomId
+  }, {
+    $set: {
+      userId,
+      roomId
+    }
   });
 
-  return userRoom.save();
+  return roomId;
 };
 
 /**
@@ -260,6 +271,7 @@ Chatter.removeUserFromRoom = function (params) {
  */
 Chatter.getRoomId = function (ref) {
   check(ref, String);
+  console.log("room to be fetched si using ref", ref);
   const room = Chatter.Room.findOne({ref});
 
   if (_.isEmpty(room)) {

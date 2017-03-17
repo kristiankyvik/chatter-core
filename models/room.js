@@ -92,5 +92,12 @@ Chatter.Room = ChatterRoom = Class.create({
     }
   },
 
-  behaviors: ["timestamp"]
+  behaviors: {
+    timestamp: {
+      hasCreatedField: true,
+      createdFieldName: 'createdAt',
+      hasUpdatedField: true,
+      updatedFieldName: 'updatedAt'
+    }
+  }
 });

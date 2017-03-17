@@ -139,6 +139,7 @@ Meteor.publishComposite('roomListData', function (params) {
               {
                 limit: 1,
                 fields: {
+                  profile: 1,
                   "status.online": 1
                 }
               }
