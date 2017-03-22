@@ -1,4 +1,5 @@
-Chatter = {
+
+const Chatter = {
   options: {
     messageLimit: 25,
     nickProperty: "username",
@@ -85,7 +86,6 @@ Chatter.setNickname = function (params) {
 };
 
 Chatter.setSupportUser = function (params) {
-  console.log("call of method received with params", params);
   check(params, {
     userId: String,
     supportUserRef: String
@@ -214,12 +214,6 @@ Chatter.addUserToRoom = function (params) {
     throw new Meteor.Error("user-does-not-exist", "user id provided is not correct");
   }
 
-  const checkUser = Meteor.users.find({_id: userId}, {fields: {_id: 1}, limit: 1}).count();
-
-  if (checkUser === 0) {
-    throw new Meteor.Error("non-existing-user", "user does not exist");
-  }
-
   Chatter.UserRoom.upsert({
     userId,
     roomId
@@ -271,7 +265,6 @@ Chatter.removeUserFromRoom = function (params) {
  */
 Chatter.getRoomId = function (ref) {
   check(ref, String);
-  console.log("room to be fetched si using ref", ref);
   const room = Chatter.Room.findOne({ref});
 
   if (_.isEmpty(room)) {
@@ -280,3 +273,5 @@ Chatter.getRoomId = function (ref) {
 
   return room._id;
 };
+
+export default Chatter;

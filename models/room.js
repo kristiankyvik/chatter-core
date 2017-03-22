@@ -1,4 +1,5 @@
 import { Class } from 'meteor/jagi:astronomy';
+import Chatter  from '../chatter.js';
 
 Chatter.Room = ChatterRoom = Class.create({
   name: "ChatterRoom",

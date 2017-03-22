@@ -45,6 +45,8 @@ Package.onUse(function (api) {
   api.export([
     'Chatter',
   ], ['client', 'server']);
+
+  api.mainModule("main.js");
 });
 
 Package.onTest(function (api) {

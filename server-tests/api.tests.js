@@ -13,7 +13,8 @@ describe("Chatter API methods", function () {
 
     const roomId = new Chatter.Room({
       name: "test room",
-      description: "test room description"
+      description: "test room description",
+      ref: "test-room-ref"
     }).save();
 
     room = Chatter.Room.findOne(roomId);
@@ -174,6 +175,46 @@ describe("Chatter API methods", function () {
     });
   });
 
+  describe("Chatter.setSupportUser method", function () {
+    it("throws an error if parameters are missing", function () {
+      assert.throws(Chatter.setSupportUser.bind(Chatter, {supportUserRef: "test-support-ref"}), Error, "Match error: Missing key \'userId\'");
+    });
+
+    it("call Meteor.users.update() once and returns id if succesfull", function () {
+      const params = {
+        userId: user._id,
+        supportUserRef: "test-support-ref"
+      };
+      const response = Chatter.setSupportUser(params);
+      assert.equal(response, user._id);
+      sinon.assert.calledOnce(update);
+    });
+
+    it("throws an error if user does not exist", function () {
+      const params = {
+        userId: "non-existent-id",
+        supportUserRef: "test-support-ref"
+      };
+      assert.throws(Chatter.setSupportUser.bind(Chatter, params), Error, "user id provided is not correct [user-does-not-exist]");
+    });
+  });
+
+  describe("Chatter.getRoomId method", function () {
+    it("throws an error if parameters are missing", function () {
+      assert.throws(Chatter.getRoomId.bind(Chatter, null), Error, "Match error: Expected string, got null");
+    });
+
+    it("throws an error if ref does not point to a room", function () {
+      assert.throws(Chatter.getRoomId.bind(Chatter, "non-existent-ref"), Error, "the ref room does not point to any room [ref-does-not-point-to-any-room]");
+    });
+
+    it("call returns room id if succesfull", function () {
+      const response = Chatter.getRoomId("test-room-ref");
+      assert.equal(response, room._id);
+    });
+  });
+
+
   describe("Chatter.removeUserFromRoom method", function () {
     it("throws an error if parameters are missing", function () {
       assert.throws(Chatter.removeUserFromRoom.bind(Chatter, {roomId: "test roomId"}), Error, "Match error: Missing key \'userId\'");
@@ -290,4 +331,5 @@ describe("Chatter API methods", function () {
       assert.throws(Chatter.removeUser.bind(Chatter, params), Error, "user id provided is not correct [user-does-not-exist]");
     });
   });
+
 });

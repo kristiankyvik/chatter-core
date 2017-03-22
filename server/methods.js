@@ -1,12 +1,14 @@
 import {userInRoom, checkIfChatterUser, capitalize} from "../utils.js";
+import Chatter from '../chatter.js';
 
 Meteor.methods({
 
   "user.changeNickname" (nickname) {
     check(nickname, String);
 
-    const userId = Meteor.userId();
-    checkIfChatterUser(userId);
+    const user = Meteor.user();
+
+    checkIfChatterUser(user);
 
     // only allow to update nickname if editableNickname has been set to true
 
@@ -15,7 +17,7 @@ Meteor.methods({
     }
 
     Meteor.users.update(
-      userId,
+      user._id,
     { $set: { "profile.chatterNickname": nickname } });
 
     return nickname;
@@ -28,6 +30,7 @@ Meteor.methods({
     });
 
     const user = Meteor.user();
+
     checkIfChatterUser(user);
 
     const {name, description} = params;
@@ -44,17 +47,12 @@ Meteor.methods({
     });
 
     let res;
-    room.validate(function (err) {
-      if (err) {
-        res = err;
-      } else {
-        res = room.save();
-        new Chatter.UserRoom({
-          userId,
-          roomId: res
-        }).save();
-      }
-    });
+    res = room.save();
+    new Chatter.UserRoom({
+      userId,
+      roomId: res
+    }).save();
+
     return res;
   },
 
@@ -75,7 +73,6 @@ Meteor.methods({
     const room = roomCursor.fetch()[0];
 
     const isSupportRoom = room.roomType === "support" ? true : false;
-
     if (!isSupportRoom && !user.profile.isChatterAdmin) {
       throw new Meteor.Error("user-is-not-admin", "user must be admin to delete rooms");
     }
@@ -171,7 +168,7 @@ Meteor.methods({
 
   "room.get" (id) {
     check(id, String);
-    checkIfChatterUser(Meteor.userId());
+    checkIfChatterUser(Meteor.user());
     return Chatter.Room.findOne(id);
   },
 
@@ -266,23 +263,17 @@ Meteor.methods({
       ref: userId
     });
 
-    let res;
-    room.validate(function (err) {
-      if (err) {
-        res = err;
-      } else {
-        res = room.save();
-        new Chatter.UserRoom({
-          userId,
-          roomId: res
-        }).save();
+    const res = room.save();
+    new Chatter.UserRoom({
+      userId,
+      roomId: res
+    }).save();
 
-        new Chatter.UserRoom({
-          userId: supportUserId,
-          roomId: res
-        }).save();
-      }
-    });
+    new Chatter.UserRoom({
+      userId: supportUserId,
+      roomId: res
+    }).save();
+
     return res;
   },
 

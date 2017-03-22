@@ -13,7 +13,7 @@ describe("Chatter Meteor methods", function () {
   before(function () {
     user = Meteor.users.findOne("id_of_user_one");
 
-    const roomId = new Chatter.Room({name: "test_room" }).save();
+    const roomId = new Chatter.Room(roomAttributes).save();
     room = Chatter.Room.findOne(roomId);
     userRoom = new Chatter.UserRoom({userId: user._id, roomId: roomId }).save();
   });
@@ -140,6 +140,16 @@ describe("Chatter Meteor methods", function () {
       }));
     });
 
+    it("user.changeNickname throws an error by default", function (done) {
+      Chatter.options.editableNickname = false;
+      Meteor.call("user.changeNickname", "new_nickname", callbackWrapper((error, response) => {
+        assert.isUndefined(response);
+        assert.equal(error.errorType, "Meteor.Error");
+        assert.equal(error.error, "nicknames-not-editable");
+        done();
+      }));
+    });
+
     it("user.changeNickname triggers a Meteor.users.update call", function (done) {
       Chatter.options.editableNickname = false;
       Meteor.call("user.changeNickname", "new_nickname", callbackWrapper((error, response) => {
@@ -198,38 +208,13 @@ describe("Chatter Meteor methods", function () {
       });
     });
 
-    describe("room.check method", function () {
-      it("throws an error when required parameters are missing", function (done) {
-        Meteor.call("room.check", null, callbackWrapper((error, response) => {
-          assert.isUndefined(response);
-          assert.equal(error.errorType, "Match.Error");
-          done();
-        }));
-      });
-
-      it("returns true when succesfull", function (done) {
-        Meteor.call("room.check", roomId, callbackWrapper((error, response) => {
-          assert.isUndefined(error);
-          assert.isTrue(response);
-          done();
-        }));
-      });
-
-      it("returns undefined when room does not exist", function (done) {
-        Meteor.call("room.check", "none-existing-id", callbackWrapper((error, response) => {
-          assert.isUndefined(error);
-          assert.isFalse(response);
-          done();
-        }));
-      });
-    });
-
     describe("room.delete method", function () {
       let supportRoomId;
       before(function () {
         const params = {
           name: "support_room",
-          roomType: "support"
+          roomType: "support",
+          description: "test description"
         };
 
         supportRoomId = new Chatter.Room(params).save();
@@ -245,7 +230,14 @@ describe("Chatter Meteor methods", function () {
       });
 
       it("throws error when user is not admin", function (done) {
-        stubs.userId.returns("non_admin_user_id");
+        stubs.user.returns({
+          _id: "id_of_user_one",
+          username: "user_one_nickname",
+          profile: {
+            isChatterAdmin: false
+          }
+        });
+
         Meteor.call("room.delete", roomId, callbackWrapper((error, response) => {
           assert.isUndefined(response);
           assert.equal(error.errorType, "Meteor.Error");
@@ -255,7 +247,13 @@ describe("Chatter Meteor methods", function () {
       });
 
       it("returns roomId when call is succesfull user is admin", function (done) {
-        stubs.userId.returns("id_of_user_one");
+        stubs.user.returns({
+          _id: "id_of_user_one",
+          username: "user_one_nickname",
+          profile: {
+            isChatterAdmin: true
+          }
+        });
         Meteor.call("room.delete", roomId, callbackWrapper((error, response) => {
           assert.isUndefined(error);
           assert.isString(response);
@@ -268,7 +266,13 @@ describe("Chatter Meteor methods", function () {
       });
 
       it("throws error when non admin tries to delete a support room he is not a part of", function (done) {
-        stubs.userId.returns("non_admin_user_id");
+        stubs.user.returns({
+          _id: "non_admin_user_id",
+          username: "user_one_nickname",
+          profile: {
+            isChatterAdmin: false
+          }
+        });
         Meteor.call("room.delete", supportRoomId, callbackWrapper((error, response) => {
           assert.isUndefined(response);
           assert.equal(error.errorType, "Meteor.Error");
@@ -293,7 +297,13 @@ describe("Chatter Meteor methods", function () {
 
   describe("mixed methods", function () {
     before(function () {
-      stubs.userId.returns("id_of_user_one");
+      stubs.user.returns({
+        _id: "id_of_user_one",
+        username: "user_one_nickname",
+        profile: {
+          isChatterAdmin: true
+        }
+      });
     });
     describe("room.join method", function () {
       describe("when parameters are missing or wrong", function () {
@@ -522,9 +532,9 @@ describe("Chatter Meteor methods", function () {
       });
 
       it("returns help room id when user has support user assigned", function (done) {
-        stubs.findOne.withArgs("id_of_user_one").returns({
+        stubs.user.returns({
           _id: "id_of_user_one",
-          username: "help_user",
+          username: "username",
           profile: {
             isChatterAdmin: true,
             supportUser: "help_user"

@@ -1,3 +1,5 @@
+import Chatter  from './chatter.js';
+
 const userInRoom = function (userId, roomId) {
   const userRooms = Chatter.UserRoom.find({roomId, userId}, {fields: {_id: 1}, limit: 1}).count();
   return userRooms > 0;

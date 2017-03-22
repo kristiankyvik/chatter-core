@@ -1,3 +1,4 @@
+import Chatter  from '../chatter.js';
 import PublishRelations from "meteor/cottz:publish-relations";
 import { Counts } from "meteor/tmeasday:publish-counts";
 

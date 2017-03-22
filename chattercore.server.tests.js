@@ -2,10 +2,45 @@ import { chai } from "meteor/practicalmeteor:chai";
 import sinon from "meteor/practicalmeteor:sinon";
 
 before(function () {
-  stubs.create("userId", Meteor, "userId");
-  stubs.userId.returns("id_of_user_one");
-  stubs.create("userId", Meteor, "user");
-  stubs.userId.returns({_id: "id_of_user_one"});
+
+  stubs.create("user", Meteor, "user");
+  stubs.user.returns({
+    _id: "id_of_user_one",
+    username: "user_one_nickname",
+    profile: {
+      isChatterAdmin: true
+    }
+  });
+
+  stubs.create("find", Meteor.users, "find");
+
+  stubs.find.withArgs({_id: "id_of_user_one"}, {fields: {_id: 1}, limit: 1}).returns({
+    count: function () {
+      return 1;
+    }
+  });
+
+  stubs.find.withArgs({_id: "non existent userId"}, {fields: {_id: 1}, limit: 1}).returns({
+    count: function () {
+      return 0;
+    }
+  });
+
+  stubs.find.withArgs({ _id: 'help_user' }, {fields: {_id: 1}, limit: 1}).returns({
+    count: function () {
+      return 1;
+    },
+    fetch: function () {
+      return [{
+        _id: "help_user",
+        username: "help user username",
+        profile: {
+          isChatterAdmin: true,
+          supportUser: "help_user"
+        }
+      }];
+    }
+  });
 
   stubs.create("findOne", Meteor.users, "findOne");
 

@@ -1,4 +1,5 @@
 import {userInRoom, checkIfChatterUser} from "../utils.js";
+import Chatter  from '../chatter.js';
 
 Meteor.methods({
   "message.send" (params) {
