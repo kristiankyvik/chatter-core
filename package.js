@@ -1,3 +1,4 @@
+
 Package.describe({
   name: 'jorgeer:chatter-core',
   version: '0.1.0',
@@ -24,7 +25,6 @@ Package.onUse(function (api) {
   api.use('meteorhacks:unblock');
   api.use('meteorhacks:fast-render');
   api.use('cottz:publish-relations@2.0.7');
-  api.use('essentials:semantic-ui');
   api.use('mizzao:user-status@0.6.6');
 
   api.addFiles('chatter.js');

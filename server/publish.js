@@ -4,7 +4,6 @@ import { Counts } from "meteor/tmeasday:publish-counts";
 
 Meteor.publish("chatterMessages", function (params) {
   this.unblock();
-  console.log("subbed to chatterMessages");
   check(params, {
     messageLimit: Number,
     roomId: String
@@ -33,7 +32,6 @@ Meteor.publish("chatterMessages", function (params) {
 
 Meteor.publish('widgetData', function () {
   this.unblock();
-  console.log("subbed to widgetData");
   if (_.isEmpty(this.userId)) return this.ready();
   Counts.publish(this, 'widgetCounter', Chatter.UserRoom.find({userId: this.userId, unreadMsgCount: { $gt: 0 }}));
 });
@@ -41,7 +39,6 @@ Meteor.publish('widgetData', function () {
 PublishRelations('roomData', function (roomId) {
   this.unblock();
   check(roomId, String);
-  console.log("subbed to roomData");
   if (_.isEmpty(this.userId)) return this.ready();
 
   const roomFilter = {
@@ -93,7 +90,6 @@ Meteor.publishComposite('roomListData', function (params) {
     roomLimit: Number,
     userId: String
   });
-  console.log("subbed to roomlistdata");
   const filter = {
 
     fields: {
@@ -154,7 +150,6 @@ Meteor.publishComposite('roomListData', function (params) {
 
 Meteor.publish('addUsersSearch', function (query) {
   this.unblock();
-  console.log("subbed to addUserSearch");
 
   if (_.isEmpty(query)) {
     return this.ready();
@@ -176,7 +171,7 @@ Meteor.publish('addUsersSearch', function (query) {
 
 PublishRelations('addUsers', function (roomId) {
   this.unblock();
-  console.log("subbed to addUsersData");
+
   if (_.isEmpty(this.userId)) return this.ready();
 
   const userFilter = {

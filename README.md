@@ -10,6 +10,14 @@ Chatter has the ambition of becoming an easy to set up in-app chat package that 
 
 ## Usage
 
+### Add the package
+
+By adding it to your packagesfile or running the following command:
+
+```
+meteor add jorgeer:chatter-core
+```
+
 ### Add fields to accounts model
 
 In order for it to work you need to add some fields to the Accounts model. This can be done by adding the following and run in on the server on startup
