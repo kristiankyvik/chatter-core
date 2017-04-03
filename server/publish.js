@@ -47,7 +47,8 @@ PublishRelations('roomData', function (roomId) {
       description: 1,
       roomType: 1,
       lastActive: 1,
-      createdAt: 1
+      createdAt: 1,
+      deletable: 1
     }
   };
 
@@ -56,7 +57,8 @@ PublishRelations('roomData', function (roomId) {
       _id: 1,
       username: 1,
       profile: 1,
-      "status.online": 1
+      "status.online": 1,
+      supportUser: 1
     }
   };
 
@@ -64,16 +66,13 @@ PublishRelations('roomData', function (roomId) {
     fields: {
       roomId: 1,
       userId: 1,
-      name: 1,
-      description: 1,
-      roomType: 1,
       lastActive: 1,
       createdAt: 1
     }
   };
 
   let users = this.join(Meteor.users, userFilter);
-  this.cursor(Chatter.Room.find({ _id: roomId }, roomFilter), function (id, room, changed) {
+  this.cursor(Chatter.Room.find({ _id: roomId }, roomFilter), function (id, room, changed, added) {
     if (!changed) {
       this.cursor(Chatter.UserRoom.find({ roomId }, userRoomFilter), function (id, userRoom) {
         users.push(userRoom.userId);
@@ -87,9 +86,11 @@ PublishRelations('roomData', function (roomId) {
 Meteor.publishComposite('roomListData', function (params) {
   this.unblock();
   check(params, {
-    roomLimit: Number,
-    userId: String
+    roomLimit: Number
   });
+
+  if (_.isEmpty(this.userId)) return this.ready();
+
   const filter = {
 
     fields: {
@@ -109,7 +110,7 @@ Meteor.publishComposite('roomListData', function (params) {
   return {
     find: function () {
       // Find the current user's rooms
-      return Chatter.UserRoom.find({ userId: params.userId },
+      return Chatter.UserRoom.find({ userId: this.userId },
         filter
       );
     },
@@ -125,7 +126,8 @@ Meteor.publishComposite('roomListData', function (params) {
                 lastActive: 1,
                 lastMessage: 1,
                 lastMessageOwner: 1,
-                archived: 1
+                archived: 1,
+                deletable: 1
               }
             }
           );

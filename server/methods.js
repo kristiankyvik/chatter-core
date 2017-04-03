@@ -64,7 +64,7 @@ Meteor.methods({
     checkIfChatterUser(user);
 
     const userId = user._id;
-    const roomCursor = Chatter.Room.find({_id: roomId}, {fields: {roomType: 1}, limit: 1});
+    const roomCursor = Chatter.Room.find({_id: roomId}, {fields: {deletable: 1}, limit: 1});
 
     if (roomCursor.count() === 0) {
       throw new Meteor.Error("non-existing-room", "room does not exist");
@@ -72,8 +72,7 @@ Meteor.methods({
 
     const room = roomCursor.fetch()[0];
 
-    const isSupportRoom = room.roomType === "support" ? true : false;
-    if (!isSupportRoom && !user.profile.isChatterAdmin) {
+    if (!room.deletable && !user.profile.isChatterAdmin) {
       throw new Meteor.Error("user-is-not-admin", "user must be admin to delete rooms");
     }
 
@@ -254,13 +253,13 @@ Meteor.methods({
     }
 
     const supportUserId = supportUser.fetch()[0]._id;
-
     const room = new Chatter.Room({
       name: "Support Chat",
       description: "A room that gets you the help you need",
       createdBy: userId,
       roomType: "support",
-      ref: userId
+      ref: userId,
+      deletable: true
     });
 
     const res = room.save();

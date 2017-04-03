@@ -60,6 +60,14 @@ Chatter.Room = ChatterRoom = Class.create({
       }
     },
 
+    deletable: {
+      type: Boolean,
+      optional: false,
+      default: function () {
+        return false;
+      }
+    },
+
     lastMessageOwner: {
       type: String,
       optional: true,
@@ -84,7 +92,10 @@ Chatter.Room = ChatterRoom = Class.create({
   },
 
   events: {
-
+    beforeRemove (e) {
+      // Remove all chatter userrooms
+      Chatter.UserRoom.remove({'roomId': e.target._id});
+    }
   },
 
   helpers: {
