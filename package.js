@@ -1,9 +1,9 @@
 
 Package.describe({
-  name: 'jorgeer:chatter-core',
+  name: 'hubroedu:chatter-core',
   version: '0.1.0',
   summary: 'Models and chat functionality for chatter',
-  git: 'https://github.com/jorgeer/chatter-core',
+  git: 'git@gitlab.com:hubroedu/chatter-core.git',
   documentation: 'README.md'
 });
 
@@ -54,7 +54,7 @@ Package.onTest(function (api) {
   api.use('accounts-base');
   api.use('ecmascript');
   api.use('practicalmeteor:chai');
-  api.use('jorgeer:chatter-core');
+  api.use('hubroedu:chatter-core');
   api.use('xolvio:cleaner');
   api.use('practicalmeteor:sinon');
   api.addFiles([

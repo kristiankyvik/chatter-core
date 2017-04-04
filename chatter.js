@@ -65,7 +65,7 @@ Chatter.addUser = function (params) {
 
   return userId;
 };
-
+hubroedu:
 Chatter.setNickname = function (params) {
   check(params, {
     userId: String,
