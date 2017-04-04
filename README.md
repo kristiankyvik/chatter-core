@@ -15,7 +15,7 @@ Chatter has the ambition of becoming an easy to set up in-app chat package that 
 By adding it to your packagesfile or running the following command:
 
 ```
-meteor add jorgeer:chatter-core
+meteor add hubroedu:chatter-core
 ```
 
 ### Add fields to accounts model

@@ -1,4 +1,3 @@
-
 Package.describe({
   name: 'hubroedu:chatter-core',
   version: '0.1.0',
@@ -28,6 +27,7 @@ Package.onUse(function (api) {
   api.use('mizzao:user-status@0.6.6');
 
   api.addFiles('chatter.js');
+
   api.addFiles('models/message.js');
   api.addFiles('models/room.js');
   api.addFiles('models/userroom.js');
@@ -35,8 +35,13 @@ Package.onUse(function (api) {
   api.addFiles([
     'server/publish.js',
     'server/access.js',
-    'server/methods.js'
+    'server/methods.js',
+    'chatter.server.js'
   ], 'server');
+
+  api.addFiles([
+    'chatter.client.js'
+  ], 'client');
 
   api.addFiles([
     'shared/methods.js',
