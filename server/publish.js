@@ -33,7 +33,8 @@ Meteor.publish("chatterMessages", function (params) {
 Meteor.publish('widgetData', function () {
   this.unblock();
   if (_.isEmpty(this.userId)) return this.ready();
-  Counts.publish(this, 'widgetCounter', Chatter.UserRoom.find({userId: this.userId, unreadMsgCount: { $gt: 0 }}));
+  Counts.publish(this, 'unreadMsgCounter', Chatter.UserRoom.find({userId: this.userId, unreadMsgCount: { $gt: 0 }}));
+  Counts.publish(this, 'unseenRoomsCounter', Chatter.UserRoom.find({userId: this.userId, seen: false}));
 });
 
 PublishRelations('roomData', function (roomId) {

@@ -207,6 +207,20 @@ Meteor.methods({
     return {roomCount};
   },
 
+  "rooms.unseen.reset" () {
+    const user = Meteor.user();
+    checkIfChatterUser(user);
+    const userId = user._id;
+
+    Chatter.UserRoom.update({
+      userId,
+      seen: false
+    },
+    { $set: {seen: true} });
+
+    return true;
+  },
+
   "room.unreadMsgCount.reset" (roomId) {
     check(roomId, String);
 

@@ -30,6 +30,14 @@ Chatter.UserRoom = ChatterUserRoom = Class.create({
       }
     },
 
+    seen: {
+      type: Boolean,
+      optional: true,
+      default: function () {
+        return false;
+      }
+    },
+
     archived: {
       type: Boolean,
       optional: true,
