@@ -16,7 +16,12 @@ Chatter.configure = function (opts) {
 };
 
 Chatter.getNickname = function (user) {
+  const userId = user._id;
   for (var i = 0, path = this.options.nickProperty.split('.'), len = path.length; i < len; i++) {
+    if (user[path[i]] === undefined) {
+      console.log("[CHATTER]: Chatter nickname path does not match user attribute");
+      return userId;
+    }
     if ( user[path[i]].constructor === Array ) {
       user = user[path[i]][ path[i + 1]];
       i++;
